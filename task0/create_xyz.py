@@ -7,10 +7,7 @@ json_path = sys.argv[1]
 out_filename = sys.argv[2]
 
 df_62k = pd.read_json(json_path, orient='split')
-# with open(out_filename, 'w') as f:
-#     df_62k.to_string(f)
 
-# exit(0)
 print("writing csv now.")
 df_62k.to_csv(
     out_filename,
