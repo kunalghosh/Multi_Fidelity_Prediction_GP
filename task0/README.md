@@ -1,4 +1,4 @@
-# Data generation
+# Task 0 :Data generation
 We have access to the xyz files (In the Pandas dataframe, stored as a json). 
 The scripts in this directory convert the xyz files into input representations
 for machine learning algorithms.
