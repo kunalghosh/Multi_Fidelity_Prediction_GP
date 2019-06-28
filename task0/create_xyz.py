@@ -12,7 +12,7 @@ df_62k = pd.read_json(json_path, orient='split')
 
 # exit(0)
 print("writing csv now.")
-df_62k[:10].to_csv(
+df_62k.to_csv(
     out_filename,
     columns=['xyz_pbe_relaxed'],
     header=False,  # do not print column names
