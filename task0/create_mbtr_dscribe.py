@@ -1,4 +1,5 @@
 ##################################################
+# Author : Kunal Ghosh (kunal.ghosh@aalto.fi)    #
 # Author : Annika Stuke (annika.stuke@aalto.fi)  #
 ##################################################
 
@@ -8,28 +9,16 @@ import ase.io
 
 from scipy.sparse import lil_matrix, save_npz
 
-# import sys
+import sys
 # sys.path.insert(0, '/wrk/astuke/DONOTREMOVE/mbtr/describe')
 
-from dscribe.descriptors import MBTR
 from dscribe.utils.stats import system_stats
+from mbtr_utils import create_mbtr, make_mbtr_desc
 
-
-def create(i_samples):
-    """This is the function that is called by each process but with different
-    parts of the data.
-    """
-    n_i_samples = len(i_samples)
-    i_res = lil_matrix((n_i_samples, n_features))
-    for i, i_sample in enumerate(i_samples):
-        feat = mbtr_desc.create(i_sample)
-        i_res[i, :] = feat
-        print("{} %".format((i + 1) / n_i_samples * 100))
-    return i_res
-
+xyz_file = sys.argv[1]
 
 # Load the systems
-ase_atoms = list(ase.io.iread("../../data/data.xyz", format="xyz"))
+ase_atoms = list(ase.io.iread(xyz_file, format="xyz"))
 
 # Load in statistics from the dataset
 stats = system_stats(ase_atoms)
@@ -39,43 +28,9 @@ min_atomic_number = stats["min_atomic_number"]
 min_distance = stats["min_distance"]
 
 decay_factor = 0.5
-mbtr_desc = MBTR(atomic_numbers=atomic_numbers,
-                 k=[1, 2, 3],
-                 periodic=False,
-                 grid={
-                     "k1": {
-                         "min": min_atomic_number,
-                         "max": max_atomic_number,
-                         "sigma": 0.2,
-                         "n": 200,
-                     },
-                     "k2": {
-                         "min": 0,
-                         "max": 1 / min_distance,
-                         "sigma": 0.02,
-                         "n": 200,
-                     },
-                     "k3": {
-                         "min": -1.0,
-                         "max": 1.0,
-                         "sigma": 0.09,
-                         "n": 200,
-                     }
-                 },
-                 weighting={
-                     "k2": {
-                         "function": "exponential",
-                         "scale": decay_factor,
-                         "cutoff": 1e-3
-                     },
-                     "k3": {
-                         "function": "exponential",
-                         "scale": decay_factor,
-                         "cutoff": 1e-3
-                     },
-                 }
-                 # flatten = False
-                 )
+
+mbtr_desc = make_mbtr_desc(atomic_numbers, max_atomic_number,
+                           min_atomic_number, min_distance, decay_factor)
 
 # Split the data into roughly equivalent chunks for each process
 n_proc = 24  # How many processes are spawned
@@ -84,8 +39,13 @@ atoms_split = (ase_atoms[i * k + min(i, m):(i + 1) * k + min(i + 1, m)]
                for i in range(n_proc))
 n_features = int(mbtr_desc.get_number_of_features())
 
+
 # Initialize a pool of processes, and tell each process in the pool to
 # handle a different part of the data
+def create(indices):
+    return create_mbtr(mbtr_desc, n_features, indices)
+
+
 pool = multiprocessing.Pool(processes=n_proc)
 res = pool.map(create, atoms_split)  # pool.map keeps the order
 
