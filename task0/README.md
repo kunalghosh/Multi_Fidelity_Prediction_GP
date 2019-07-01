@@ -23,6 +23,7 @@ For example, the Many-body tensor representation (MBTR).
 	* Extracts XYZ file
 	* Save the MBTR as scipy.sparse `lil_matrix`
 	* MBTR data saved in `build_mbtr/mbtr.npz`
+> On Triton (SLURM) run `sh sbatch_script.sh`
 	
 4. Load data as follows
 	
