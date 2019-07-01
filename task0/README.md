@@ -18,12 +18,12 @@ For example, the Many-body tensor representation (MBTR).
 2. cd to task0
  `cd Multi_Fidelity_Prediction_GP/task0`
 3. Run the MBTR generation shell script	
-`sh gen_onehost.sh`
+`sh gen_onehost.sh` . On Triton (SLURM) run `sh sbatch_script.sh`
 	* Downloads the dataset	
 	* Extracts XYZ file
 	* Save the MBTR as scipy.sparse `lil_matrix`
 	* MBTR data saved in `build_mbtr/mbtr.npz`
-> On Triton (SLURM) run `sh sbatch_script.sh`
+	
 	
 4. Load data as follows
 	
