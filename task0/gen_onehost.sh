@@ -25,7 +25,7 @@ echo "Created the Conda environment"
 source activate ./myenv
 echo "Activated the conda environment"
 
-pip install dscribe gpytorch ase
+pip install --no-cache-dir dscribe gpytorch ase
 conda install pytorch -c pytorch
 echo "Installed additional packages."
 
