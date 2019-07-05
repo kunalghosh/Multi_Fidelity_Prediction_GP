@@ -7,7 +7,7 @@ from scipy.sparse import load_npz, save_npz
 from sklearn.model_selection import train_test_split
 
 from gp_pytorch import ExactGPModel, model_fit, model_predict
-from utils import get_level
+from mfgp.utils import get_level
 
 np.random.seed(1)
 
