@@ -31,7 +31,7 @@ y_train, y_test = homo_lowfid[ids_train], homo_lowfid[ids_test]
 
 # convert data to tensor
 x_train_tensor = torch.tensor(X_train.toarray())
-x_test_tensor  = torch.tensor(X_test.toarrya())
+x_test_tensor = torch.tensor(X_test.toarray())
 y_train_tensor = torch.tensor(y_train)
 # Setup the GP model
 likelihood = GaussianLikelihood()
