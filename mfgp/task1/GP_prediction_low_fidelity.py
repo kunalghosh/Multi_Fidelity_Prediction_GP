@@ -21,13 +21,13 @@ df_62k = pd.read_json(json_path, orient='split')
 
 homo_lowfid = df_62k.apply(lambda row: get_level(
     row, level_type='HOMO', subset='PBE+vdW_vacuum'),
-                           axis=1)
+                           axis=1).to_numpy()
 
 idxs = np.arange(len(homo_lowfid))
 # Compute training and test splits
 ids_train, ids_test = train_test_split(idxs, test_size=0.3, random_state=0)
 X_train, X_test = mbtr_data[ids_train, :], mbtr_data[ids_test, :]
-y_train, y_test = homo_lowfid[ids_train, :], homo_lowfid[ids_test, :]
+y_train, y_test = homo_lowfid[ids_train], homo_lowfid[ids_test]
 
 # Setup the GP model
 noise = 0.4
@@ -35,10 +35,10 @@ kernel = ConstantKernel(1.0) * RBF(length_scale=1.0)
 gpr = GaussianProcessRegressor(kernel=kernel, alpha=noise**2)
 
 # Fit the model
-gpr.fit(X_train, y_train)
+gpr.fit(X_train.toarray(), y_train)
 
 # predict
-mu_s, std_s = gpr.predict(X_test, return_std=True)
+mu_s, std_s = gpr.predict(X_test.toarray(), return_std=True)
 
 # save data
 np.savez("data.npz",
