@@ -2,6 +2,7 @@ import sys
 
 import numpy as np
 import pandas as pd
+import torch
 from gpytorch.likelihoods import GaussianLikelihood
 from scipy.sparse import load_npz, save_npz
 from sklearn.model_selection import train_test_split
@@ -30,19 +31,19 @@ y_train, y_test = homo_lowfid[ids_train], homo_lowfid[ids_test]
 
 # Setup the GP model
 likelihood = GaussianLikelihood()
-gpr = ExactGPModel(X_train.toarray(), y_train, likelihood)
+gpr = ExactGPModel(torch.tensor(X_train.toarray()), torch.tensor(y_train), likelihood)
 
 # Fit the model
 model_fit(model=gpr,
           likelihood=likelihood,
-          x_train=X_train.toarray(),
-          y_train=y_train)
+          x_train=torch.tensor(X_train.toarray()),
+          y_train=torch.tensor(y_train))
 
 # predict
 mu_s = model_predict(
     model=gpr,
     likelihood=likelihood,
-    x_test=X_test.toarray(),
+    x_test=torch.tensor(X_test.toarray()),
 )
 
 # save data
