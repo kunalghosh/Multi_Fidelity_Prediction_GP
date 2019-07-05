@@ -29,21 +29,25 @@ ids_train, ids_test = train_test_split(idxs, test_size=0.3, random_state=0)
 X_train, X_test = mbtr_data[ids_train, :], mbtr_data[ids_test, :]
 y_train, y_test = homo_lowfid[ids_train], homo_lowfid[ids_test]
 
+# convert data to tensor
+x_train_tensor = torch.tensor(X_train.toarray())
+x_test_tensor  = torch.tensor(X_test.toarrya())
+y_train_tensor = torch.tensor(y_train)
 # Setup the GP model
 likelihood = GaussianLikelihood()
-gpr = ExactGPModel(torch.tensor(X_train.toarray()), torch.tensor(y_train), likelihood)
+gpr = ExactGPModel(x_train_tensor, y_train_tensor, likelihood)
 
 # Fit the model
 model_fit(model=gpr,
           likelihood=likelihood,
-          x_train=torch.tensor(X_train.toarray()),
-          y_train=torch.tensor(y_train))
+          x_train=x_train_tensor,
+          y_train=y_train_tensor)
 
 # predict
 mu_s = model_predict(
     model=gpr,
     likelihood=likelihood,
-    x_test=torch.tensor(X_test.toarray()),
+    x_test=x_test_tensor,
 )
 
 # save data
