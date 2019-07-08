@@ -1,6 +1,6 @@
 import gpytorch
 import torch
-from gpytorch.kernels import ScaleKernel, RBFKernel
+from gpytorch.kernels import ScaleKernel, RBFKernel, InducingPointKernel
 from gpytorch.distributions import MultivariateNormal
 
 
@@ -8,7 +8,10 @@ class ExactGPModel(gpytorch.models.ExactGP):
     def __init__(self, train_x, train_y, likelihood):
         super(ExactGPModel, self).__init__(train_x, train_y, likelihood)
         self.mean_module = gpytorch.means.ConstantMean()
-        self.covar_module = ScaleKernel(RBFKernel())
+        self.base_covar_module = ScaleKernel(RBFKernel())
+        self.covar_module = InducingPointKernel(self.base_covar_module,
+                                                inducing_points=train_x[:200],
+                                                likelihood=likelihood)
 
     def forward(self, x):
         mean_x = self.mean_module(x)
@@ -35,20 +38,22 @@ def model_fit(model=None,
         output = model(x_train)
         loss = -mll(output, y_train)
         loss.backward()
-        print(f"Iter {i+1}/{max_epochs} - Loss {loss.item()} "
-              f"lengthscale {model.covar_module[1].lengthscale.item()}"
-              f" noise {model.likelihood.noise.item()}")
+        print(
+            f"Iter {i+1}/{max_epochs} - Loss {loss.item()} "
+            # f"lengthscale {model.covar_module[1].lengthscale.item()}"
+            # f" noise {model.likelihood.noise.item()}")
+        )
         optimizer.step()
 
 
 def model_predict(model=None, likelihood=None, x_test=None):
-    assert model is None, f"Model is {model}, pass a valid GPyTorch model"
-    assert likelihood is None, f"Likelihood is {likelihood}, pass same GPyTorch likelihood used during training."
-    assert x_test is None, "x_test is {x_test}, pass test points at which to make predictions."
+    assert model is not None, f"Model is {model}, pass a valid GPyTorch model"
+    assert likelihood is not None, f"Likelihood is {likelihood}, pass same GPyTorch likelihood used during training."
+    assert x_test is not None, "x_test is {x_test}, pass test points at which to make predictions."
 
     model.eval()
     likelihood.eval()
 
-    with torch.no_grad(), gpytorch.setttings.fast_pred_var():
+    with torch.no_grad(), gpytorch.settings.fast_pred_var():
         observed_pred = likelihood(model(x_test))
         return observed_pred
