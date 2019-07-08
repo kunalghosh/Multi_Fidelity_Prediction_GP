@@ -26,6 +26,7 @@ homo_lowfid = df_62k.apply(lambda row: get_level(
 idxs = np.arange(len(homo_lowfid))
 # Compute training and test splits
 ids_train, ids_test = train_test_split(idxs, test_size=0.3, random_state=0)
+mbtr_data.data = np.nan_to_num(mbtr_data.data)
 X_train, X_test = mbtr_data[ids_train, :], mbtr_data[ids_test, :]
 y_train, y_test = homo_lowfid[ids_train], homo_lowfid[ids_test]
 
