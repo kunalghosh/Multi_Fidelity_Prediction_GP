@@ -53,7 +53,7 @@ mu_s = model_predict(
 
 # save data
 np.savez(
-    "gpytorch_data.npz",
+    "gpytorch_sparse_data.npz",
     ids_train=ids_train,
     ids_test=ids_test,
     homo_lowfid_train=y_train,
@@ -62,5 +62,5 @@ np.savez(
 )
 
 # save the sparse matrices
-save_npz("gpytorch_train_mbtr_sparsematrix.npz", X_train.tocsr())
-save_npz("gpytorch_test_mbtr_sparsematrix.npz", X_test.tocsr())
+save_npz("gpytorch_sparse_train_mbtr_sparsematrix.npz", X_train.tocsr())
+save_npz("gpytorch_sparse_test_mbtr_sparsematrix.npz", X_test.tocsr())
