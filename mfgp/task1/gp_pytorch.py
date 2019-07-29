@@ -1,16 +1,22 @@
+import pdb
 import gpytorch
 import torch
-from gpytorch.kernels import ScaleKernel, RBFKernel, InducingPointKernel
+from torch.optim.lr_scheduler import StepLR
+from gpytorch.kernels import ScaleKernel, RBFKernel, InducingPointKernel, MaternKernel
+from sklearn.cluster import KMeans
 from gpytorch.distributions import MultivariateNormal
 
 
 class ExactGPModel(gpytorch.models.ExactGP):
-    def __init__(self, train_x, train_y, likelihood):
+    def __init__(self, train_x, train_y, likelihood, z):
         super(ExactGPModel, self).__init__(train_x, train_y, likelihood)
         self.mean_module = gpytorch.means.ConstantMean()
         self.base_covar_module = ScaleKernel(RBFKernel())
+        self.M = 500  # number of inducing points
+        if z is None:
+            z = train_x[:self.M]
         self.covar_module = InducingPointKernel(self.base_covar_module,
-                                                inducing_points=train_x[:200],
+                                                inducing_points=z,
                                                 likelihood=likelihood)
 
     def forward(self, x):
@@ -19,10 +25,28 @@ class ExactGPModel(gpytorch.models.ExactGP):
         return MultivariateNormal(mean_x, covar_x)
 
 
-def model_fit(model=None,
-              likelihood=None,
-              x_train=None,
-              y_train=None,
+class ExactGPModel_Matern(gpytorch.models.ExactGP):
+    def __init__(self, train_x, train_y, likelihood, z):
+        super(ExactGPModel_Matern, self).__init__(train_x, train_y, likelihood)
+        self.mean_module = gpytorch.means.ConstantMean()
+        self.base_covar_module = ScaleKernel(MaternKernel(nu=2.5))
+        self.M = 500  # number of inducing points
+        if z is None:
+            z = train_x[:self.M]
+        self.covar_module = InducingPointKernel(self.base_covar_module,
+                                                inducing_points=z,
+                                                likelihood=likelihood)
+
+    def forward(self, x):
+        mean_x = self.mean_module(x)
+        covar_x = self.covar_module(x)
+        return MultivariateNormal(mean_x, covar_x)
+
+
+def model_fit(model,
+              likelihood,
+              x_train,
+              y_train,
               torch_optimizer=torch.optim.Adam,
               lr=0.1,
               max_epochs=50):
@@ -31,6 +55,7 @@ def model_fit(model=None,
     likelihood.train()
 
     optimizer = torch_optimizer(model.parameters(), lr=lr)
+    scheduler = StepLR(optimizer, step_size=250, gamma=0.5)
     mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
 
     for i in range(max_epochs):
@@ -43,7 +68,12 @@ def model_fit(model=None,
             # f"lengthscale {model.covar_module[1].lengthscale.item()}"
             # f" noise {model.likelihood.noise.item()}")
         )
-        optimizer.step()
+        scheduler.step()
+        if isinstance(optimizer, torch.optim.LBFGS):
+            closure = lambda: -mll(model(x_train), y_train)
+            optimizer.step(closure)
+        else:
+            optimizer.step()
 
 
 def model_predict(model=None, likelihood=None, x_test=None):
