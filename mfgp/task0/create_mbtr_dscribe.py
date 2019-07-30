@@ -56,20 +56,33 @@ n_features = int(mbtr_desc.get_number_of_features())
 def create(indices):
     return create_mbtr(mbtr_desc, n_features, indices)
 
+print(f"atoms split : {type(atoms_split)} \n {atoms_split}")
 
 pool = multiprocessing.Pool(processes=n_proc)
 res = pool.map(create, atoms_split)  # pool.map keeps the order
 
+n_featuresk1 = res[0][0].shape[1]
+n_featuresk2 = res[0][1].shape[1]
+n_featuresk3 = res[0][2].shape[1]
 # Save results
 n_samples = len(ase_atoms)
-mbtr_list = lil_matrix((n_samples, n_features))
+mbtr_listk1 = lil_matrix((n_samples, n_featuresk1))
+mbtr_listk2 = lil_matrix((n_samples, n_featuresk2))
+mbtr_listk3 = lil_matrix((n_samples, n_featuresk3))
 
 i_sample = 0
 for i, i_res in enumerate(res):
-    i_n_samples = i_res.shape[0]
-    mbtr_list[i_sample:i_sample + i_n_samples, :] = i_res
+    i_resk1, i_resk2, i_resk3 = i_res
+    i_n_samples = i_resk1.shape[0]
+    mbtr_listk1[i_sample:i_sample + i_n_samples, :] = i_resk1
+    mbtr_listk2[i_sample:i_sample + i_n_samples, :] = i_resk2
+    mbtr_listk3[i_sample:i_sample + i_n_samples, :] = i_resk3
     i_sample += i_n_samples
 
 # Saves the descriptors as a sparse matrix
-mbtr_list = mbtr_list.tocsr()
-save_npz("mbtr.npz", mbtr_list)
+mbtr_listk1 = mbtr_listk1.tocsr()
+mbtr_listk2 = mbtr_listk2.tocsr()
+mbtr_listk3 = mbtr_listk3.tocsr()
+save_npz("mbtrk1.npz", mbtr_listk1)
+save_npz("mbtrk2.npz", mbtr_listk2)
+save_npz("mbtrk3.npz", mbtr_listk3)

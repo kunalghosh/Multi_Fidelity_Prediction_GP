@@ -57,7 +57,7 @@ def make_mbtr_desc(atomic_numbers, max_atomic_number, min_atomic_number,
                 "cutoff": 1e-3
             },
         },
-        # flatten = False
+        flatten = False
     )
 
     return mbtr_desc
