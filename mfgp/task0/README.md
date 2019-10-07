@@ -9,7 +9,7 @@ For example, the Many-body tensor representation (MBTR).
 	1. multiprocessing
 	2. ase
 	3. scipy
-	4. dscribe
+	4. dscribe >= 0.2.8
 	5. pandas
 
 # Usage instructions
