@@ -41,7 +41,6 @@ mbtr_data.data = np.nan_to_num(mbtr_data.data)
 X_train, X_test, X_valid = mbtr_data[ids_train, :], mbtr_data[ids_test, :], mbtr_data[ids_valid, :]
 y_train, y_test, y_valid = homo_lowfid[ids_train], homo_lowfid[ids_test], homo_lowfid[ids_valid]
 
-
 # convert data to tensor
 x_train_tensor = torch.Tensor(X_train.toarray().squeeze())
 x_test_tensor = torch.Tensor(X_test.toarray().squeeze())

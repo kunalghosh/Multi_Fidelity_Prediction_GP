@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import numpy as np
 import gpytorch
 import torch
@@ -74,7 +75,6 @@ def model_fit(model,
         )
         scheduler.step()
         optimizer.step()
-
 
 def model_predict(model=None, likelihood=None, x_test=None):
     assert model is not None, f"Model is {model}, pass a valid GPyTorch model"

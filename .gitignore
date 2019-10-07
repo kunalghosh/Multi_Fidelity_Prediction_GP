@@ -1,5 +1,15 @@
 # Triton outfiles
 *.out
+
+# Project specific 
+*.xyz
+*.npz
+*.csv
+*.json
+*.tar.gz
+myenv/
+build_mbtr*/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
