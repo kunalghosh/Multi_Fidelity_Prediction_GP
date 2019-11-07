@@ -14,3 +14,5 @@ molecules (inidices) with highest predictive variance.
 
 Steps 2 and 3 are repeated until the highest predictive variance in `predictive_variances_hist_{i}.png` drops below a pre-determined
 (given by domain experts) threshold.
+
+4. test shingo teranishi
