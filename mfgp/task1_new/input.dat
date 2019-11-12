@@ -1,5 +1,5 @@
-cluster
-io_test
+high2
+10Kloadhigh2
 8
 1000
 10000
@@ -8,13 +8,13 @@ io_test
 0.5
 0
 none
-../../test2/build_mbtr/mbtrk2.npz
-../../test2/build_mbtr/df_full_split_ids_with_smiles_v15.json
-no
+../Acc_check/build_mbtr/mbtrk2.npz
+../Acc_check/df_full_split_ids_with_smiles_v15.json
+yes
 ../10K_dataset_load_high/10Kloadhigh2_0_idxs.npz
 load
 10Kdataset_dataset_split_idxs.npz
-load
+False
 
 #acq_fn
 #output

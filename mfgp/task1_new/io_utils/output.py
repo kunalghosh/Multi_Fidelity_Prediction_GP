@@ -15,10 +15,25 @@ def overwrite(filepath, text):
     f.close()
 
 def append_write(filepath, text):
-    """                                                                                                                
+    """                                                                                                
     Writes the text into the given file appending.                                                                                                                           
     """
     f = open(filepath, 'a')
     f.write(text)
     f.close()
 
+def out_time(filepath, time):
+    """                                                                                                
+    Writes calculation time into the given file appending.                                                                                                           
+    """
+    f = open(filepath, 'a')
+    f.write("time "),f.write(str(time) + "[s]" + "\n")
+    f.close()
+
+def out_time_all(filepath, time):
+    """                                                                                                
+    Writes calculation time into the given file appending.                                                                                                           
+    """
+    f = open(filepath, 'a')
+    f.write("time all "),f.write(str(time) + "[s]" + "\n")
+    f.close()    

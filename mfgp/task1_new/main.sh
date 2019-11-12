@@ -1,3 +1,3 @@
 #! /usr/bin/sh -e
 source activate ../task0/myenv
-python main.py input.dat
+python __main__.py input.dat

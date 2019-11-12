@@ -4,8 +4,8 @@ from io_utils import append_write, out_time
 
 def desc_pp(preprocess, X_train, X_test):
     #-- normalization
-#    start = time.time()
-#    append_write(out_name, "starting preprocess \n")    
+    start = time.time()
+    append_write(out_name, "starting preprocess \n")    
 
     if preprocess == "none":
         X_train_pp = X_train.toarray()
@@ -19,7 +19,7 @@ def desc_pp(preprocess, X_train, X_test):
         X_train_pp = preprocessing.scale(X_train.toarray())
         X_test_pp = preprocessing.scale(X_test.toarray())
 
-#    process_time = time.time() - start
-#    out_time(out_name, process_time)        
+    process_time = time.time() - start
+    out_time(out_name, process_time)        
 
     return X_train_pp, X_test_pp
