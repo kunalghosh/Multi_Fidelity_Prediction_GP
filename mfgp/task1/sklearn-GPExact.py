@@ -48,14 +48,15 @@ if args.indices_path is None:
     print("Computing the training and test indices")
     idxs = np.arange(len(homo_lowfid))
     # Compute training and test splits
-    ids_train, ids_test = train_test_split(idxs, train_size=2000, random_state=0)
-    ids_test, _ = train_test_split(ids_test, train_size=2000, random_state=0)
+    ids_train, ids_test = train_test_split(idxs, train_size=3000, random_state=0)
+    ids_test, _ = train_test_split(ids_test, train_size=1000, random_state=0)
 else:
     print("Using the indices passed in the argument.")
     indices_obj = np.load(args.indices_path)
     ids_train = indices_obj["train_idxs"].flatten()
     ids_valid = indices_obj["valid_idxs"]
     ids_test = indices_obj["test_idxs"]
+    print(f"Number of datapoints in train {len(ids_train)} valid {len(ids_valid)} test {len(ids_test)}")
 
 mbtr_data.data = np.nan_to_num(mbtr_data.data)
 X_train, X_test = mbtr_data[ids_train, :], mbtr_data[ids_test, :]
@@ -80,7 +81,7 @@ if normalize_y:
 # kernel = ConstantKernel(1, constant_value_bounds=(1e-8, 1e2)) * RBF(length_scale=1e-2, length_scale_bounds=(1e-10, 1e2)) + WhiteKernel(noise_level=1, noise_level_bounds=(1e-5, 1e1))
 n_features = X_train.shape[-1]
 print(f"N features : {n_features}")
-kernel = ConstantKernel(constant_value_bounds=(1e-1, 1e2)) * RBF(length_scale=[7071], length_scale_bounds=(1e2, 1e5)) # best result.
+kernel = ConstantKernel(constant_value_bounds=(1e-5, 1e5)) * RBF(length_scale=[7071], length_scale_bounds=(1e-5, 1e5)) # best result.
 # kernel = RBF(length_scale=[1e7]*n_features, length_scale_bounds=(1e7, 1e8)) # ARD Kernel
 # kernel = ConstantKernel(1, constant_value_bounds=(1e-5, 1e1)) * Matern(1e-16, length_scale_bounds=(1e-16, 1), nu=2.5)
 
@@ -115,12 +116,15 @@ print(f"Test score (R^2) : {gpr.score(X_test, y_test)}")
 
 pred = gpr.predict(X_test, return_std=True) 
 print(pred)
-pred = pred[0] # just the means
-pred_stds = pred[0]
+pred_means = pred[0] # just the means
+pred_stds = pred[1]
+pred = pred_means
+min, max, mean = np.min, np.max, np.mean
+print(f"Prediction std summary, min {min(pred_stds)} max {max(pred_stds)} avg {mean(pred_stds)} avg_gt_0 {mean(pred_stds[pred_stds>0])}")
 if normalize_y:
     pred = pred * y_std + y_mean
 print(f"Test pred : {pred}")
-print(f"true -  pred values: {y_test - pred}")
+# print(f"true -  pred values: {y_test - pred}")
 print(f"mae error = {np.mean(np.abs(pred-y_test))}")
 print(f"Kernel params = {gpr.kernel_.get_params()}")
 # print(f"kernel hyperparams = {kernel.hyperparameters}")
