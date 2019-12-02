@@ -22,3 +22,17 @@ def fig_HOMO(homo_lowfid, idxs, fig_name):
     plt.ylim(0, 6000)
     (a_hist2, a_bins2, _) = plt.hist(homo_lowfid[idxs], bins=70)
     plt.savefig(fig_name) 
+
+def fig_high_std(std_s, fig_name):
+    #-- Histgram of high std
+    plt.figure()
+    plt.title('', fontsize = 20)
+    plt.xlabel('std.', fontsize = 16)
+    plt.ylabel('Number of molecules', fontsize = 16)
+    plt.tick_params(labelsize = 14)
+    #    plt.xlim(0, 90)
+    #    plt.ylim(0, 2500)
+    (a_hist2, a_bins2, _) = plt.hist(std_s[:], bins=170)
+    plt.savefig(out_name + "_" + str(i+1) + "_std.eps")
+    
+

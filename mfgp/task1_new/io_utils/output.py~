@@ -29,11 +29,18 @@ def out_time(filepath, time):
     f = open(filepath, 'a')
     f.write("time "),f.write(str(time) + "[s]" + "\n")
     f.close()
-
 def out_time_all(filepath, time):
     """                                                                                                
     Writes calculation time into the given file appending.                                                                                                           
     """
     f = open(filepath, 'a')
-    f.write("time all "),f.write(str(time) + "[s]" + "\n")
+    f.write("time all"),f.write(str(time) + "[s]" + "\n")
+    f.close()
+    
+def out_time_all_temp(filepath, time):
+    """                                                                                                
+    Writes calculation time into the given file appending.                                                                                                           
+    """
+    f = open(filepath, 'a')
+    f.write("time for this step "),f.write(str(time) + "[s]" + "\n")
     f.close()    

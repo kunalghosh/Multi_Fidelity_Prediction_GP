@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-def fig_atom(df_62k, idxs):
+def fig_atom(df_62k, idxs, fig_name):
     plt.figure()
     num_atoms = df_62k["number_of_atoms"].values
     plt.title('', fontsize = 20)
@@ -10,9 +10,9 @@ def fig_atom(df_62k, idxs):
     plt.xlim(0, 90)
     plt.ylim(0, 2500)
     (a_hist2, a_bins2, _) = plt.hist(num_atoms[idxs], bins=170)
-    plt.savefig('atoms_all.eps')
+    plt.savefig(fig_name)
     
-def fig_HOMO(homo_lowfid, idxs):
+def fig_HOMO(homo_lowfid, idxs, fig_name):
     plt.figure()
     plt.title('Histogram of HOMO energy', fontsize = 20)
     plt.xlabel('Energy', fontsize = 16)
@@ -21,4 +21,4 @@ def fig_HOMO(homo_lowfid, idxs):
     plt.xlim(-10, 0)
     plt.ylim(0, 6000)
     (a_hist2, a_bins2, _) = plt.hist(homo_lowfid[idxs], bins=70)
-    plt.savefig('HOMO_all.eps') 
+    plt.savefig(fig_name) 
