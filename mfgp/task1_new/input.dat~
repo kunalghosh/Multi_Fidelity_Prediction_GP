@@ -1,11 +1,11 @@
-none
+high_and_cluster
 test
-4
+3
 1000
 44004
+10000
 1000
-1000
-0.5
+2.0
 0
 none
 ../AA_data/mbtr_k2.npz
@@ -19,12 +19,14 @@ AA
 700
 13
 1e2
-2
-1000
-1000
-2000
-4000
-8000
+0
+constRBF
+False
+500
+500
+500
+500
+
 
 #acq_fn
 #output

@@ -3,14 +3,14 @@ test
 4
 1000
 44004
+10000
 1000
-1000
-0.5
+2.0
 0
 none
 ../AA_data/mbtr_k2.npz
 ../AA_data/HOMO.txt
-no
+yes
 ../10K_dataset_load_high/10Kloadhigh2_0_idxs.npz
 save
 ../10K_dataset_load_high/10Kdataset_dataset_split_idxs.npz
@@ -19,12 +19,15 @@ AA
 700
 13
 1e2
-2
+0
+constRBF
+False
 1000
 1000
 2000
 4000
 8000
+
 
 #acq_fn
 #output

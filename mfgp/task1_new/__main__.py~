@@ -373,9 +373,9 @@ def main():
     #-- figure
     if dataset == "OE" :
         fig_atom(df_62k, prediction_idxs, out_name +'_atoms_pre_0.eps')
-        fig_HOMO(homo_lowfid, prediction_idxs, out_name + 'HOMO_pre_0.eps')
+        fig_HOMO(homo_lowfid,prediction_idxs, out_name + 'HOMO_pre_0.eps')
     elif dataset == "AA" :
-        fig_HOMO(homo_lowfid, prediction_idxs, out_name + 'HOMO_pre_0.eps')
+        fig_HOMO(homo_lowfid,remaining_idxs, out_name + 'HOMO_pre_0.eps')
         
     process_time_all = time.time() - start_all
     out_time_all(out_name, process_time_all)
@@ -478,9 +478,9 @@ def main():
         #-- figure
         if dataset == "OE" :
             fig_atom(df_62k, prediction_idxs, out_name + '_atoms_pre_' + str(i+1) +'.eps')
-            fig_HOMO(homo_lowfid, prediction_idxs, out_name + '_HOMO_pre_' + str(i+1) + '.eps')
+            fig_HOMO(homo_lowfid,prediction_idxs, out_name + '_HOMO_pre_' + str(i+1) + '.eps')
         elif dataset == "AA" :
-            fig_HOMO(homo_lowfid, prediction_idxs, out_name + '_HOMO_pre_' + str(i+1) + '.eps')
+            fig_HOMO(homo_lowfid,remaining_idxs, out_name + '_HOMO_pre_' + str(i+1) + '.eps')
             
 
         process_time_all = time.time() - start_all
