@@ -231,7 +231,7 @@ def main():
     length_sum = 0 
     const_sum = 0
     i = -1
-    sample_sum,r2_sum,MAE_sum,length_sum,const_sum = main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bound,const_sum,length_sum,y_test,prediction_idxs,sample_sum,r2_sum,MAE_sum,homo_lowfid,df_62k)
+    sample_sum,r2_sum,MAE_sum,length_sum,const_sum,const,length = main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bound,const_sum,length_sum,y_test,prediction_idxs,sample_sum,r2_sum,MAE_sum,homo_lowfid,df_62k)
     #---------------------------------------------        
 
     process_time_all = time.time() - start_all
@@ -274,7 +274,7 @@ def main():
         append_write(out_name,"constant of constant kernel before fitting " + str(const) + "\n")
         #---------------------------------------------
         #-- Fit the model
-        sample_sum,r2_sum,MAE_sum,length_sum,const_sum = main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bound,const_sum,length_sum,y_test,prediction_idxs,sample_sum,r2_sum,MAE_sum,homo_lowfid,df_62k)
+        sample_sum,r2_sum,MAE_sum,length_sum,const_sum,const,length = main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bound,const_sum,length_sum,y_test,prediction_idxs,sample_sum,r2_sum,MAE_sum,homo_lowfid,df_62k)
         #---------------------------------------------            
 
         process_time_all = time.time() - start_all
@@ -397,7 +397,7 @@ def main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bo
     elif dataset == "AA" :
         fig_HOMO(homo_lowfid, prediction_idxs, out_name + 'HOMO_pre_'+  str(i+1) + '.eps')
 
-    return sample_sum,r2_sum,MAE_sum,length_sum,const_sum
+    return sample_sum,r2_sum,MAE_sum,length_sum,const_sum,const,length
 
 def str_to_bool(s):
         if s == 'True':
