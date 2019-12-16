@@ -5,7 +5,7 @@
 #QSUB -omp 24
 #QSUB -place pack
 #QSUB -over false
-#PBS -l walltime=24:00:00
+#PBS -l walltime=12:00:00
 #PBS -N test
 cd ${PBS_O_WORKDIR}
 . /etc/profile.d/modules.sh

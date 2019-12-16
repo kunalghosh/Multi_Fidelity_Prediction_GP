@@ -79,7 +79,6 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
         X_train = mbtr_data[prediction_idxs, :]
         y_train = homo_lowfid[prediction_idxs]
 
-
         #-- Preprocessing
         start = time.time()
         X_train_pp = desc_pp_notest(preprocess, X_train)   
@@ -157,7 +156,7 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
         from sklearn import cluster
         from sklearn.metrics import pairwise_distances_argmin_min
         """
-        F. Clustering and choose highest std mols without chunk
+        G. Clustering and choose highest std mols without chunk
         """
 
         num_clusters = prediction_set_size
@@ -553,11 +552,7 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
         from sklearn import cluster
         from sklearn.metrics import pairwise_distances_argmin_min
         """
-        G. Combination of B and C
-        without chunk,
-        1. Choose mols with high std depends on the distribution
-        2. Make cluster
-        3. Choose mols which is near the center of clusters
+        uncompleted
         """
         K_pre = rnd_size # highest std
         K_high = prediction_set_size # num_cluster
@@ -661,15 +656,17 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
         from sklearn import cluster
         from sklearn.metrics import pairwise_distances_argmin_min
         """
-        D. Combination of B and C
+        E. Combination of B and C
         without chunk,
         1. Choose mols with high std 
         2. Make cluster
-        3. Choose mols which is near the center of clusters
+        3. Choose mols which have highest std.
         """
         K_pre = rnd_size # highest std
         K_high = prediction_set_size # num_cluster
         prediction_idxs_bef = prediction_idxs
+        #--
+        num_clusters = K_high
         
         if len(remaining_idxs) == K_high :
             pick_idxs = remaining_idxs
@@ -702,9 +699,8 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
             plt.savefig(out_name + "_" + str(i+1) + "_std.eps")
             
             #-- unsorted top K idxs  
-            #            K = int(len(remaining_idxs)/2.0)
             K = int(len(remaining_idxs)/K_pre)
-            pick_idxs = np.argpartition(-std_s, K)[:K]
+            pick_idxs_tmp = np.argpartition(-std_s, K)[:K]
             
             #-- check 
             append_write(out_name,"Max value of std within pick_idxs " + str(np.max(std_s[pick_idxs])) + "\n" )
@@ -713,17 +709,14 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
             append_write(out_name,"Min value of std within all remaining_idxs " + str(np.min(std_s[:])) + "\n" )
             append_write(out_name, "The # of zero values " + str(np.count_nonzero(std_s < 1e-10)) + "\n" )
             append_write(out_name, "The # of not zero values " + str(np.count_nonzero(std_s > 1e-10)) + "\n" )
-            pick_idxs = np.array(prediction_idxs)[pick_idxs]
+            pick_idxs2 = np.array(prediction_idxs)[pick_idxs_tmp]
             
             #--
-            X_train = mbtr_data[pick_idxs, :]
-            y_train = homo_lowfid[pick_idxs]
+            X_train = mbtr_data[pick_idxs2, :]
+            y_train = homo_lowfid[pick_idxs2]
             
-            #-- Preprocessing                                       
-            X_train_pp = desc_pp_notest(preprocess, X_train)   
-            
-            #--
-            num_clusters = K_high
+            #-- Preprocessing
+            X_train_pp = desc_pp_notest(preprocess, X_train)  
             
             #-- Clustering
             start = time.time()
@@ -738,38 +731,24 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
             append_write(out_name,"length of centers " + str(len(centers)) + "\n")
             
             #-- Figure
-            fig_MDS_scatter_std(mbtr_data[pick_idxs,:].toarray(), std[pick_idxs], out_name + "_" + str(i+1) + "_MDS_std.eps")
-            fig_MDS_scatter_label(mbtr_data[pick_idxs,:].toarray(), labels, out_name + "_" + str(i+1) + "_MDS_label.eps")
-
-
-
+#            fig_MDS_scatter_std(mbtr_data[pick_idxs,:].toarray(), std[pick_idxs], out_name + "_" + str(i+1) + "_MDS_std.eps")
+#            fig_MDS_scatter_label(mbtr_data[pick_idxs,:].toarray(), labels, out_name + "_" + str(i+1) + "_MDS_label.eps")
 
             #-- Choose mols in each cluster
-#            start = time.time()
-#            append_write(out_name,"starting calculate find the mol which have highest std in each cluster \n")
-#            cluster_idxs = {}
-#            pick_idxs = np.empty(num_clusters, dtype = int)
+            start = time.time()
+            append_write(out_name,"starting calculate find the mol which have highest std in each cluster \n")
+            cluster_idxs = {}
+            pick_idxs = np.empty(num_clusters, dtype = int)
 
-#            for j in range(num_clusters):
-#                cluster_idxs = np.array(np.where(labels == j)).flatten() 
-#                prediction_clu_idxs = np.array(prediction_idxs)[cluster_idxs]
-#                std_s_clu = std_s[cluster_idxs]
-#                if len(std_s_clu) == 1 :
-#                    pick_idxs[j] = prediction_clu_idxs
-#                else:
-#                    pick_idxs_temp = np.argpartition(-std_s_clu, 1)[:1]
-#                    pick_idxs[j] = prediction_clu_idxs[pick_idxs_temp]
-            
-#            start = time.time()
-#            append_write(out_name,"starting calculat nearest points of centers \n")
-#            closest, _ = pairwise_distances_argmin_min(centers, X_train_pp)
-#            append_write(out_name,"number of closest points " + str(len(closest)) + "\n")
-#            process_time = time.time() - start
-#            out_time(out_name, process_time)
-            
-            #-- Calculate centers
-#            pick_idxs = np.array(pick_idxs)[closest]
-#            append_write(out_name,"length of pick idxs " + str(len(pick_idxs)) + "\n")
+            for j in range(num_clusters):
+                cluster_idxs = np.array(np.where(labels == j)).flatten() 
+                prediction_clu_idxs = np.array(pick_idxs2)[cluster_idxs]
+                std_s_clu = std_s[pick_idxs_tmp[cluster_idxs]]
+                if len(std_s_clu) == 1 :
+                    pick_idxs[j] = prediction_clu_idxs
+                else:
+                    pick_idxs_temp = np.argpartition(-std_s_clu, 1)[:1]
+                    pick_idxs[j] = prediction_clu_idxs[pick_idxs_temp]
             
             prediction_idxs = np.r_[prediction_idxs_bef, pick_idxs]
             remaining_idxs = np.setdiff1d(remaining_idxs, pick_idxs)
@@ -788,13 +767,7 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
         from sklearn import cluster
         from sklearn.metrics import pairwise_distances_argmin_min
         """
-        D. Combination of B and C
-        aaaaa
-        aaaaa
-        without chunk,
-        1. Make cluster
-        2. Choose mols which is near the center of clusters
-        3. Choose mols with high std 
+        uncompleted
         """
 
         prediction_idxs_bef = prediction_idxs
@@ -911,18 +884,14 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
         #-- save the values 
         np.savez(out_name + "_" + str(i+1) + "_idxs.npz", remaining_idxs=remaining_idxs, prediction_idxs=prediction_idxs, pick_idxs = pick_idxs)
 
-
-
-
-
     elif fn_name == "high_and_random":
         from sklearn import cluster
         from sklearn.metrics import pairwise_distances_argmin_min
         """
-        H. Combination of A and B
+        F. Combination of A and B
         without chunk,
         1. Choose mols with high std 
-        2. random
+        2. random sampling
         """
         K_pre = rnd_size # highest std
         K_high = prediction_set_size # num_cluster
