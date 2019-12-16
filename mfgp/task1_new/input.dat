@@ -1,6 +1,6 @@
 #condtidion
 fn_name                 none
-out_name                none2
+out_name                test
 dataset                 AA
 dataset_size            44004
 test_set_size           10000
@@ -9,7 +9,7 @@ K_high                  100
 
 #preprocess
 mbtr_red                False
-preprcess               none
+preprocess               none
 
 #kernel
 kernel_type             constRBF
