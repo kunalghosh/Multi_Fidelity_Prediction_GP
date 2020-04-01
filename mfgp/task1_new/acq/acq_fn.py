@@ -6,14 +6,14 @@ from sklearn import preprocessing
 from utils import desc_pp, desc_pp_notest,pre_rem_split
 from io_utils import append_write, out_time, fig_MDS_scatter_std, fig_MDS_scatter_label
 
-def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd_size, mbtr_data,homo_lowfid, K_high , gpr, preprocess, out_name):
+def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd_size, mbtr_data,homo_lowfid, K_high , gpr, preprocess, out_name, random_seed):
     if  fn_name == "none":
         """
         A. random sampling 
         """
         prediction_idxs_bef = prediction_idxs
 
-        prediction_idxs, remaining_idxs = pre_rem_split(prediction_set_size, remaining_idxs)
+        prediction_idxs, remaining_idxs = pre_rem_split(prediction_set_size, remaining_idxs, random_seed)
 
         pick_idxs = prediction_idxs
         
@@ -34,9 +34,9 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
         """
         prediction_idxs_bef = prediction_idxs
 
-        prediction_idxs, remaining_idxs = pre_rem_split(prediction_set_size, remaining_idxs)
+        prediction_idxs, remaining_idxs = pre_rem_split(prediction_set_size, remaining_idxs, random_seed)
        
-        pick_idxs,_ = train_test_split(prediction_idxs, train_size = rnd_size)
+        pick_idxs,_ = train_test_split(prediction_idxs, train_size = rnd_size, random_state=random_seed)
         
         prediction_idxs = np.r_[prediction_idxs_bef, pick_idxs]
        
@@ -57,7 +57,7 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
         """
         prediction_idxs_bef = prediction_idxs
         
-        prediction_idxs, remaining_idxs = pre_rem_split(prediction_set_size, remaining_idxs)
+        prediction_idxs, remaining_idxs = pre_rem_split(prediction_set_size, remaining_idxs, random_seed)
 
         X_train = mbtr_data[prediction_idxs, :]
         y_train = homo_lowfid[prediction_idxs]
@@ -110,7 +110,7 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
         #-- clustering
         start = time.time()
         append_write(out_name,"starting clustering \n")
-        km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24)
+        km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24, random_state=random_seed)
         z_km = km.fit(X_train_pp)
         process_time = time.time() - start
         out_time(out_name, process_time)
@@ -197,7 +197,7 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
         #-- clustering
         start = time.time()
         append_write(out_name,"starting clustering \n")
-        km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24)
+        km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24, random_state=random_seed)
         z_km = km.fit(X_train_pp)
         process_time = time.time() - start
         out_time(out_name, process_time)
@@ -246,7 +246,7 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
         """
         prediction_idxs_bef = prediction_idxs
 
-        prediction_idxs, remaining_idxs = pre_rem_split(prediction_set_size, remaining_idxs)        
+        prediction_idxs, remaining_idxs = pre_rem_split(prediction_set_size, remaining_idxs, random_seed)        
             
         pick_idxs = prediction_idxs
 
@@ -286,7 +286,7 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
         #-- clustering
         start = time.time()
         append_write(out_name,"starting clustering" + "\n")
-        km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 1)
+        km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 1, random_state=random_seed)
         z_km = km.fit(X_train_pp)
         process_time = time.time() - start
         out_time(out_name, process_time)
@@ -501,7 +501,7 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
             #-- Clustering
             start = time.time()
             append_write(out_name,"starting clustering \n")
-            km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24)
+            km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24, random_state=random_seed)
             z_km = km.fit(X_train_pp)
             process_time = time.time() - start
             out_time(out_name, process_time)
@@ -615,7 +615,7 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
             #-- Clustering
             start = time.time()
             append_write(out_name,"starting clustering \n")
-            km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24)
+            km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24, random_state=random_seed)
             z_km = km.fit(X_train_pp)
             process_time = time.time() - start
             out_time(out_name, process_time)
@@ -721,7 +721,7 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
             #-- Clustering
             start = time.time()
             append_write(out_name,"starting clustering \n")
-            km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24)
+            km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24, random_state=random_seed)
             z_km = km.fit(X_train_pp)
             process_time = time.time() - start
             out_time(out_name, process_time)
@@ -825,7 +825,7 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
             #-- clustering
             start = time.time()
             append_write(out_name,"starting clustering \n")
-            km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24)
+            km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24, random_state=random_seed)
             z_km = km.fit(X_train_pp)
             process_time = time.time() - start
             out_time(out_name, process_time)
@@ -949,7 +949,7 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
             X_train_pp = desc_pp_notest(preprocess, X_train)   
 
             #-- Random
-            pick_idxs, _ = pre_rem_split(prediction_set_size, pick_idxs)
+            pick_idxs, _ = pre_rem_split(prediction_set_size, pick_idxs, random_seed)
             
             prediction_idxs = np.r_[prediction_idxs_bef, pick_idxs]
             remaining_idxs = np.setdiff1d(remaining_idxs, pick_idxs)

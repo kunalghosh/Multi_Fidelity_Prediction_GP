@@ -31,6 +31,7 @@ def main():
     fn_name = InData.fn_name
     K_high = InData.K_high
     rnd_size = InData.rnd_size
+    random_seed = InData.random_seed
     #- Flag
     save_load_flag = InData.save_load_flag
     save_load_split_flag = InData.save_load_split_flag
@@ -57,6 +58,9 @@ def main():
     const = InData.const
     bound = InData.bound
     n_opt = InData.n_opt
+
+    # set the random seed
+    np.random.seed(random_seed)
 
     #-- Initialize
     if restart_flag:
@@ -139,7 +143,7 @@ def main():
         sys.exit()
         
     normalize_y = False
-    gpr = GaussianProcessRegressor(kernel=kernel, normalize_y=normalize_y, n_restarts_optimizer = n_opt)
+    gpr = GaussianProcessRegressor(kernel=kernel, normalize_y=normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)
     append_write(out_name,"length of RBF kernel before fitting " + str(length) + "\n")
     append_write(out_name,"constant of constant kernel before fitting " + str(const) + "\n")
 
@@ -163,7 +167,7 @@ def main():
                 append_write(out_name, "mbtr_data_size " + str(mbtr_data_size) + "\n")
                 append_write(out_name, "dataset_size " + str(dataset_size) + "\n")
 
-                remaining_idxs, not_used_idxs = train_test_split(range(mbtr_data_size), train_size = dataset_size)
+                remaining_idxs, not_used_idxs = train_test_split(range(mbtr_data_size), train_size = dataset_size, random_state = random_seed)
                 np.save(out_name + "_dataset_idxs", remaining_idxs)
 
                 #-- Figure
@@ -174,12 +178,12 @@ def main():
                     fig_HOMO(homo_lowfid,remaining_idxs, out_name + 'HOMO_pre_dataset.eps')
 
                 #-- test , 1st train, remaining split.
-                test_idxs, remaining_idxs = train_test_split(remaining_idxs, train_size = test_set_size)
+                test_idxs, remaining_idxs = train_test_split(remaining_idxs, train_size = test_set_size, random_state = random_seed)
                 np.savez(out_name + "_dataset_split_idxs.npz", remaining_idxs=remaining_idxs, test_idxs=test_idxs)
 
             elif dataset_size  == mbtr_data_size:    
                 append_write(out_name, "mbtr_data_size ==  dataset_size \n")
-                test_idxs, remaining_idxs = train_test_split(range(mbtr_data_size), train_size = test_set_size)
+                test_idxs, remaining_idxs = train_test_split(range(mbtr_data_size), train_size = test_set_size, random_state = random_seed)
 
             else: 
                 append_write(out_name,"dataset_size should be = or < mbtr_data_size \n")
@@ -190,7 +194,7 @@ def main():
             append_write(out_name, "length of remaining_idxs " + str(len(remaining_idxs)) + "\n")            
 
         prediction_set_size = pre_idxs[0]
-        prediction_idxs, remaining_idxs = pre_rem_split(prediction_set_size, remaining_idxs)
+        prediction_idxs, remaining_idxs = pre_rem_split(prediction_set_size, remaining_idxs, random_seed)
         append_write(out_name, "length of prediction_idxs " + str(len(prediction_idxs)) + "\n")
         append_write(out_name, "length of remaining_idxs " + str(len(remaining_idxs)) + "\n")
 
@@ -256,7 +260,8 @@ def main():
                                                                       , K_high\
                                                                       , gpr\
                                                                       , preprocess\
-                                                                      , out_name)
+                                                                      , out_name\
+                                                                      , random_seed)
 
         #-- Save the values 
         np.savez(out_name + "_" + str(i+1) + "_full_idxs.npz", remaining_idxs=remaining_idxs, prediction_idxs = prediction_idxs, test_idxs = test_idxs)
@@ -269,7 +274,7 @@ def main():
         append_write(out_name,"length of remaining_idxs " + str(len(remaining_idxs)) + "\n")
         append_write(out_name,"length of test_idxs " + str(len(test_idxs)) + "\n")
 
-        gpr = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt)            
+        gpr = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)            
         append_write(out_name,"length of RBF kernel before fitting " + str(length) + "\n")
         append_write(out_name,"constant of constant kernel before fitting " + str(const) + "\n")
         #---------------------------------------------
