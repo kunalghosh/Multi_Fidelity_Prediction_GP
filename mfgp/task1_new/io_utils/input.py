@@ -70,6 +70,7 @@ class Input:
         self.n_opt = self.set_para('n_opt', 0 , int )
         self.kernel_type = self.set_para('kernel_type', 'constRBF' , str )
         self.restart_flag = self.set_para('restart_flag', 'False' , bool )
+        self.random_seed = self.set_para('random_seed', 1234, int)
         
         self.pre_idxs = np.empty(int(self.num_itr+1),dtype = int)
 
