@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -246,6 +247,20 @@ def main():
         append_write(out_name,"============================= \n")
         append_write(out_name,str(i+1) + "-th learning" + "\n")
         start_all_temp = time.time()
+        
+        # check if this iteration has already been done.
+        saved_idxs_file = Path(out_name + "_" + str(i+1) + "_full_idxs.npz")
+        if saved_idxs_file.is_file():
+            # file exists, skip this iteration
+            append_write(out_name," Iteration already skipping to the next one.")
+            continue
+        else:
+            # file doesn't exist load the prediction_idxs, remaining_idxs and
+            # test_idxs from the previous iterations's file
+            with np.load(out_name + "_" + str(i) + "_full_idxs.npz") as data:
+                prediction_idxs = data['prediction_idxs']
+                remaining_idxs = data['remaining_idxs']
+                test_idxs = data['test_idxs']
 
         prediction_set_size = pre_idxs[i+1]
 
