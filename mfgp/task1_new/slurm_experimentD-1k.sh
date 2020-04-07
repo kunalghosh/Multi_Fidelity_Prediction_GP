@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=30
 #SBATCH --partition=small
-#SBATCH --output=activeLearning-D-1k.out
+#SBATCH --output=activeLearning-D-1k-temp.out
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
