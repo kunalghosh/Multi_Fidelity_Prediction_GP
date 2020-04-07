@@ -45,7 +45,8 @@ means = [[0.527572612, 0.395494212, 0.305729616, 0.230183849, 0.170217741],
 for idx, (mean, std) in enumerate(zip(means,stds)):
 	if idx == 4:
 		break # only put A to D in plot 1
-	plt.errorbar(batch_sizes, mean, std, label=labels[idx], alpha=0.8)
+	plt.errorbar(batch_sizes, mean, std, label=labels[idx], alpha=0.8, capsize=lines['linewidth'])
+	plt.scatter(batch_sizes, mean)
 	# plt.plot(batch_sizes, mean, std, label=labels[idx])
 
 # repeated_x = [batch_sizes] * len(means)
@@ -65,7 +66,8 @@ plt.clf()
 
 for idx, (mean, std) in enumerate(zip(means,stds)):
 	if idx >= 3:
-		plt.errorbar(batch_sizes, mean, std, label=labels[idx], alpha=0.8)
+		plt.errorbar(batch_sizes, mean, std, label=labels[idx], alpha=0.8, capsize=lines['linewidth'])
+		plt.scatter(batch_sizes, mean)
 	# plt.plot(batch_sizes, mean, std, label=labels[idx])
 
 # repeated_x = [batch_sizes] * len(means)
