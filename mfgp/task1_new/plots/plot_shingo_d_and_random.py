@@ -1,7 +1,9 @@
 """
-Plot the strategy D vs A. Here D is the best strategy so far and A is 
-the random strategy. We see that D is able to achive the same accuracy
-with far fewer datapoints compared to A.
+Plot the strategy D vs B. Here D is the best strategy so far and B is 
+the worst strategy. We see that D is able to achive the same accuracy
+with far fewer datapoints compared to B. Initially I was plotting D vs A
+but Jari gave a feedback that the improvement is not much so better to plot
+against a strategy where the improvement is much more significant.
 """
 import re
 import matplotlib
@@ -44,22 +46,67 @@ means = [[0.527572612, 0.395494212, 0.305729616, 0.230183849, 0.170217741],
 	[0.532987113, 0.382061848, 0.278853979, 0.200607586, 0.145790025]]
 
 for idx, (mean, std) in enumerate(zip(means,stds)):
-	if labels[idx] in ['A', 'D']:
+	if labels[idx] in ['B', 'D']:
 		"""
-		Only plot strategy A and D.
+		Only plot strategy B and D.
 		"""
-		plt.errorbar(batch_sizes, mean, std, label=labels[idx], capsize=lines['linewidth'])
-		plt.scatter(batch_sizes, mean)
+		plt.errorbar(batch_sizes, mean, std, capsize=lines['linewidth'])
+		plt.scatter(batch_sizes, mean, label=labels[idx])
 
 # draw a horizontal line with x = batch_sizes and y = accuracy of largest dataset with random
-a_idx = labels.index('A')
-plt.hlines(means[a_idx][-1] ,batch_sizes[0], batch_sizes[-1], linestyle="dashed", zorder=3) 
+a_idx = labels.index('B')
+plt.hlines(means[a_idx][-2], 0, batch_sizes[-1], linestyle="dashed", zorder=3) 
 plt.legend()
 plt.xticks(np.arange(0,18, step=2)) 
 plt.xlabel("Dataset size in 1000s")
 plt.ylabel("Mean absolute error (eV)")
 plt.grid()
 plt.tight_layout()
-plt.savefig("Plot_A_and_D.pdf")
+plt.savefig("Plot_B_and_D.pdf")
+plt.close()
+plt.clf()
+
+# -------------------- Plot B and D with curve fits ---------------------
+
+for idx, (mean, std) in enumerate(zip(means,stds)):
+    if labels[idx] in ['B', 'D']:
+        """
+        Only plot strategy B and D.
+        """
+        print(f"Data for strategy {labels[idx]}")
+
+        results = curve_fit(lambda x,a,b,c,d: d + (a-d)/(1 + (x/c)**b), batch_sizes, mean, p0=[0.5, 0.5, 0.5, 0.5], bounds=(-1, [3., 1., 2, 2]))
+        a, b, c, d= results[0]
+        print(a, b, c, d)
+        x = np.arange(1, 17)
+        y = d + (a-d)/(1 + (x/c)**b) 
+
+        # results = curve_fit(lambda x,a,b: a*x**b, batch_sizes, mean, p0=[0.5, -0.4])#, bounds=(0, [3., 1., 0.5]))
+        # a, b= results[0]
+        # print(a, b)
+        # x = np.arange(1, 17)
+        # y = a*x**b 
+
+        # results = curve_fit(lambda x,a,b,c,d: a*np.exp(b*x**d)+c, batch_sizes, mean, p0=[0.2, 0.4, 0.2, 2])#, bounds=(0, [3., 1., 0.5]))
+        # a, b, c, d = results[0]
+        # print(a, b, c, d)
+        # x = np.arange(1, 17)
+        # y = a * np.exp(b * x**d) + c
+
+        # results = curve_fit(lambda x,a,b,c,d: a*x**3 + b*x**2 + c*x + d, batch_sizes, mean)#, p0=[2, -1, 0.5])#, bounds=(0, [3., 1., 0.5]))
+        # a, b, c, d = results[0]
+        # print(a, b, c, d)
+        # x = np.arange(1, 16)
+        # y = a*x**3 + b*x**2 + c*x + d
+        plt.plot(x, y)
+        plt.scatter(batch_sizes, mean, label=labels[idx])
+
+plt.legend()
+# plt.xscale("log")
+plt.xlabel("Dataset size (x10^3)")
+plt.ylabel("Mean absolute error (eV)")
+plt.grid()
+plt.tight_layout()
+plt.savefig("Plot_B_and_D_curvefit.pdf")
 plt.close()
 plt.clf()
