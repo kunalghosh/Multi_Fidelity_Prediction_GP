@@ -68,6 +68,9 @@ plt.clf()
 
 # -------------------- Plot B and D with curve fits ---------------------
 
+coeffs = { 'B' : None, 'D' : None }
+mean_dict = {'B' : None, 'D' : None}
+
 for idx, (mean, std) in enumerate(zip(means,stds)):
     if labels[idx] in ['B', 'D']:
         """
@@ -77,6 +80,8 @@ for idx, (mean, std) in enumerate(zip(means,stds)):
 
         results = curve_fit(lambda x,a,b,c,d: d + (a-d)/(1 + (x/c)**b), batch_sizes, mean, p0=[0.5, 0.5, 0.5, 0.5], bounds=(-1, [3., 1., 2, 2]))
         a, b, c, d= results[0]
+        coeffs[labels[idx]] = results[0]
+        mean_dict[labels[idx]] = mean
         print(a, b, c, d)
         x = np.arange(1, 17)
         y = d + (a-d)/(1 + (x/c)**b) 
@@ -101,8 +106,38 @@ for idx, (mean, std) in enumerate(zip(means,stds)):
         plt.plot(x, y)
         plt.scatter(batch_sizes, mean, label=labels[idx])
 
+#-------------- Draw lines indicating for which value of x, D achieves same accuracy (y-value) as B ----------------
+# for each mean in B, find the corresponding 'x' in D
+xticks = batch_sizes.copy()
+xlabels = []
+a,b,c,d = coeffs['D']
+for y, batch_size in zip(mean_dict['B'], batch_sizes):
+    x = c * (-1 + (a-d)/(y-d))**(1./b)
+    xticks.append(x)
+    xlabels.append(x)
+    print(batch_size, x)
+    # vertical line at x
+    # plt.axvline(x=x, color='k', linestyle="--")
+    plt.plot((x, x), (0, y), color='k', linestyle="--")
+    plt.hlines(y, x, batch_size, color='k', linestyle="--")
+
+xticks.sort()
+print(xticks)
+print(f"labels {xlabels}")
 plt.legend()
-# plt.xscale("log")
+xticks_str = []
+for idx, x in enumerate(xticks):
+    if x in batch_sizes:
+        xticks_str.append(" ")
+    else:
+        xticks_str.append("%.2f" % x)
+
+print(xticks_str)
+
+plt.xscale("log")
+plt.tick_params(axis='x', which='minor')
+plt.xticks(ticks=sorted(xticks), labels=xticks_str)
+plt.xticks(rotation=45)
 plt.xlabel("Dataset size (x10^3)")
 plt.ylabel("Mean absolute error (eV)")
 plt.grid()
