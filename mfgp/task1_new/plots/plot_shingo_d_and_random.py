@@ -109,12 +109,12 @@ for idx, (mean, std) in enumerate(zip(means,stds)):
 #-------------- Draw lines indicating for which value of x, D achieves same accuracy (y-value) as B ----------------
 # for each mean in B, find the corresponding 'x' in D
 xticks = batch_sizes.copy()
-xlabels = []
+data_saving = []
 a,b,c,d = coeffs['D']
 for y, batch_size in zip(mean_dict['B'], batch_sizes):
     x = c * (-1 + (a-d)/(y-d))**(1./b)
     xticks.append(x)
-    xlabels.append(x)
+    data_saving.append(batch_size - x)
     print(batch_size, x)
     # vertical line at x
     # plt.axvline(x=x, color='k', linestyle="--")
@@ -123,7 +123,6 @@ for y, batch_size in zip(mean_dict['B'], batch_sizes):
 
 xticks.sort()
 print(xticks)
-print(f"labels {xlabels}")
 plt.legend()
 xticks_str = []
 for idx, x in enumerate(xticks):
@@ -143,5 +142,23 @@ plt.ylabel("Mean absolute error (eV)")
 plt.grid()
 plt.tight_layout()
 plt.savefig("Plot_B_and_D_curvefit.pdf")
+plt.close()
+plt.clf()
+
+# --------------- data for this plot is generated in the previous section ----------------------
+
+data_saving = np.array(data_saving)
+batch_sizes = np.array(batch_sizes)
+savings_in_percent = 100 * data_saving / batch_sizes
+print(f"datasavings {data_saving}")
+plt.plot(batch_sizes, savings_in_percent, color="k")
+plt.scatter(batch_sizes, savings_in_percent, color="k", label="Datasaving (D vs B) in percent")
+plt.legend()
+plt.xticks(batch_sizes)
+plt.xlabel("Data size (x10^3)")
+plt.ylabel("Datasaving in percent")
+plt.grid()
+plt.tight_layout()
+plt.savefig("Plot_BvsD_savings.pdf")
 plt.close()
 plt.clf()
