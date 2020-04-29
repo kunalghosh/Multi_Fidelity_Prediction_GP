@@ -46,15 +46,15 @@ means = [[0.527572612, 0.395494212, 0.305729616, 0.230183849, 0.170217741],
 	[0.532987113, 0.382061848, 0.278853979, 0.200607586, 0.145790025]]
 
 for idx, (mean, std) in enumerate(zip(means,stds)):
-	if labels[idx] in ['B', 'D']:
+	if labels[idx] in ['A', 'D']:
 		"""
-		Only plot strategy B and D.
+		Only plot strategy A and D.
 		"""
 		plt.errorbar(batch_sizes, mean, std, capsize=lines['linewidth'])
 		plt.scatter(batch_sizes, mean, label=labels[idx])
 
 # draw a horizontal line with x = batch_sizes and y = accuracy of largest dataset with random
-a_idx = labels.index('B')
+a_idx = labels.index('A')
 plt.hlines(means[a_idx][-2], 0, batch_sizes[-1], linestyle="dashed", zorder=3) 
 plt.legend()
 plt.xticks(np.arange(0,18, step=2)) 
@@ -68,13 +68,13 @@ plt.clf()
 
 # -------------------- Plot B and D with curve fits ---------------------
 
-coeffs = { 'B' : None, 'D' : None }
-mean_dict = {'B' : None, 'D' : None}
+coeffs = { 'A' : None, 'D' : None }
+mean_dict = {'A' : None, 'D' : None}
 
 for idx, (mean, std) in enumerate(zip(means,stds)):
-    if labels[idx] in ['B', 'D']:
+    if labels[idx] in ['A', 'D']:
         """
-        Only plot strategy B and D.
+        Only plot strategy A and D.
         """
         print(f"Data for strategy {labels[idx]}")
 
@@ -111,7 +111,7 @@ for idx, (mean, std) in enumerate(zip(means,stds)):
 xticks = batch_sizes.copy()
 data_saving = []
 a,b,c,d = coeffs['D']
-for y, batch_size in zip(mean_dict['B'], batch_sizes):
+for y, batch_size in zip(mean_dict['A'], batch_sizes):
     x = c * (-1 + (a-d)/(y-d))**(1./b)
     xticks.append(x)
     data_saving.append(batch_size - x)
@@ -141,7 +141,7 @@ plt.xlabel("Dataset size (x10^3)")
 plt.ylabel("Mean absolute error (eV)")
 plt.grid()
 plt.tight_layout()
-plt.savefig("Plot_B_and_D_curvefit.pdf")
+plt.savefig("Plot_A_and_D_curvefit.pdf")
 plt.close()
 plt.clf()
 
@@ -152,13 +152,14 @@ batch_sizes = np.array(batch_sizes)
 savings_in_percent = 100 * data_saving / batch_sizes
 print(f"datasavings {data_saving}")
 plt.plot(batch_sizes, savings_in_percent, color="k")
-plt.scatter(batch_sizes, savings_in_percent, color="k", label="Datasaving (D vs B) in percent")
+plt.scatter(batch_sizes, savings_in_percent, color="k", label="Datasaving (D vs A) in percent")
+plt.xscale("linear")
 plt.legend()
 plt.xticks(batch_sizes)
 plt.xlabel("Data size (x10^3)")
 plt.ylabel("Datasaving in percent")
 plt.grid()
 plt.tight_layout()
-plt.savefig("Plot_BvsD_savings.pdf")
+plt.savefig("Plot_AvsD_savings.pdf")
 plt.close()
 plt.clf()
