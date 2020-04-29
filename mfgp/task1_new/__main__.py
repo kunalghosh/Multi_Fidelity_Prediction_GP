@@ -256,11 +256,13 @@ def main():
             continue
         else:
             # file doesn't exist load the prediction_idxs, remaining_idxs and
-            # test_idxs from the previous iterations's file
-            with np.load(out_name + "_" + str(i) + "_full_idxs.npz") as data:
-                prediction_idxs = data['prediction_idxs']
-                remaining_idxs = data['remaining_idxs']
-                test_idxs = data['test_idxs']
+            # test_idxs from the previous iterations's file. If the iteration is 0
+            # this means this is the first run, nothing to load.
+            if i > 0:
+                with np.load(out_name + "_" + str(i) + "_full_idxs.npz") as data:
+                    prediction_idxs = data['prediction_idxs']
+                    remaining_idxs = data['remaining_idxs']
+                    test_idxs = data['test_idxs']
 
         prediction_set_size = pre_idxs[i+1]
 
