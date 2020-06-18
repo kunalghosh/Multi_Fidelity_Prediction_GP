@@ -1,4 +1,6 @@
+import pdb
 import sys
+import pickle as pkl
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -230,42 +232,127 @@ def main():
 
     #---------------------------------------------
     #-- Fit the model
+    # sample_sum = np.array([])
+    # r2_sum = np.array([])
+    # MAE_sum = np.array([])
     sample_sum = 0
     r2_sum = 0
     MAE_sum = 0
     length_sum = 0 
     const_sum = 0
     i = -1
-    sample_sum,r2_sum,MAE_sum,length_sum,const_sum,const,length = main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bound,const_sum,length_sum,y_test,prediction_idxs,sample_sum,r2_sum,MAE_sum,homo_lowfid,df_62k)
+
+    ## if the following files exist, load the data into the variable
+    ## and prepend it.
+    get_path = lambda file_suffix: Path(out_name + file_suffix + ".npy")
+    def exists(file_suffix):
+        file = get_path(file_suffix) 
+        return file.is_file()
+
+    # def get_data(file_suffix):
+    #     filename = out_name + file_suffix + ".npy"
+    #     print(f"loading data from {filename}")
+    #     data = np.load(filename)
+    #     return data
+
+    filename_var_dict = {"_sample": sample_sum, "_r2" : r2_sum, "_MAE" : MAE_sum}
+    # 
+    # for file_suffix in filename_var_dict.keys():
+    #     var = filename_var_dict[file_suffix]
+    #     if exists(file_suffix):
+    #         var = get_data(file_suffix)
+    #         print(f"Loaded : {file_suffix} , contents : {var}")
+    # 
+    # print(f"DEBUG : MAE_sum in the beginning : {MAE_sum}")
+
+    for file_suffix in filename_var_dict.keys():
+        var = filename_var_dict[file_suffix]
+        if exists(file_suffix):
+            p = get_path(file_suffix)
+            fname_noextension = p.stem
+            fname_ext = p.suffix
+            datestr = datetime.datetime.today().strftime("%Y-%m-%dT%I-%M-%S")
+            new_fname = fname_noextension + "_" + datestr + fname_ext
+            new_path = Path(p.parent, new_fname)
+            p.rename(new_path)
+            print(f"Renamed {p} to {new_path}")
+
+
+    sample_sum,r2_sum,MAE_sum,length_sum,const_sum,const,length = main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bound,const_sum,length_sum,y_test,prediction_idxs,sample_sum,r2_sum,MAE_sum,homo_lowfid,df_62k, kernel,normalize_y,n_opt,random_seed)
     #---------------------------------------------        
 
     process_time_all = time.time() - start_all
     out_time_all(out_name, process_time_all)
 
+    should_i_resume = False
     #-- Iteration start
     for i in range(num_itr):
         append_write(out_name,"============================= \n")
         append_write(out_name,str(i+1) + "-th learning" + "\n")
         start_all_temp = time.time()
         
+        # pdb.set_trace()
         # check if this iteration has already been done.
         saved_idxs_file = Path(out_name + "_" + str(i+1) + "_full_idxs.npz")
         if saved_idxs_file.is_file():
             # file exists, skip this iteration
-            append_write(out_name," Iteration already skipping to the next one.")
+            append_write(out_name," Iteration already done skipping to the next one.")
+            should_i_resume = True
             continue
         else:
             # file doesn't exist load the prediction_idxs, remaining_idxs and
             # test_idxs from the previous iterations's file. If the iteration is 0
             # this means this is the first run, nothing to load.
-            if i > 0:
+            if i > 0 and should_i_resume:
+                should_i_resume = False # since we have already resumed.
+                print(f"loading {out_name}_{str(i)}_full_idxs.npz")
+                append_write(out_name, f"loading {out_name}_{str(i)}_full_idxs.npz")
                 with np.load(out_name + "_" + str(i) + "_full_idxs.npz") as data:
                     prediction_idxs = data['prediction_idxs']
                     remaining_idxs = data['remaining_idxs']
                     test_idxs = data['test_idxs']
+                # refit GPR with these idxs because that's used in acq_fn to pick next points.
+                X_train_pp, _ = desc_pp(preprocess, mbtr_data_red[prediction_idxs, :], X_test)
+                y_train = homo_lowfid[prediction_idxs]
+                gpr = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)            
+                ## Reload hyperparams
+                with open(out_name + '_para_kernel_aft_' + str(i-1) + '.txt') as f2:
+                    data = eval(f2.read())
+                pdb.set_trace()
+                gpr.kernel.k1.constant_value = data['k1__constant_value']
+                gpr.kernel.k2.length_scale = data['k2__length_scale']
+                print(f"Inside loading section : {gpr.get_params}")
+                
+                # # pdb.set_trace()
+                # ## gpr.fit(X_train_pp, y_train)
+                # param_file_pkl = Path(out_name + "_para_kernel_aft_" + str(i-1) + ".pkl")
+                # # if param_file.is_file():
+                # #     with open(out_name + '_para_kernel_aft_' + str(i+1) + '.txt') as f2:
+                # #         params = eval(f2.read())
+                # #         gpr.set_params(**params)
+                # #         print(f"Loaded gpr params from {param_file}")
+                # #         para_kernel_aft = params
+                # if param_file_pkl.is_file():
+                #     print(f"LOADING PARAM FILE..... idx : {i}")
+                #     with param_file_pkl.open("rb") as f:
+                #         data = pkl.load(f)
+                #         print(f"loading params : {data}")
+                #         gpr = gpr.set_params(**data)
+                #         with open(out_name + '_para_kernel_aft_' + str(i-1) + '.txt') as f2:
+                #             data = eval(f2.read())
+                #         pdb.set_trace()
+                #         gpr.kernel.k1.constant_value = data['k1__constant_value']
+                #         gpr.kernel.k2.length_scale = data['k2__length_scale']
+                #         # gpr.kernel.set_params(**data)
+                #         # gpr = gpr.kernel.set_params(**data)
+                #         # HERE, the kernel hyper params are not loaded correctly.
+                #         # pdb.set_trace()
+                #         print(f"Inside loading section : {gpr.get_params}")
+
 
         prediction_set_size = pre_idxs[i+1]
 
+        print(f"Prediciton idxs {i}-before : {prediction_idxs}")
         prediction_idxs, remaining_idxs, X_train_pp, y_train = acq_fn(fn_name\
                                                                       , i\
                                                                       , prediction_idxs\
@@ -279,6 +366,7 @@ def main():
                                                                       , preprocess\
                                                                       , out_name\
                                                                       , random_seed)
+        print(f"Prediciton idxs {i}-after : {prediction_idxs}")
 
         #-- Save the values 
         np.savez(out_name + "_" + str(i+1) + "_full_idxs.npz", remaining_idxs=remaining_idxs, prediction_idxs = prediction_idxs, test_idxs = test_idxs)
@@ -296,7 +384,7 @@ def main():
         append_write(out_name,"constant of constant kernel before fitting " + str(const) + "\n")
         #---------------------------------------------
         #-- Fit the model
-        sample_sum,r2_sum,MAE_sum,length_sum,const_sum,const,length = main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bound,const_sum,length_sum,y_test,prediction_idxs,sample_sum,r2_sum,MAE_sum,homo_lowfid,df_62k)
+        sample_sum,r2_sum,MAE_sum,length_sum,const_sum,const,length = main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bound,const_sum,length_sum,y_test,prediction_idxs,sample_sum,r2_sum,MAE_sum,homo_lowfid,df_62k, kernel, normalize_y, n_opt, random_seed)
         #---------------------------------------------            
 
         process_time_all = time.time() - start_all
@@ -318,6 +406,7 @@ def main():
         f = open(out_name, 'a')
         form="%i %20.10f %20.10f \n"
         for i in range(num_itr + 1):
+            # pdb.set_trace()
             f.write(form % (i,r2_sum[i],MAE_sum[i]))
         f.close()    
         append_write(out_name, "\n Output for hyper parameters \n")
@@ -332,20 +421,46 @@ def main():
     append_write(out_name,"End calculation !")
 
     
-def main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bound,const_sum,length_sum,y_test,prediction_idxs,sample_sum,r2_sum,MAE_sum,homo_lowfid,df_62k):
+def main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bound,const_sum,length_sum,y_test,prediction_idxs,sample_sum,r2_sum,MAE_sum,homo_lowfid,df_62k, kernel,normalize_y,n_opt,random_seed):
+    print(f"DEBUG : Inside main_loop , value of MAE_sum is {MAE_sum}")
 
     #-- Fit the model
     append_write(out_name,"initial learning \n")
     start = time.time()
     append_write(out_name,"start to make a model \n")
+    print(X_train_pp)
+    # gpr = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)            
     gpr.fit(X_train_pp, y_train)
     process_time = time.time() - start
     out_time(out_name, process_time)
 
-    #-- Save hyper paramter
-    para_kernel_aft = gpr.kernel_.get_params()
-    with open(out_name + '_para_kernel_aft_' + str(i+1) + '.txt', 'w') as f2:
-        print(para_kernel_aft, file=f2)
+    # pdb.set_trace()
+    #-- Load hyper parameter if file exists
+    param_file = Path(out_name + "_para_kernel_aft_" + str(i+1) + ".txt")
+    param_file_pkl = Path(out_name + "_para_kernel_aft_" + str(i+1) + ".pkl")
+    # if param_file.is_file():
+    #     with open(out_name + '_para_kernel_aft_' + str(i+1) + '.txt') as f2:
+    #         params = eval(f2.read())
+    #         gpr.set_params(**params)
+    #         print(f"Loaded gpr params from {param_file}")
+    #         para_kernel_aft = params
+    if param_file_pkl.is_file():
+        with param_file_pkl.open("rb") as f:
+            data = pkl.load(f)
+            pdb.set_trace()
+            print(f"loading params : {data}")
+            gpr = gpr.set_params(**data)
+            para_kernel_aft = gpr.kernel_.get_params()
+    else:
+        #-- Save hyper paramter
+        para_kernel_aft = gpr.kernel_.get_params()
+        with open(out_name + '_para_kernel_aft_' + str(i+1) + '.txt', 'w') as f2:
+            print(para_kernel_aft, file=f2)
+
+        para_aft = gpr.get_params()
+        with open(out_name + '_para_kernel_aft_' + str(i+1) + ".pkl", "wb") as f:
+            print(f"saving params : {para_aft}")
+            pkl.dump(para_aft, f)
 
    #-- Get hyper paramter
     if kernel_type == "RBF":
@@ -368,6 +483,7 @@ def main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bo
     #-- Predict
     start = time.time()
     append_write(out_name,"start prediction" + "\n")
+    print(f"Iteration {i} : gpr params {gpr.get_params()}")
     mu_s, std_s = gpr.predict(X_test_pp, return_std=True)
     process_time = time.time() - start
     out_time(out_name, process_time)
@@ -393,6 +509,7 @@ def main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bo
     fig_scatter_r2(y_test, mu_s, out_name + '_r2_' + str(i+1) + '.eps')
 
     #-- Score array
+    # if MAE_sum.size == 0: 
     if i == -1:
         sample_sum = np.array(len(prediction_idxs))
         r2_sum = r2
@@ -401,8 +518,14 @@ def main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bo
         sample_sum = np.append(sample_sum ,len(prediction_idxs))
         r2_sum = np.append(r2_sum ,r2)        
         MAE_sum = np.append(MAE_sum, MAE)
+    # pdb.set_trace()
+    # sample_sum = np.append(sample_sum ,len(prediction_idxs))
+    # r2_sum = np.append(r2_sum ,r2)        
+    # MAE_sum = np.append(MAE_sum, MAE)
+    
         
     #-- Save score
+    # pdb.set_trace()
     np.save(out_name + "_sample", sample_sum)
     np.save(out_name + "_r2", r2_sum)    
     np.save(out_name + "_MAE", MAE_sum)
