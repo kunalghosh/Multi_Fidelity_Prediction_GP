@@ -289,39 +289,82 @@ def main():
     for i in range(num_itr):
         append_write(out_name,"============================= \n")
         append_write(out_name,str(i+1) + "-th learning" + "\n")
+        print(f"{out_name} {str(i+1)}-th learning")
         start_all_temp = time.time()
         
         # pdb.set_trace()
         # check if this iteration has already been done.
         saved_idxs_file = Path(out_name + "_" + str(i+1) + "_full_idxs.npz")
-        if saved_idxs_file.is_file():
-            # file exists, skip this iteration
-            append_write(out_name," Iteration already done skipping to the next one.")
+        saved_params_file = Path(out_name + "_para_kernel_aft_" + str(i+1) + ".txt")
+        if saved_params_file.is_file():
+            # i.e. if the (i+1)th saved param file exists then
+            # we can continue.
             should_i_resume = True
             continue
         else:
-            # file doesn't exist load the prediction_idxs, remaining_idxs and
-            # test_idxs from the previous iterations's file. If the iteration is 0
-            # this means this is the first run, nothing to load.
+            # (i+1)th saved param file doesn't exit, which means
+            # (i)th saved param file is the last one.
             if i > 0 and should_i_resume:
-                should_i_resume = False # since we have already resumed.
-                print(f"loading {out_name}_{str(i)}_full_idxs.npz")
-                append_write(out_name, f"loading {out_name}_{str(i)}_full_idxs.npz")
-                with np.load(out_name + "_" + str(i) + "_full_idxs.npz") as data:
+                should_i_resume = False
+                print(f"loading {out_name}_para_kernel_aft_{str(i)}.txt")
+                append_write(out_name, f"loading {out_name}_para_kernel_aft_{str(i)}.txt")
+                with open(f"{out_name}_para_kernel_aft_{str(i)}.txt") as f:
+                    data = eval(f.read())
+                    gpr = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)            
+                    gpr.kernel.k1.constant_value = data['k1__constant_value']
+                    gpr.kernel.k2.length_scale = data['k2__length_scale']
+
+                    gpr2 = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)            
+                    gpr2.kernel.k1.constant_value = data['k1__constant_value']
+                    gpr2.kernel.k2.length_scale = data['k2__length_scale']
+                    print(f"Inside loading section : {gpr.get_params}")
+                # also load the data
+                print(f"loading {out_name}_{str(i+1)}_full_idxs.npz")
+                with np.load(out_name + "_" + str(i+1) + "_full_idxs.npz") as data:
                     prediction_idxs = data['prediction_idxs']
                     remaining_idxs = data['remaining_idxs']
                     test_idxs = data['test_idxs']
                 # refit GPR with these idxs because that's used in acq_fn to pick next points.
                 X_train_pp, _ = desc_pp(preprocess, mbtr_data_red[prediction_idxs, :], X_test)
                 y_train = homo_lowfid[prediction_idxs]
-                gpr = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)            
-                ## Reload hyperparams
-                with open(out_name + '_para_kernel_aft_' + str(i-1) + '.txt') as f2:
-                    data = eval(f2.read())
+                gpr.fit(X_train_pp, y_train)
+                # gpr2.fit(X_train_pp, y_train)
+                gpr2.log_marginal_likelihood_value_ = -1040.929968135276
+                gpr2._y_train_mean = np.array([0.])
+                gpr2.X_train_ = X_train_pp
+                print(f"GPR vals : k1.constant_value {gpr.kernel.k1.constant_value} k2.length_scale {gpr.kernel.k2.length_scale}")
+                print(f"GPR2 vals : k1.constant_value {gpr2.kernel.k1.constant_value} k2.length_scale {gpr2.kernel.k2.length_scale}")
                 pdb.set_trace()
-                gpr.kernel.k1.constant_value = data['k1__constant_value']
-                gpr.kernel.k2.length_scale = data['k2__length_scale']
-                print(f"Inside loading section : {gpr.get_params}")
+                gpr=gpr2
+
+        # if saved_idxs_file.is_file():
+        #     # file exists, skip this iteration
+        #     append_write(out_name," Iteration already done skipping to the next one.")
+        #     should_i_resume = True
+        #     continue
+        # else:
+        #     # file doesn't exist load the prediction_idxs, remaining_idxs and
+        #     # test_idxs from the previous iterations's file. If the iteration is 0
+        #     # this means this is the first run, nothing to load.
+        #     if i > 0 and should_i_resume:
+        #         should_i_resume = False # since we have already resumed.
+        #         print(f"loading {out_name}_{str(i)}_full_idxs.npz")
+        #         append_write(out_name, f"loading {out_name}_{str(i)}_full_idxs.npz")
+        #         with np.load(out_name + "_" + str(i) + "_full_idxs.npz") as data:
+        #             prediction_idxs = data['prediction_idxs']
+        #             remaining_idxs = data['remaining_idxs']
+        #             test_idxs = data['test_idxs']
+        #         # refit GPR with these idxs because that's used in acq_fn to pick next points.
+        #         X_train_pp, _ = desc_pp(preprocess, mbtr_data_red[prediction_idxs, :], X_test)
+        #         y_train = homo_lowfid[prediction_idxs]
+        #         gpr = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)            
+        #         ## Reload hyperparams
+        #         with open(out_name + '_para_kernel_aft_' + str(i-1) + '.txt') as f2:
+        #             data = eval(f2.read())
+        #         pdb.set_trace()
+        #         gpr.kernel.k1.constant_value = data['k1__constant_value']
+        #         gpr.kernel.k2.length_scale = data['k2__length_scale']
+        #         print(f"Inside loading section : {gpr.get_params}")
                 
                 # # pdb.set_trace()
                 # ## gpr.fit(X_train_pp, y_train)
@@ -483,7 +526,7 @@ def main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bo
     #-- Predict
     start = time.time()
     append_write(out_name,"start prediction" + "\n")
-    print(f"Iteration {i} : gpr params {gpr.get_params()}")
+    print(f"Iteration {i} : gpr params {gpr.get_params()} . k1_consant_value {const} k2_length_scale {length}")
     mu_s, std_s = gpr.predict(X_test_pp, return_std=True)
     process_time = time.time() - start
     out_time(out_name, process_time)
