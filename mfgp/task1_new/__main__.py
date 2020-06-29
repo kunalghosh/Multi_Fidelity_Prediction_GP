@@ -314,9 +314,9 @@ def main():
                     gpr.kernel.k1.constant_value = data['k1__constant_value']
                     gpr.kernel.k2.length_scale = data['k2__length_scale']
 
-                    gpr2 = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)            
-                    gpr2.kernel.k1.constant_value = data['k1__constant_value']
-                    gpr2.kernel.k2.length_scale = data['k2__length_scale']
+                    # gpr2 = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)            
+                    # gpr2.kernel.k1.constant_value = data['k1__constant_value']
+                    # gpr2.kernel.k2.length_scale = data['k2__length_scale']
                     print(f"Inside loading section : {gpr.get_params}")
                 # also load the data
                 print(f"loading {out_name}_{str(i+1)}_full_idxs.npz")
@@ -328,14 +328,14 @@ def main():
                 X_train_pp, _ = desc_pp(preprocess, mbtr_data_red[prediction_idxs, :], X_test)
                 y_train = homo_lowfid[prediction_idxs]
                 gpr.fit(X_train_pp, y_train)
-                # gpr2.fit(X_train_pp, y_train)
-                gpr2.log_marginal_likelihood_value_ = -1040.929968135276
-                gpr2._y_train_mean = np.array([0.])
-                gpr2.X_train_ = X_train_pp
+                # # gpr2.fit(X_train_pp, y_train)
+                # gpr2.log_marginal_likelihood_value_ = -1040.929968135276
+                # gpr2._y_train_mean = np.array([0.])
+                # gpr2.X_train_ = X_train_pp
                 print(f"GPR vals : k1.constant_value {gpr.kernel.k1.constant_value} k2.length_scale {gpr.kernel.k2.length_scale}")
-                print(f"GPR2 vals : k1.constant_value {gpr2.kernel.k1.constant_value} k2.length_scale {gpr2.kernel.k2.length_scale}")
-                pdb.set_trace()
-                gpr=gpr2
+                # print(f"GPR2 vals : k1.constant_value {gpr2.kernel.k1.constant_value} k2.length_scale {gpr2.kernel.k2.length_scale}")
+                # pdb.set_trace()
+                # gpr=gpr2
 
         # if saved_idxs_file.is_file():
         #     # file exists, skip this iteration
@@ -490,7 +490,7 @@ def main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bo
     if param_file_pkl.is_file():
         with param_file_pkl.open("rb") as f:
             data = pkl.load(f)
-            pdb.set_trace()
+            # pdb.set_trace()
             print(f"loading params : {data}")
             gpr = gpr.set_params(**data)
             para_kernel_aft = gpr.kernel_.get_params()
