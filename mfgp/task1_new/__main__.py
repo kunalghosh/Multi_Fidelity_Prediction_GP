@@ -311,8 +311,8 @@ def main():
                 with open(f"{out_name}_para_kernel_aft_{str(i)}.txt") as f:
                     data = eval(f.read())
                     gpr = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)            
-                    gpr.kernel.k1.constant_value = data['k1__constant_value']
-                    gpr.kernel.k2.length_scale = data['k2__length_scale']
+                    # gpr.kernel.k1.constant_value = data['k1__constant_value']
+                    # gpr.kernel.k2.length_scale = data['k2__length_scale']
 
                     # gpr2 = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)            
                     # gpr2.kernel.k1.constant_value = data['k1__constant_value']
