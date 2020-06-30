@@ -20,4 +20,4 @@ if [ ! -d "run$SLURM_ARRAY_TASK_ID" ]; then
 fi
 
 cd run$SLURM_ARRAY_TASK_ID
-srun ../main-D.sh run$SLURM_ARRAY_TASK_ID input.dat
+srun ../main.sh run$SLURM_ARRAY_TASK_ID input.dat
