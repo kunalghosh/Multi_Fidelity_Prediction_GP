@@ -16,7 +16,7 @@ export PROJAPPL=/projappl/project_2000382
 if [ ! -d "run$SLURM_ARRAY_TASK_ID" ]; then
     # directory doesn't exist
     echo "run directories don't exist exitting !"
-    exit(1)
+    exit 1
 fi
 
 cd run$SLURM_ARRAY_TASK_ID
