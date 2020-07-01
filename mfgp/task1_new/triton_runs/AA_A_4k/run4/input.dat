@@ -1,6 +1,6 @@
 #condtidion
 fn_name                 rnd2
-out_name                test-A-8k
+out_name                test-A-4k
 dataset                 AA
 dataset_size            44004
 test_set_size           10000
@@ -25,10 +25,12 @@ save_load_split_flag    False
 restart_flag            False
 
 #trainsize
-num_itr                 2
+num_itr                 4
 pre_idxs_0              1000
-pre_idxs_1              8000
-pre_idxs_2              8000
+pre_idxs_1              4000
+pre_idxs_2              4000
+pre_idxs_3              4000
+pre_idxs_4              4000
 
 #path
 mbtr_path              ../../../../../../multifidelity_data/AA/mbtr_k2.npz
