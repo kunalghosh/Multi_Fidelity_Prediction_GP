@@ -395,7 +395,7 @@ def main():
 
         prediction_set_size = pre_idxs[i+1]
 
-        print(f"Prediciton idxs {i}-before : {prediction_idxs}")
+        # print(f"Prediciton idxs {i}-before : {prediction_idxs}")
         prediction_idxs, remaining_idxs, X_train_pp, y_train = acq_fn(fn_name\
                                                                       , i\
                                                                       , prediction_idxs\
@@ -409,7 +409,7 @@ def main():
                                                                       , preprocess\
                                                                       , out_name\
                                                                       , random_seed)
-        print(f"Prediciton idxs {i}-after : {prediction_idxs}")
+        # print(f"Prediciton idxs {i}-after : {prediction_idxs}")
 
         #-- Save the values 
         np.savez(out_name + "_" + str(i+1) + "_full_idxs.npz", remaining_idxs=remaining_idxs, prediction_idxs = prediction_idxs, test_idxs = test_idxs)
