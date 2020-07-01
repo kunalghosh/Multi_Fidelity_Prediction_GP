@@ -1,6 +1,6 @@
 #condtidion
-fn_name                 high_and_cluster
-out_name                test-D-8k
+fn_name                 rnd2
+out_name                test-A-8k
 dataset                 AA
 dataset_size            44004
 test_set_size           10000
