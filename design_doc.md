@@ -49,6 +49,13 @@ class SKLearnGPModel(Model):
 
   def predict(self, X_test):
     self.model.predict(X_test)
+
+  def get_params(self):
+    self.params = {
+                   "constant_value" : self.kernel.k1.constant_value,
+                   "length_scale"   : self.kernel.k2.length_scale
+                  }
+    return self.params
 ```
 
 ## Handling the configuration file
@@ -86,14 +93,14 @@ save_load_split_flag    = False# save_load_split_flag    False
 restart_flag            = False # restart_flag            False
 
 #active learning specific config
-num_total_iterations    = 4
 batch_sizes             = [
-                            1000,
+                            1000, #  for each active learning loop first batch size is the same to keep the learning comparable.
                             1000,
                             2000,
                             4000,
                             8000,
                             ]
+num_total_iterations    = len(batch_sizes)
 
 #paths
 mbtr_path               = "../../../../data/AA/mbtr_k2.npz"
@@ -107,4 +114,69 @@ This would allow us to import the config as without the need for any explicit pa
 ```python
 import config
 config.acquisition_name # returns "rnd2"
+```
+
+## The Acqusition functions
+
+> The following section was written by first listing down the function names.
+> Then the docstring was filled in to figure out what the function must do.
+> Subsequently the argument list (their datatypes) and the return types were identified.
+
+```python
+def strategy_A(heldout_set: list, batch_size: int, random_seed: int) -> list:
+  """
+  Random strategy :
+    pick molecules randomly from the held outs set
+  """
+  pass
+
+def strategy_B(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed:int ) -> list:
+  """
+  Uncertainty:
+    1. Use the GP trained on the previous batch to make predictions on the held out set.
+    2. Sort molecules based on prediction uncertainty.
+    3. Pick the molecules with the highest uncertainty
+  """
+  pass
+
+ def strategy_C(helout_set: list, batch_size: int, random_seed: int) -> list:
+  """
+  Clustering:
+  1. Cluster the held out set, into as many clusters as the next batch_size
+  2. Pick the cluster centers
+  """
+  pass
+
+def strategy_D(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed: int) -> list:
+  """
+  Uncertainty and Clustering:
+  1. Use the GP trained on the previous batch to make predictions on the held out set.
+  2. Sort molecules based on prediction uncertainty.
+  3. Pick the _top half_ of molecules with the highest uncertainty
+  4. Cluster the set into as many clusters as the next batch_size.
+  5. Pick the cluster centers.
+  """
+  pass
+
+def strategy_E(arg):
+  """
+
+  """
+  pass
+
+def strategy_F(arg):
+  """
+  """
+  pass
+
+def strategy_G(arg):
+  """
+  Cluster and Uncertainty:
+  1. Cluster the entire held out set, into as many clusters as the next batch_size.
+  2. Make predictions for the entire held out set. (1 and 2 can happen independently.)
+  3. 
+  """
+  pass
+
+
 ```
