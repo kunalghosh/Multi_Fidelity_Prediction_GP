@@ -127,7 +127,7 @@ config.acquisition_name # returns "rnd2"
 def strategy_A(heldout_set: list, batch_size: int, random_seed: int) -> list:
   """
   Random strategy :
-    pick molecules randomly from the held outs set
+    1. Pick molecules randomly from the held out set.
   """
   pass
 
@@ -143,19 +143,19 @@ def strategy_B(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_se
  def strategy_C(helout_set: list, batch_size: int, random_seed: int) -> list:
   """
   Clustering:
-  1. Cluster the held out set, into as many clusters as the next batch_size
-  2. Pick the cluster centers
+    1. Cluster the held out set, into as many clusters as the next batch_size
+    2. Pick the cluster centers
   """
   pass
 
 def strategy_D(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed: int) -> list:
   """
   Uncertainty and Clustering:
-  1. Use the GP trained on the previous batch to make predictions on the held out set.
-  2. Sort molecules based on prediction uncertainty.
-  3. Pick the _top half_ of molecules with the highest uncertainty
-  4. Cluster the set into as many clusters as the next batch_size.
-  5. Pick the cluster centers.
+    1. Use the GP trained on the previous batch to make predictions on the held out set.
+    2. Sort molecules based on prediction uncertainty.
+    3. Pick the _top half_ of molecules with the highest uncertainty
+    4. Cluster the set into as many clusters as the next batch_size.
+    5. Pick the cluster centers.
   """
   pass
 
@@ -173,9 +173,9 @@ def strategy_F(arg):
 def strategy_G(arg):
   """
   Cluster and Uncertainty:
-  1. Cluster the entire held out set, into as many clusters as the next batch_size.
-  2. Make predictions for the entire held out set. (1 and 2 can happen independently.)
-  3.
+    1. Cluster the entire held out set, into as many clusters as the next batch_size.
+    2. Make predictions for the entire held out set. (1 and 2 can happen independently.)
+    3.
   """
   pass
 
