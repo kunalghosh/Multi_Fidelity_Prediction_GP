@@ -170,6 +170,12 @@ def strategy_D(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_se
 
 def strategy_E(arg, debug=False):
   """
+  Combination of B. and C.
+    1. Use the GP trained on the previous batch to make predictions on the held out set.
+    2. Sort molecules based on prediction uncertainty.
+    3. Pick the _top half_ of molecules with the highest uncertainty
+    4. Cluster the set into as many clusters as the next batch_size.
+    5. Sort each cluster based on uncertainty and pick molecule with highest uncertainty.
 
   debug : boolean
     Used to enable debug logs and plots.
@@ -178,6 +184,11 @@ def strategy_E(arg, debug=False):
 
 def strategy_F(arg, debug=False):
   """
+  Combination of A. and B.
+    1. Use the GP trained on the previous batch to make predictions on the held out set.
+    2. Sort molecules based on prediction uncertainty.
+    3. Pick the _top half_ of molecules with the highest uncertainty
+    4. Randomly pick as many molecules as the next batch_size (NOTE !! The figure needs to be updated.)
 
   debug : boolean
     Used to enable debug logs and plots.
