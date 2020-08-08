@@ -124,58 +124,75 @@ config.acquisition_name # returns "rnd2"
 > * Subsequently the argument list (their datatypes) and the return types were identified.
 
 ```python
-def strategy_A(heldout_set: list, batch_size: int, random_seed: int) -> list:
+def strategy_A(heldout_set: list, batch_size: int, random_seed: int, debug=False) -> list:
   """
   Random strategy :
     1. Pick molecules randomly from the held out set.
   """
   pass
 
-def strategy_B(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed:int ) -> list:
+def strategy_B(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed:int, debug=False) -> list:
   """
   Uncertainty:
     1. Use the GP trained on the previous batch to make predictions on the held out set.
     2. Sort molecules based on prediction uncertainty.
     3. Pick the molecules with the highest uncertainty
+
+    debug : boolean
+      Used to enable debug logs and plots.
   """
   pass
 
- def strategy_C(helout_set: list, batch_size: int, random_seed: int) -> list:
+ def strategy_C(helout_set: list, batch_size: int, random_seed: int, debug=False) -> list:
   """
   Clustering:
     1. Cluster the held out set, into as many clusters as the next batch_size
-    2. Pick the cluster centers
+    2. Pick molecule closest to the cluster centers
+
+    debug : boolean
+      Used to enable debug logs and plots.
   """
   pass
 
-def strategy_D(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed: int) -> list:
+def strategy_D(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed: int, debug=False) -> list:
   """
   Uncertainty and Clustering:
     1. Use the GP trained on the previous batch to make predictions on the held out set.
     2. Sort molecules based on prediction uncertainty.
     3. Pick the _top half_ of molecules with the highest uncertainty
     4. Cluster the set into as many clusters as the next batch_size.
-    5. Pick the cluster centers.
+    5. Pick molecule closest to the cluster centers
+
+    debug : boolean
+      Used to enable debug logs and plots.
   """
   pass
 
-def strategy_E(arg):
+def strategy_E(arg, debug=False):
   """
 
+  debug : boolean
+    Used to enable debug logs and plots.
   """
   pass
 
-def strategy_F(arg):
+def strategy_F(arg, debug=False):
   """
+
+  debug : boolean
+    Used to enable debug logs and plots.
   """
   pass
 
-def strategy_G(arg):
+def strategy_G(arg, debug=False):
   """
   Cluster and Uncertainty:
     1. Cluster the entire held out set, into as many clusters as the next batch_size.
     2. Make predictions for the entire held out set. (1 and 2 can happen independently.)
-    3.
+    3. Pick the molecule with the highest uncertainty in each cluster (if cluster has one element pick that).
+
+    debug : boolean
+      Used to enable debug logs and plots.
   """
   pass
 
