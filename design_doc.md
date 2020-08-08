@@ -118,9 +118,10 @@ config.acquisition_name # returns "rnd2"
 
 ## The Acqusition functions
 
-> The following section was written by first listing down the function names.
-> Then the docstring was filled in to figure out what the function must do.
-> Subsequently the argument list (their datatypes) and the return types were identified.
+> The following section was written by :
+> * First listing down the function names.
+> * Then the docstring was filled in to figure out what the function must do.
+> * Subsequently the argument list (their datatypes) and the return types were identified.
 
 ```python
 def strategy_A(heldout_set: list, batch_size: int, random_seed: int) -> list:
@@ -174,7 +175,7 @@ def strategy_G(arg):
   Cluster and Uncertainty:
   1. Cluster the entire held out set, into as many clusters as the next batch_size.
   2. Make predictions for the entire held out set. (1 and 2 can happen independently.)
-  3. 
+  3.
   """
   pass
 
