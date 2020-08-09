@@ -168,7 +168,7 @@ def strategy_D(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_se
   """
   pass
 
-def strategy_E(arg, debug=False):
+def strategy_E(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed:int, debug=False) -> list:
   """
   Combination of B. and C.
     1. Use the GP trained on the previous batch to make predictions on the held out set.
@@ -182,7 +182,7 @@ def strategy_E(arg, debug=False):
   """
   pass
 
-def strategy_F(arg, debug=False):
+def strategy_F(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed:int, debug=False) -> list:
   """
   Combination of A. and B.
     1. Use the GP trained on the previous batch to make predictions on the held out set.
@@ -195,7 +195,7 @@ def strategy_F(arg, debug=False):
   """
   pass
 
-def strategy_G(arg, debug=False):
+def strategy_G(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed:int, debug=False) -> list:
   """
   Cluster and Uncertainty:
     1. Cluster the entire held out set, into as many clusters as the next batch_size.
@@ -206,6 +206,40 @@ def strategy_G(arg, debug=False):
       Used to enable debug logs and plots.
   """
   pass
+```
 
+* Next we need one function which does clustering.
 
+```python
+def cluster(heldout_set: list, n_clusters: int) -> (list, list):
+  """
+  first list returned is a list of indices indicating which cluster each molecule belongs to.
+  second one is the cluster centers
+  """
+  # return (cluster_assignment, cluster_centers)
+  pass
+
+def get_closest_to_center(heldout_set: list, cluster_assignment: list, cluster_centers: list) -> list:
+  """
+  Molecules in the cluster which are closest to the cluster center.
+  """
+  pass
+
+```
+
+* We also need a function which sorts a list based on criterion
+```python
+def sort(data: list, based_on: list) -> list:
+  pass
+
+def get_last_x(data: list, top_k: float) -> list:
+  """
+  if top_k = 0.5, then return second half, if top_k = 1/3 then return last 1/3 of data.
+  """
+  pass
+
+def sort_and_get_last_x(data: list, based_on: list, top_k: float) -> list:
+  sorted_data = sort(data, based_on)
+  last_x = get_last_x(sorted_data, top_k)
+  return last_x
 ```
