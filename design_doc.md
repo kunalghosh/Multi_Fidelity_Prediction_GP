@@ -326,3 +326,40 @@ def sort_and_get_last_x(data: list, based_on: list, top_k: float) -> list:
   last_x = get_last_x(sorted_data, top_k)
   return last_x
 ```
+
+
+## Datastructure save load class
+We need a class which can load an save pre-define python lists etc.
+When loading it just populates datastructures.list1 with the list so we can
+do append / read etc to it.
+
+## Timing function
+```python
+import functools
+import time
+
+def timer(func):
+    @functools.wraps(func)
+    def wrapper_timer(*args, **kwargs):
+        tic = time.perf_counter()
+        value = func(*args, **kwargs)
+        toc = time.perf_counter()
+        elapsed_time = toc - tic
+        print(f"Elapsed time in function-{func.__name__} : {elapsed_time:0.4f} seconds")
+        return value
+    return wrapper_timer
+```
+
+The above function would be used as:
+
+```python
+@timer
+def loadjson(path):
+    with open(path, "r") as json_file:
+        json_data = json_file.read()
+    return json.loads(json_data)
+
+loadjson("test.json") # test.json has above json config
+## Elapsed time in function-loadjson : 0.0002 seconds
+
+```
