@@ -115,6 +115,89 @@ This would allow us to import the config as without the need for any explicit pa
 import config
 config.acquisition_name # returns "rnd2"
 ```
+### Alternative based on JSON
+
+The further investigation the python based config file is problematic since there is no easy way to pass it to
+a script as a command line parameter. Instead using a JSON based config is better.
+
+```JSON
+{
+  "acquisition_name"     : "rnd2",
+  "out_name"             : "test",
+  "dataset"              : "AA",
+  "dataset_size"         : 44004,
+  "testset_size"         : 10000,
+  "rnd_size"             : 2.0,
+  "K_high"               : 100,
+  "random_seed"          : 1234,
+  "mbtr_read"            : false,
+  "preprocess"           : null,
+  "kernel_name"          : "constRBF",
+  "length_scale_init"    : 700,
+  "prefactor_init"       : 20,
+  "hyperparam_bounds"    : 1e2,
+  "n_opt"                : 0,
+  "save_load_flag"       : "save",
+  "save_load_split_flag" : false,
+  "restart_flag"         : false,
+  "batch_sizes"          : [
+                              1000,
+                              1000,
+                              2000,
+                              4000,
+                              8000
+                            ],
+  "num_total_iterations" : 4,
+  "mbtr_path"            : "../../../../data/AA/mbtr_k2.npz",
+  "json_path"            : "../../../../data/AA/HOMO.txt",
+  "loadidxs_path"        : "../../../../data/AA_derived/10K_dataset_load_high/10Kloadhigh2_0_idxs.npz",
+  "loadsplitidxs_path"   : "../../../../data/AA_derived/10K_dataset_load_high/10Kdataset_dataset_split_idxs.npz"
+}
+```
+Then the code to load the above json file would be
+
+```python
+import json
+
+from dataclasses import dataclass
+
+@dataclass
+class Config:
+    acquisition_name : str
+    out_name : str
+    dataset : str
+    dataset_size : int
+    testset_size : int
+    rnd_size : int
+    K_high : int
+    random_seed : int
+
+    mbtr_read : bool
+    preprocess : None
+    kernel_name : str
+    length_scale_init : int
+    prefactor_init : int
+    hyperparam_bounds : int
+    n_opt : int
+
+    save_load_flag : str
+    save_load_split_flag : bool
+    restart_flag : bool
+
+    batch_sizes : list
+    num_total_iterations : int
+
+    mbtr_path : str
+    json_path : str
+    loadidxs_path : str
+    loadsplitidxs_path : str
+
+with open("config.json", "r") as json_file:
+  json_data = json_file.read()
+
+json_config = json.loads(json_data)
+config = Config(**json_config)
+```
 
 ## The Acqusition functions
 
