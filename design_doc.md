@@ -363,3 +363,6 @@ loadjson("test.json") # test.json has above json config
 ## Elapsed time in function-loadjson : 0.0002 seconds
 
 ```
+
+
+# Write the main function which does what the current main does.
