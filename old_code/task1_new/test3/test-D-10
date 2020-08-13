@@ -1,0 +1,441 @@
+start load mbtr 
+time 4.196962118148804[s]
+start load AA 
+time 0.1250779628753662[s]
+=============================
+2020-06-04 10:10:39.066558
+condition 
+fn_name(acquistion function) high_and_cluster
+num_itr 15
+dataset_size 700
+test_set_size 100
+rnd_size(random sampling) or K_pre(high_and_cluster) 2.0
+high_size(high std) 10.0
+flag for reducing the MBTR array False
+mbtr_path ../../../../Multi_Fidelity_Prediction_GP/data/AA/mbtr_k2.npz
+json_path ../../../../Multi_Fidelity_Prediction_GP/data/AA/HOMO.txt
+save_load_flag save
+loadidxs_path ../../../../Multi_Fidelity_Prediction_GP/data/AA_derived/10K_dataset_load_high/10Kloadhigh2_0_idxs.npz
+save_load_split_flag False
+loadsplitidxs_path ../../../../Multi_Fidelity_Prediction_GP/data/AA_derived/10K_dataset_load_high/10Kdataset_dataset_split_idxs.npz
+CPU: 4
+dataset is AA
+the number of added indexes in step 0 30
+the number of added indexes in step 1 30
+the number of added indexes in step 2 30
+the number of added indexes in step 3 30
+the number of added indexes in step 4 30
+the number of added indexes in step 5 30
+the number of added indexes in step 6 30
+the number of added indexes in step 7 30
+the number of added indexes in step 8 30
+the number of added indexes in step 9 30
+the number of added indexes in step 10 30
+the number of added indexes in step 11 30
+the number of added indexes in step 12 30
+the number of added indexes in step 13 30
+the number of added indexes in step 14 30
+the number of added indexes in step 15 30
+preprocess none
+length_value 700.0
+const_value 20.0
+upper bound 100.0
+lower bound 0.01
+n_restart_optimizer 0
+0-th learning 
+mbtr_data col 44004
+mbtr_data row 13200
+mbtr_data_size 44004
+mbtr_data_red_size 13200
+=============================
+length of RBF kernel before fitting 700.0
+constant of constant kernel before fitting 20.0
+save_load_split_flag: False 
+mbtr_data_size =/ dataset_size 
+mbtr_data_size 44004
+dataset_size 700
+length of test_idxs 100
+length of remaining_idxs 600
+length of prediction_idxs 30
+length of remaining_idxs 570
+save_load_flag: save 
+initial learning 
+start to make a model 
+time 0.11284780502319336[s]
+start prediction
+time 0.058686017990112305[s]
+start calculating r2 by hand 
+time 0.0004711151123046875[s]
+start calculating MAE 
+time 0.00034689903259277344[s]
+r2 by hand -6.729195461108128
+MAE 10.247608999999994
+time all 5.00065279006958[s]
+============================= 
+1-th learning
+ Iteration already skipping to the next one.============================= 
+2-th learning
+ Iteration already skipping to the next one.============================= 
+3-th learning
+ Iteration already skipping to the next one.============================= 
+4-th learning
+ Iteration already skipping to the next one.============================= 
+5-th learning
+ Iteration already skipping to the next one.============================= 
+6-th learning
+ Iteration already skipping to the next one.============================= 
+7-th learning
+starting prediction 
+time 0.2239530086517334[s]
+Max value of std within pick_idxs 10.827643568439408
+Min value of std within pick_idxs 10.827643568439408
+Max value of std within all remaining_idxs 10.827643568439408
+Min value of std within all remaining_idxs 10.827643568439408
+The # of zero values 0
+The # of not zero values 390
+starting clustering 
+time 9.19754695892334[s]
+length of centers 30
+starting calculate nearest points of centers 
+number of closest points 30
+time 0.01249384880065918[s]
+length of pick idxs 30
+check duplicates of prediction_idxs False
+length of all_idxs 700
+check duplicates of all idxs False
+length of prediction_idxs 240
+length of remaining_idxs 360
+length of test_idxs 100
+length of RBF kernel before fitting 8.524143101120808
+constant of constant kernel before fitting 117.23786524516728
+initial learning 
+start to make a model 
+time 6.872730016708374[s]
+start prediction
+time 0.4412841796875[s]
+start calculating r2 by hand 
+time 0.0006830692291259766[s]
+start calculating MAE 
+time 0.0009248256683349609[s]
+r2 by hand -6.728920494208585
+MAE 10.247398536684805
+time all 22.49697780609131[s]
+time for this step 17.49318504333496[s]
+============================= 
+8-th learning
+starting prediction 
+time 1.516503095626831[s]
+Max value of std within pick_idxs 11.263826583922112
+Min value of std within pick_idxs 11.263826583922112
+Max value of std within all remaining_idxs 11.263826583922112
+Min value of std within all remaining_idxs 11.263622653347566
+The # of zero values 0
+The # of not zero values 360
+starting clustering 
+time 4.3862528800964355[s]
+length of centers 30
+starting calculate nearest points of centers 
+number of closest points 30
+time 0.011990070343017578[s]
+length of pick idxs 30
+check duplicates of prediction_idxs False
+length of all_idxs 700
+check duplicates of all idxs False
+length of prediction_idxs 270
+length of remaining_idxs 330
+length of test_idxs 100
+length of RBF kernel before fitting 10.004208177435034
+constant of constant kernel before fitting 126.8737893126705
+initial learning 
+start to make a model 
+time 7.760913848876953[s]
+start prediction
+time 0.491685152053833[s]
+start calculating r2 by hand 
+time 0.0018012523651123047[s]
+start calculating MAE 
+time 0.0007481575012207031[s]
+r2 by hand -6.728882447236539
+MAE 10.247365894929262
+time all 37.45886492729187[s]
+time for this step 14.960753202438354[s]
+============================= 
+9-th learning
+starting prediction 
+time 1.5592153072357178[s]
+Max value of std within pick_idxs 11.349199092790162
+Min value of std within pick_idxs 11.349199092790162
+Max value of std within all remaining_idxs 11.349199092790162
+Min value of std within all remaining_idxs 11.348957407874053
+The # of zero values 0
+The # of not zero values 330
+starting clustering 
+time 3.323023796081543[s]
+length of centers 30
+starting calculate nearest points of centers 
+number of closest points 30
+time 0.008450031280517578[s]
+length of pick idxs 30
+check duplicates of prediction_idxs False
+length of all_idxs 700
+check duplicates of all idxs False
+length of prediction_idxs 300
+length of remaining_idxs 300
+length of test_idxs 100
+length of RBF kernel before fitting 10.084555751505144
+constant of constant kernel before fitting 128.80432004778902
+initial learning 
+start to make a model 
+time 9.747985124588013[s]
+start prediction
+time 0.5433480739593506[s]
+start calculating r2 by hand 
+time 0.001474142074584961[s]
+start calculating MAE 
+time 0.00040912628173828125[s]
+r2 by hand -6.728891578455741
+MAE 10.247372877833358
+time all 53.24621272087097[s]
+time for this step 15.786282062530518[s]
+============================= 
+10-th learning
+starting prediction 
+time 1.5912280082702637[s]
+Max value of std within pick_idxs 11.492373121705704
+Min value of std within pick_idxs 11.492373121705704
+Max value of std within all remaining_idxs 11.492373121705704
+Min value of std within all remaining_idxs 11.492138903302063
+The # of zero values 0
+The # of not zero values 300
+starting clustering 
+time 2.731510877609253[s]
+length of centers 30
+starting calculate nearest points of centers 
+number of closest points 30
+time 0.01004791259765625[s]
+length of pick idxs 30
+check duplicates of prediction_idxs False
+length of all_idxs 700
+check duplicates of all idxs False
+length of prediction_idxs 330
+length of remaining_idxs 270
+length of test_idxs 100
+length of RBF kernel before fitting 10.062623994491723
+constant of constant kernel before fitting 132.0746399685037
+initial learning 
+start to make a model 
+time 11.699490070343018[s]
+start prediction
+time 0.6191747188568115[s]
+start calculating r2 by hand 
+time 0.0014989376068115234[s]
+start calculating MAE 
+time 0.00048279762268066406[s]
+r2 by hand -6.728861573857492
+MAE 10.247349945787237
+time all 70.59191608428955[s]
+time for this step 17.34462308883667[s]
+============================= 
+11-th learning
+starting prediction 
+time 1.5820248126983643[s]
+Max value of std within pick_idxs 11.54330320945625
+Min value of std within pick_idxs 11.54330320945625
+Max value of std within all remaining_idxs 11.54330320945625
+Min value of std within all remaining_idxs 2.5922487314046165
+The # of zero values 0
+The # of not zero values 270
+starting clustering 
+time 1.6816260814666748[s]
+length of centers 30
+starting calculate nearest points of centers 
+number of closest points 30
+time 0.006425142288208008[s]
+length of pick idxs 30
+check duplicates of prediction_idxs False
+length of all_idxs 700
+check duplicates of all idxs False
+length of prediction_idxs 360
+length of remaining_idxs 240
+length of test_idxs 100
+length of RBF kernel before fitting 10.132821923700943
+constant of constant kernel before fitting 133.24784898544294
+initial learning 
+start to make a model 
+time 13.868531227111816[s]
+start prediction
+time 0.8054111003875732[s]
+start calculating r2 by hand 
+time 0.0014941692352294922[s]
+start calculating MAE 
+time 0.00055694580078125[s]
+r2 by hand -6.728813090843377
+MAE 10.24731296684906
+time all 89.36992597579956[s]
+time for this step 18.77720284461975[s]
+============================= 
+12-th learning
+starting prediction 
+time 1.6691670417785645[s]
+Max value of std within pick_idxs 11.579025282799869
+Min value of std within pick_idxs 11.579025282799869
+Max value of std within all remaining_idxs 11.579025282799869
+Min value of std within all remaining_idxs 2.574667598301625
+The # of zero values 0
+The # of not zero values 240
+starting clustering 
+time 1.7569808959960938[s]
+length of centers 30
+starting calculate nearest points of centers 
+number of closest points 30
+time 0.01108407974243164[s]
+length of pick idxs 30
+check duplicates of prediction_idxs False
+length of all_idxs 700
+check duplicates of all idxs False
+length of prediction_idxs 390
+length of remaining_idxs 210
+length of test_idxs 100
+length of RBF kernel before fitting 10.23622403167753
+constant of constant kernel before fitting 134.0738264997186
+initial learning 
+start to make a model 
+time 16.809900045394897[s]
+start prediction
+time 0.8353748321533203[s]
+start calculating r2 by hand 
+time 0.00150299072265625[s]
+start calculating MAE 
+time 0.00042700767517089844[s]
+r2 by hand -6.728782797714481
+MAE 10.247289904904838
+time all 111.4026849269867[s]
+time for this step 22.038212060928345[s]
+============================= 
+13-th learning
+starting prediction 
+time 1.689384937286377[s]
+Max value of std within pick_idxs 11.61753707359352
+Min value of std within pick_idxs 11.61753707359352
+Max value of std within all remaining_idxs 11.61753707359352
+Min value of std within all remaining_idxs 2.568701461039766
+The # of zero values 0
+The # of not zero values 210
+starting clustering 
+time 2.243353843688965[s]
+length of centers 30
+starting calculate nearest points of centers 
+number of closest points 30
+time 0.006715297698974609[s]
+length of pick idxs 30
+check duplicates of prediction_idxs False
+length of all_idxs 700
+check duplicates of all idxs False
+length of prediction_idxs 420
+length of remaining_idxs 180
+length of test_idxs 100
+length of RBF kernel before fitting 10.295612301459828
+constant of constant kernel before fitting 134.96716765631987
+initial learning 
+start to make a model 
+time 19.54658603668213[s]
+start prediction
+time 0.8459978103637695[s]
+start calculating r2 by hand 
+time 0.000225067138671875[s]
+start calculating MAE 
+time 0.0005919933319091797[s]
+r2 by hand -6.728755264495419
+MAE 10.247268970480922
+time all 136.47146487236023[s]
+time for this step 25.06242799758911[s]
+============================= 
+14-th learning
+starting prediction 
+time 1.3963940143585205[s]
+Max value of std within pick_idxs 11.710296217055802
+Min value of std within pick_idxs 11.710296217055802
+Max value of std within all remaining_idxs 11.710296217055802
+Min value of std within all remaining_idxs 2.5767555590503592
+The # of zero values 0
+The # of not zero values 180
+starting clustering 
+time 1.1195199489593506[s]
+length of centers 30
+starting calculate nearest points of centers 
+number of closest points 30
+time 0.0068569183349609375[s]
+length of pick idxs 30
+check duplicates of prediction_idxs False
+length of all_idxs 700
+check duplicates of all idxs False
+length of prediction_idxs 450
+length of remaining_idxs 150
+length of test_idxs 100
+length of RBF kernel before fitting 10.346644086285165
+constant of constant kernel before fitting 137.13103749119145
+initial learning 
+start to make a model 
+time 21.488826036453247[s]
+start prediction
+time 0.8783769607543945[s]
+start calculating r2 by hand 
+time 0.001531839370727539[s]
+start calculating MAE 
+time 0.0006048679351806641[s]
+r2 by hand -6.728743238493416
+MAE 10.247259834195608
+time all 162.06450581550598[s]
+time for this step 25.592325925827026[s]
+============================= 
+15-th learning
+starting prediction 
+time 1.225531816482544[s]
+Max value of std within pick_idxs 11.753879190160228
+Min value of std within pick_idxs 11.753879190160228
+Max value of std within all remaining_idxs 11.753879190160228
+Min value of std within all remaining_idxs 2.5811153227651262
+The # of zero values 0
+The # of not zero values 150
+starting clustering 
+time 0.9651529788970947[s]
+length of centers 30
+starting calculate nearest points of centers 
+number of closest points 30
+time 0.0041658878326416016[s]
+length of pick idxs 30
+check duplicates of prediction_idxs False
+length of all_idxs 700
+check duplicates of all idxs False
+length of prediction_idxs 480
+length of remaining_idxs 120
+length of test_idxs 100
+length of RBF kernel before fitting 10.368138722449006
+constant of constant kernel before fitting 138.15367601688166
+initial learning 
+start to make a model 
+time 24.68033194541931[s]
+start prediction
+time 1.1099112033843994[s]
+start calculating r2 by hand 
+time 0.0015082359313964844[s]
+start calculating MAE 
+time 0.0005037784576416016[s]
+r2 by hand -6.72869925500567
+MAE 10.24722645581857
+time all 190.9765818119049[s]
+time for this step 28.910416841506958[s]
+time all 190.97700881958008[s]
+
+ Output for score 
+Times     r2                 MAE 
+0        -6.7291954611        10.2476090000 
+1        -6.7289204942        10.2473985367 
+2        -6.7288824472        10.2473658949 
+3        -6.7288915785        10.2473728778 
+4        -6.7288615739        10.2473499458 
+5        -6.7288130908        10.2473129668 
+6        -6.7287827977        10.2472899049 
+7        -6.7287552645        10.2472689705 
+8        -6.7287432385        10.2472598342 
+9        -6.7286992550        10.2472264558 

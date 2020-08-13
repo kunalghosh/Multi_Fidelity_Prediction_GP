@@ -1,0 +1,50 @@
+#condtidion
+fn_name                 high_and_cluster
+out_name                test-D-10
+dataset                 AA
+dataset_size            700
+test_set_size           100
+rnd_size                2.0
+K_high                  10
+random_seed             5678
+
+#preprocess
+mbtr_red                False
+preprocess               none
+
+#kernel
+kernel_type             constRBF
+length                  700
+const                   20
+bound                   1e2
+n_opt                   0
+
+#flag
+save_load_flag          save
+save_load_split_flag    False
+restart_flag            False
+
+#trainsize
+num_itr                 15
+pre_idxs_0              30
+pre_idxs_1              30
+pre_idxs_2              30
+pre_idxs_3              30
+pre_idxs_4              30
+pre_idxs_5              30
+pre_idxs_6              30
+pre_idxs_7              30
+pre_idxs_8              30
+pre_idxs_9              30
+pre_idxs_10             30
+pre_idxs_11             30
+pre_idxs_12             30
+pre_idxs_13             30
+pre_idxs_14             30
+pre_idxs_15             30
+
+#path
+mbtr_path               ../../../../Multi_Fidelity_Prediction_GP/data/AA/mbtr_k2.npz
+json_path               ../../../../Multi_Fidelity_Prediction_GP/data/AA/HOMO.txt
+loadidxs_path           ../../../../Multi_Fidelity_Prediction_GP/data/AA_derived/10K_dataset_load_high/10Kloadhigh2_0_idxs.npz
+loadsplitidxs_path      ../../../../Multi_Fidelity_Prediction_GP/data/AA_derived/10K_dataset_load_high/10Kdataset_dataset_split_idxs.npz
