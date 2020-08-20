@@ -1,5 +1,5 @@
 from aldc.models import SKLearnGPModel
-from aldc.utils import sort
+from aldc.utils import sort_and_get_last_x
 import numpy as np
 
 def strategy_B(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed:int,mbtr_data ,debug=False) -> list:
@@ -28,10 +28,7 @@ def strategy_B(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_se
       #making predictions on th entire dataset
       mu_s, std_s = gp.predict(X_train_pp) #mu->mean? yes
   
-      sorted_data = sort(prediction_set ,std_s)
-
-      K = len(sorted_data) - batch_size
-      prediction_set = sorted_data[K:]
+      prediction_set = sort_and_get_last_x(prediction_set, std_s, batch_size)
   
       #heldout_set = np.setdiff1d(heldout_set, prediction_set)
   
