@@ -26,18 +26,19 @@ class Kernel():
 class SKLearnGPModel(Model):
     """docstring for SKLearnGPModel."""
     def __init__(self, kernel_name: str):
-        super(SKLearnModel, self).__init__()
+        super(SKLearnGPModel, self).__init__(kernel_name)
         self.random_seed = 1234 # change it with config
-        self.kernel = kernels.get(kernel_name)
+        kernels = Kernel()
+        self.kernel = kernels.get(kernel_name)()
         self.params = dict() # dictionary of parameters
         self.model = GaussianProcessRegressor(kernel=self.kernel,\
                 random_state=self.random_seed)
 
     def fit(self, X_train, Y_train):
-        self.model.fit()
+        self.model.fit(X_train, Y_train)
 
     def predict(self, X_test):
-        self.model.predict(X_test)
+        return self.model.predict(X_test, return_std=True)
 
     def get_params(self):
         self.params = {
