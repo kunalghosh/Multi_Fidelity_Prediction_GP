@@ -363,6 +363,74 @@ loadjson("test.json") # test.json has above json config
 ## Elapsed time in function-loadjson : 0.0002 seconds
 
 ```
+# The dataset class
+One for each dataset, OE, AA etc.
 
+```python
+from torch.utils.data import Dataset
+
+class OEDataset(Dataset):
+    def __init__(self, path : str, transform = None):
+        super(OEDataset, self).__init__()
+        self.transform = transform
+        self.dataframe = pd.read_json(path, orient='split')
+        self.num_atoms = self.dataframe["number_of_atoms"].values
+        self.homo_lowfid = self.dataframe.apply(self.get_lowfid_data, axis=1).to_numpy()
+
+    def get_lowfid_data(self, row):
+        return get_level(row, level_type='HOMO', subset='PBE+vdW_vacuum')
+
+    def __len__(self):
+        return len(self.homo_lowfid)
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        sample = self.homo_lowfid[idx]
+
+        if self.transform:
+            sample = sle.transform(sample)
+
+        return sample
+
+class AADataset(Dataset):
+    def __init__(self, path : str, transform = None):
+        super(AADataset, self).__init__()
+        self.transform = transform
+        self.dataframe = pd.read_json(path, orient='split')
+        self.num_atoms = self.dataframe["number_of_atoms"].values
+        self.homo_lowfid = self.dataframe.apply(self.get_lowfid_data, axis=1).to_numpy()
+
+    def get_lowfid_data(self, row):
+        return get_level(row, level_type='HOMO', subset='PBE+vdW_vacuum')
+
+    def __len__(self):
+        return len(self.homo_lowfid)
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        sample = self.homo_lowfid[idx]
+
+        if self.transform:
+            sample = sle.transform(sample)
+
+        return sample
+
+```
+
+# The data class
+The objective of this class is to handle data
+  * Preprocess data when its loaded
+  * Given a list of indices return the X (training features) or the Y (training targets).
+  * Get next batch of samples. `accepts a strategy function`.
+
+```python
+class DataLoader:
+  def __init__(self, )
+
+```
 
 # Write the main function which does what the current main does.
