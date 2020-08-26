@@ -49,4 +49,4 @@ def strategy_G(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_se
                 #pick_idxs[j] = prediction_clu_idxs[pick_idxs_temp]
         
         prediction_set =  pick_idxs
-    return prediction_set
+    return list(prediction_set)

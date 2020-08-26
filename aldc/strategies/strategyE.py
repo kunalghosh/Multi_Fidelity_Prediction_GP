@@ -62,4 +62,4 @@ def strategy_E(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_se
         #heldout_set = np.setdiff1d(heldout_set, prediction_set)
 
         
-    return prediction_set
+    return list(prediction_set)

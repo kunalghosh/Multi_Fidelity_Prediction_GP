@@ -21,4 +21,4 @@ def strategy_C(heldout_set: list, batch_size: int, random_seed: int, mbtr_data, 
 
     #heldout_set = np.setdiff1d(heldout_set, prediction_set )
     
-    return prediction_set
+    return list(prediction_set)
