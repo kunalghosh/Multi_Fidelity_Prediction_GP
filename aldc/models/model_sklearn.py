@@ -49,3 +49,8 @@ class SKLearnGPModel(Model):
             "length_scale"   : self.model.kernel_.get_params()['k2__length_scale']
         }
         return self.params
+    
+    def set_params(self, const, lenght_scale):
+        self.model.kernel.k1.constant_value = const
+        self.model.kernel.k2.length_scale = lenght_scale
+
