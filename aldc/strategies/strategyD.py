@@ -20,5 +20,5 @@ def strategy_D(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_se
     prediction_set = strategy_C(prediction_set, batch_size, random_seed, mbtr_data, debug)
               
   
-    return prediction_set
+    return list(prediction_set)
 

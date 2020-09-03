@@ -7,9 +7,9 @@ class Kernel():
     def __init__(self):
         super(Kernel, self).__init__()
         # change these later with the config values.
-        self.const = 1.0 
-        self.bound = 1.0
-        self.length = 1.0
+        self.const = 20.0 
+        self.bound = 100.0
+        self.length = 700.0
     
     def get(self, name: str):
         if hasattr(self, name):
@@ -36,13 +36,21 @@ class SKLearnGPModel(Model):
 
     def fit(self, X_train, Y_train):
         self.model.fit(X_train, Y_train)
+        #print(self.model.kernel_.get_params())
+
 
     def predict(self, X_test):
-        return self.model.predict(X_test, return_std=True)
+        mu, std = self.model.predict(X_test, return_std=True)
+        return mu, std
 
     def get_params(self):
         self.params = {
-            "constant_value" : self.kernel.k1.constant_value,
-            "length_scale"   : self.kernel.k2.length_scale
+            "constant_value" : self.model.kernel_.get_params()['k1__constant_value'],
+            "length_scale"   : self.model.kernel_.get_params()['k2__length_scale']
         }
         return self.params
+    
+    def set_params(self, const, lenght_scale):
+        self.model.kernel.k1.constant_value = const
+        self.model.kernel.k2.length_scale = lenght_scale
+

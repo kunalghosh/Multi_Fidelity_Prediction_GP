@@ -22,11 +22,13 @@ def strategy_B(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_se
   
       #-- Preprocessing                                                                                                                                                    
       #X_train_pp = desc_pp_notest(preprocess, X_train)               
-      X_train_pp = X_train.toarray()
+      X_train = X_train.toarray()
     
 
       #making predictions on th entire dataset
-      mu_s, std_s = gp.predict(X_train_pp) #mu->mean? yes
+      mu_s, std_s = gp.predict(X_train) #mu->mean? yes
+      
+
   
       prediction_set = sort_and_get_last_x(prediction_set, std_s, batch_size)
   
