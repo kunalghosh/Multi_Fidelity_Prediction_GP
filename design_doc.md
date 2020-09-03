@@ -1,4 +1,4 @@
-# Design Doc
+s# Design Doc
 
 ## The model class
 
@@ -368,14 +368,16 @@ One for each dataset, OE, AA etc.
 
 ```python
 from torch.utils.data import Dataset
+from scipy.sparse import load_npz
 
 class OEDataset(Dataset):
-    def __init__(self, path : str, transform = None):
+    def __init__(self, feature_path : str, targets_path : str, transform = None):
         super(OEDataset, self).__init__()
         self.transform = transform
-        self.dataframe = pd.read_json(path, orient='split')
-        self.num_atoms = self.dataframe["number_of_atoms"].values
-        self.homo_lowfid = self.dataframe.apply(self.get_lowfid_data, axis=1).to_numpy()
+        self.targets_df = pd.read_json(targets_path, orient='split')
+        self.num_atoms = self.targets_df["number_of_atoms"].values
+        self.homo_lowfid = self.targets_df.apply(self.get_lowfid_data, axis=1).to_numpy()
+        self.features = load_npz(feature_path)
 
     def get_lowfid_data(self, row):
         return get_level(row, level_type='HOMO', subset='PBE+vdW_vacuum')
@@ -387,20 +389,21 @@ class OEDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        sample = self.homo_lowfid[idx]
+        sample = (self.features[idx], self.homo_lowfid[idx])
 
         if self.transform:
-            sample = sle.transform(sample)
+            feature, target = sample
+            sample = sle.transform(target)
+            sample = (feature, target)
 
         return sample
 
 class AADataset(Dataset):
-    def __init__(self, path : str, transform = None):
+    def __init__(self, feature_path : str, targets_path : str, transform = None):
         super(AADataset, self).__init__()
         self.transform = transform
-        self.dataframe = pd.read_json(path, orient='split')
-        self.num_atoms = self.dataframe["number_of_atoms"].values
-        self.homo_lowfid = self.dataframe.apply(self.get_lowfid_data, axis=1).to_numpy()
+        self.homo_lowfid = np.loadtxt(targets_path)
+        self.features = load_npz(feature_path)
 
     def get_lowfid_data(self, row):
         return get_level(row, level_type='HOMO', subset='PBE+vdW_vacuum')
@@ -412,13 +415,14 @@ class AADataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        sample = self.homo_lowfid[idx]
+        sample = (self.features[idx], self.homo_lowfid[idx])
 
         if self.transform:
-            sample = sle.transform(sample)
+            feature, target = sample
+            sample = sle.transform(target)
+            sample = (feature, target)
 
         return sample
-
 ```
 
 # The data class
