@@ -1,10 +1,9 @@
-from aldc.models import GPytorchGPModel
+from model_gpytorch import GPytorchGPModel
 import torch
 import gpytorch
 import numpy as np
 from scipy.sparse import load_npz, save_npz
 import os
-from aldc.strategies import acq_fn
 import json
 from sklearn.model_selection import train_test_split
 
