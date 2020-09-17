@@ -207,12 +207,29 @@ config = Config(**json_config)
 > * Subsequently the argument list (their datatypes) and the return types were identified.
 
 ```python
-def strategy_A(heldout_set: list, batch_size: int, random_seed: int, debug=False) -> list:
-  """
-  Random strategy :
-    1. Pick molecules randomly from the held out set.
-  """
-  pass
+class StrategyA():
+  def __init__(self, random_seed: int, model = None, debug = False):
+    self.random_seed = random_seed
+    self.model = model
+    self.debug = debug
+    self.strategy = self.strategy_A
+
+  def __call__(heldout_set: list, batch_size: int) -> list:
+    # if strategy needs a model, it just uses self.model internally.
+    next_batch = self.strategy(heldout_set, batch_size)
+    return next_batch
+
+
+  def strategy_A(heldout_set: list, batch_size: int, random_seed: int, debug=False) -> list:
+    """
+    Random strategy :
+      1. Pick molecules randomly from the held out set.
+    """
+    pass
+
+####### example strategy class above ##############
+
+
 
 def strategy_B(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed:int, debug=False) -> list:
   """
@@ -433,8 +450,22 @@ The objective of this class is to handle data
 
 ```python
 class DataLoader:
-  def __init__(self, )
+    def __init__(self, batch_sizes: list, dataset: Dataset, strategy): # strategy class (because it needs to know the GP not the data loader)
+        super(DataLoader, self).__init__()
+        self.dataset = dataset
+        self.batch_sizes = batch_sizes
+        self.current_batch_index = 0 # always starts from zero.
+        self.strategy = strategy
 
+    def get_data_from_idx(self, indices: list) -> List:
+        return self.dataset[indices]
+
+    def get_next_batch(self, heldout_set: List) -> List:
+        batch_size = self.batch_sizes[self.current_batch_index]
+        # if strategy needs a model, it just uses self.model internally.
+        self.next_batch = self.strategy(heldout_set, batch_size)
+        self.current_batch_index += 1
+        return self.next_batch
 ```
 
 # Write the main function which does what the current main does.
