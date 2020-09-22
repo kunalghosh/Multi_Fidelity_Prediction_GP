@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=activeLearning-A-4k
+#SBATCH --job-name=activeLearning-A-1k
 #SBATCH --account=project_2000382
 #SBATCH --time=72:00:00
 #SBATCH --mem-per-cpu=5G
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=20
 #SBATCH --partition=large
-#SBATCH --array=1-10
+#SBATCH --array=0-9
 #SBATCH --output=activeLearning_1k_%a.out
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
