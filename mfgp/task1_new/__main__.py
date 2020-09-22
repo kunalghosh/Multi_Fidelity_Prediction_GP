@@ -80,17 +80,23 @@ def main():
 
     #-- Load for HOMO energy
     if dataset == "OE" :
-        start = time.time()
-        append_write(out_name, "start load df_62k \n")
-        df_62k = pd.read_json(json_path, orient='split')
+        df_62k = 0
+        start = time.time()	
+        append_write(out_name, "start load OE \n")
+        homo_lowfid = np.loadtxt(json_path)
         process_time = time.time() - start
         out_time(out_name, process_time)
-        
-        num_atoms = df_62k["number_of_atoms"].values
-        
-        homo_lowfid = df_62k.apply(lambda row: get_level(
-            row, level_type='HOMO', subset='PBE+vdW_vacuum'),
-                                   axis=1).to_numpy()
+        # start = time.time()
+        # append_write(out_name, "start load df_62k \n")
+        # df_62k = pd.read_json(json_path, orient='split')
+        # process_time = time.time() - start
+        # out_time(out_name, process_time)
+        # 
+        # num_atoms = df_62k["number_of_atoms"].values
+        # 
+        # homo_lowfid = df_62k.apply(lambda row: get_level(
+        #     row, level_type='HOMO', subset='PBE+vdW_vacuum'),
+        #                            axis=1).to_numpy()
     elif dataset == "AA":
         df_62k = 0
         start = time.time()
@@ -98,8 +104,15 @@ def main():
         homo_lowfid =  np.loadtxt(json_path)
         process_time = time.time() - start
         out_time(out_name, process_time)
+    elif dataset == "QM9":
+        df_62k = 0
+        start = time.time()
+        append_write(out_name, "start load QM9 \n")
+        homo_lowfid =  np.loadtxt(json_path)
+        process_time = time.time() - start
+        out_time(out_name, process_time)
     else:
-        append_write(out_name,"Dataset sould be AA or OE \n")
+        append_write(out_name,"Dataset sould be AA or OE or QM9\n")
         append_write(out_name,"program stopped ! \n")    
         sys.exit()
 
@@ -123,9 +136,9 @@ def main():
     f.close()
 
     #-- Figure of 62k dataset and AA dataset
-    if dataset == "OE" :
-        fig_atom(df_62k,range(61489),"atoms_all.eps")
-        fig_HOMO(homo_lowfid,range(61489), "HOMO_all.eps")
+    if dataset in ["OE", "QM9"] :
+        # fig_atom(df_62k,range(61489),"atoms_all.eps")
+        fig_HOMO(homo_lowfid,range(dataset_size), "HOMO_all.eps")
     elif dataset == "AA" :
         fig_HOMO(homo_lowfid,range(44004), "HOMO_all.eps")
     else:
@@ -174,10 +187,14 @@ def main():
                 np.save(out_name + "_dataset_idxs", remaining_idxs)
 
                 #-- Figure
-                if dataset == "OE" :
-                    fig_atom(df_62k,remaining_idxs, out_name +'_atoms_pre_dataset.eps')
-                    fig_HOMO(homo_lowfid,remaining_idxs, out_name + 'HOMO_pre_dataset.eps')
-                elif dataset == "AA" :
+                # if dataset == "OE" :
+                #     # fig_atom(df_62k,remaining_idxs, out_name +'_atoms_pre_dataset.eps')
+                #     fig_HOMO(homo_lowfid,remaining_idxs, out_name + 'HOMO_pre_dataset.eps')
+                # elif dataset == "AA" :
+                #     fig_HOMO(homo_lowfid,remaining_idxs, out_name + 'HOMO_pre_dataset.eps')
+                if dataset in ["OE", "AA", "QM9"]:
+                    print(f"Dataset {dataset} homo_lowfig {len(homo_lowfid)}, Remaining idxs {len(remaining_idxs)}")
+                    print(f"Remaining idxs max {max(remaining_idxs)} min {min(remaining_idxs)}")
                     fig_HOMO(homo_lowfid,remaining_idxs, out_name + 'HOMO_pre_dataset.eps')
 
                 #-- test , 1st train, remaining split.
@@ -579,10 +596,12 @@ def main_loop(i,out_name,dataset,X_train_pp,X_test_pp,y_train,gpr,kernel_type,bo
     np.save(out_name + "_std_" + str(i+1) ,std_s)
     
     #-- Figure
-    if dataset == "OE" :
-        fig_atom(df_62k, prediction_idxs, out_name +'_atoms_pre_' + str(i+1) + '.eps')
-        fig_HOMO(homo_lowfid, prediction_idxs, out_name + 'HOMO_pre_' + str(i+1) + '.eps')
-    elif dataset == "AA" :
+    # if dataset == "OE" :
+    #     # fig_atom(df_62k, prediction_idxs, out_name +'_atoms_pre_' + str(i+1) + '.eps')
+    #     fig_HOMO(homo_lowfid, prediction_idxs, out_name + 'HOMO_pre_' + str(i+1) + '.eps')
+    # elif dataset == "AA" :
+    #     fig_HOMO(homo_lowfid, prediction_idxs, out_name + 'HOMO_pre_'+  str(i+1) + '.eps')
+    if dataset in ["OE", "AA", "QM9"]:
         fig_HOMO(homo_lowfid, prediction_idxs, out_name + 'HOMO_pre_'+  str(i+1) + '.eps')
 
     return sample_sum,r2_sum,MAE_sum,length_sum,const_sum,const,length
