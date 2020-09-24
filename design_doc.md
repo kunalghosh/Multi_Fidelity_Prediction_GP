@@ -209,6 +209,7 @@ config = Config(**json_config)
 ```python
 class StrategyA():
   def __init__(self, random_seed: int, model = None, debug = False):
+    super(StrategyA, self).__init__()
     self.random_seed = random_seed
     self.model = model
     self.debug = debug
@@ -469,3 +470,33 @@ class DataLoader:
 ```
 
 # Write the main function which does what the current main does.
+```python
+class ActiveLearningLoop()
+  def __init__(self, config : Config):
+    super(ActiveLearningLoop, self).__init__()
+    self.config = config
+    self.train_set = None
+    self.heldout_set = None
+    self.test_set = None
+
+  def get_data_splits(self):
+    # split the data into train heldout_set and test
+    # we only work with indices
+    pass
+
+  def step(self):
+    """take one active learning step"""
+    # train model with current train set
+    # send heldout_set to strategy.
+    # get next set of training indices.
+    # update train_set
+    # update heldout_set
+```
+
+```python
+
+# load config
+# load data
+# get a split of indices
+# create model
+# 
