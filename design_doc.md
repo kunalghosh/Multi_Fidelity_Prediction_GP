@@ -478,6 +478,8 @@ class ActiveLearningLoop()
     self.train_set = None
     self.heldout_set = None
     self.test_set = None
+    self.current_iteration = 0
+    self.current_iteration_time = 0
 
   def get_data_splits(self):
     # split the data into train heldout_set and test
@@ -499,4 +501,5 @@ class ActiveLearningLoop()
 # load data
 # get a split of indices
 # create model
-# 
+#
+```
