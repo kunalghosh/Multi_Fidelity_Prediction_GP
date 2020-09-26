@@ -28,17 +28,12 @@ class DataHandler():
         # self.test_set = [] # List of indices in the test set.
 
     def _initial_splits(self):
+        """Splits the dataset into training, heldout and test sets."""
         self.indices = np.arange(self.dataset_size)
         self.heldout_indices, self.test_indices = train_test_split(self.indices,
                                                                 test_size = self.testset_size,
                                                                 random_state = self.random_seed)
-        self.train_indices = [] # initial train indices are empty
-        # when we get the splits for the 0th training, get_splits(batch_index=0)
-        # then the training indices are populated.
 
-
-    def get_splits(self, batch_index):
-        """Splits the dataset into training, heldout and test sets."""
         training_set_size = self.batches_list[batch_index]
         self.train_indices, self.heldout_indices = train_test_split(self.heldout_indices,
                                                                     train_size = training_set_size,
@@ -46,4 +41,18 @@ class DataHandler():
         self.iteration_indices_list.append(Indices(training=self.train_indices,
                                                    heldout=self.heldout_indices,
                                                    test=self.test_indices))
+        # return self.iteration_indices_list[batch_index]
+
+    def get_splits(self, batch_index):
         return self.iteration_indices_list[batch_index]
+
+    def add_train_idxs(self, trainset_new_idxs):
+        # get old indices
+        previous_data_splits = self.iteration_indices_list[-1]
+        # new training Indices
+        train_indices = np.r_[previous_data_splits.train_indices, trainset_new_idxs]
+        # new heldout indices
+        heldout_indices = np.setdiff1d(previous_data_splits.heldout_indices, trainset_new_idxs)
+
+        next_batch_indices = Indices(training = train_indices, heldout = heldout_indices, test = self.test_indices)
+        self.iteration_indices_list.append(next_batch_indices)
