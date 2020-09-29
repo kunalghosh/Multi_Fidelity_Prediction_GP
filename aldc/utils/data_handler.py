@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from torch.utils.data import Dataset
 from sklearn.model_selection import train_test_split
 
@@ -20,12 +19,29 @@ class DataHandler():
         self.batches_list = batches_list
         self.random_seed = random_seed
         self.iteration_indices_list = [] # dictionary which keeps a track of which iteration had what indices
-        _initial_splits()
+        self.batch_index = 0
+
 
         # # following three become a small data class
         # self.heldout_set = [] # List of indices in heldout_set
         # self.training_set = [] # List of indices in training set
         # self.test_set = [] # List of indices in the test set.
+
+    def __iter__(self):
+        self.batch_index = 0
+        return self
+
+    def __next__(self):
+        self.batch_index += 1
+        if self.batch_index < len(self.batches_list)
+            return self.batch_index
+        else:
+            raise StopIteration
+
+    def get_next_batch_size(self):
+        self.batch_index += 1
+        return self.batches_list[self.batch_index]
+
 
     def _initial_splits(self):
         """Splits the dataset into training, heldout and test sets."""
@@ -34,7 +50,7 @@ class DataHandler():
                                                                 test_size = self.testset_size,
                                                                 random_state = self.random_seed)
 
-        training_set_size = self.batches_list[batch_index]
+        training_set_size = self.batches_list[self.batch_index]
         self.train_indices, self.heldout_indices = train_test_split(self.heldout_indices,
                                                                     train_size = training_set_size,
                                                                     random_state = self.random_seed)
@@ -44,9 +60,12 @@ class DataHandler():
         # return self.iteration_indices_list[batch_index]
 
     def get_splits(self, batch_index):
+        if batch_index == 0:
+            _initial_splits()
+
         return self.iteration_indices_list[batch_index]
 
-    def add_train_idxs(self, trainset_new_idxs):
+    def update_splits(self, trainset_new_idxs):
         # get old indices
         previous_data_splits = self.iteration_indices_list[-1]
         # new training Indices
