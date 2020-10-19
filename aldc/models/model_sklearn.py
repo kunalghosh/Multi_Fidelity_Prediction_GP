@@ -25,7 +25,7 @@ class Kernel():
 
 class SKLearnGPModel(Model):
     """docstring for SKLearnGPModel."""
-    def __init__(self, kernel_name: str, n_restarts: int, random_seed: int, normalize_y: boolean):
+    def __init__(self, kernel_name: str, n_restarts: int, random_seed: int, normalize_y: bool, logger=None):
         super(SKLearnGPModel, self).__init__()
         self.random_seed = random_seed # change it with config
         kernels = Kernel()
@@ -35,10 +35,10 @@ class SKLearnGPModel(Model):
         self.normalize_y = normalize_y
         self.model = GaussianProcessRegressor(kernel = self.kernel,\
                 random_state = self.random_seed,
-                n_restarts   = self.n_restarts,
+                n_restarts_optimizer   = self.n_restarts,
                 normalize_y  = self.normalize_y)
 
-    def fit(self, X_train, Y_train):
+    def train(self, X_train, Y_train):
         self.model.fit(X_train, Y_train)
         #print(self.model.kernel_.get_params())
 
