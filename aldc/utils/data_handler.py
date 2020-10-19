@@ -1,15 +1,18 @@
+import numpy as np
+from dataclasses import dataclass
 from torch.utils.data import Dataset
 from sklearn.model_selection import train_test_split
 
 
+
 @dataclass
 class Indices:
-    training: list
-    heldout: list
-    test: list
+    train_indices: list
+    heldout_indices: list
+    test_indices: list
 
 class DataHandler():
-    def __init__(self, dataset: Dataset, dataset_size: int, testset_size: int, batches_list: list, random_seed: int):
+    def __init__(self, dataset: Dataset, dataset_size: int, testset_size: int, batches_list: list, random_seed: int, logger=None):
         super(DataHandler, self).__init__()
         self.dataset = dataset
         self.dataset_size = dataset_size
@@ -33,7 +36,7 @@ class DataHandler():
 
     def __next__(self):
         self.batch_index += 1
-        if self.batch_index < len(self.batches_list)
+        if self.batch_index < len(self.batches_list):
             return self.batch_index
         else:
             raise StopIteration
@@ -54,14 +57,14 @@ class DataHandler():
         self.train_indices, self.heldout_indices = train_test_split(self.heldout_indices,
                                                                     train_size = training_set_size,
                                                                     random_state = self.random_seed)
-        self.iteration_indices_list.append(Indices(training=self.train_indices,
-                                                   heldout=self.heldout_indices,
-                                                   test=self.test_indices))
+        self.iteration_indices_list.append(Indices(train_indices=self.train_indices,
+                                                   heldout_indices=self.heldout_indices,
+                                                   test_indices=self.test_indices))
         # return self.iteration_indices_list[batch_index]
 
     def get_splits(self, batch_index):
         if batch_index == 0:
-            _initial_splits()
+            self._initial_splits()
 
         return self.iteration_indices_list[batch_index]
 
