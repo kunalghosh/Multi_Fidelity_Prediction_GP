@@ -1,15 +1,14 @@
 class Model(object):
   """docstring for Model."""
 
-  def __init__(self, arg):
+  def __init__(self):
     super(Model, self).__init__()
-    self.arg = arg
     self.params = dict() # dictionary of model parameters
 
-  def fit(self, arg):
+  def train(self):
     pass
 
-  def predict(self, arg):
+  def predict(self, input_data):
     pass
 
   def load_params(self, path: str):
