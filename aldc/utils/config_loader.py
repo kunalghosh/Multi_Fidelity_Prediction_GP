@@ -1,4 +1,5 @@
 import json
+from aldc.utils import Config
 
 def get_config_from_json(json_file):
     with open(json_file, "r") as json_file:
