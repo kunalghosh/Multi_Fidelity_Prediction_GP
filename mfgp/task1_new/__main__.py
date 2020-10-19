@@ -4,6 +4,8 @@ import pickle as pkl
 from pathlib import Path
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from scipy.sparse import load_npz, save_npz, lil_matrix
 from sklearn.model_selection import train_test_split
