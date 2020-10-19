@@ -1,7 +1,7 @@
 from aldc.models import SKLearnGPModel
 
 
-def strategy_F(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed:int, mbtr_data, debug=False) -> list:
+def strategy_F(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_seed:int, mbtr_data, debug=False, logger=None) -> list:
     """
     Combination of A. and B.
     1. Use the GP trained on the previous batch to make predictions on the held out set.
@@ -21,10 +21,10 @@ def strategy_F(gp: SKLearnGPModel, heldout_set: list, batch_size: int, random_se
 
     n_high = int(len(heldout_set)/2.0)
     if batch_size > n_high:
-      n_high = batch_size 
+      n_high = batch_size
 
     prediction_set = strategy_B(gp, heldout_set, n_high, random_seed, mbtr_data, debug)
-    
-    prediction_set = strategy_A(prediction_set, batch_size, random_seed, debug) 
-    
+
+    prediction_set = strategy_A(prediction_set, batch_size, random_seed, debug)
+
     return prediction_set
