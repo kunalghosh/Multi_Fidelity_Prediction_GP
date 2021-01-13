@@ -1,0 +1,72 @@
+start load mbtr 
+time 12.498316764831543[s]
+start load QM9 
+time 0.4181241989135742[s]
+=============================
+2020-10-10 00:12:05.498887
+condition 
+fn_name(acquistion function) high_and_cluster
+num_itr 5
+dataset_size 133814
+test_set_size 10000
+rnd_size(random sampling) or K_pre(high_and_cluster) 2.0
+high_size(high std) 100.0
+flag for reducing the MBTR array False
+mbtr_path ../../../../../../../data/QM9/mbtr_0.1.npz
+json_path ../../../../../../../data/QM9/HOMO.txt
+save_load_flag save
+loadidxs_path ../../../../../../../data/QM9_derived/10K_dataset_load_high/10Kloadhigh2_0_idxs.npz
+save_load_split_flag False
+loadsplitidxs_path ../../../../../../../data/QM9_derived/10K_dataset_load_high/10Kdataset_dataset_split_idxs.npz
+CPU: 40
+dataset is QM9
+the number of added indexes in step 0 1000
+the number of added indexes in step 1 1000
+the number of added indexes in step 2 2000
+the number of added indexes in step 3 4000
+the number of added indexes in step 4 8000
+the number of added indexes in step 5 16000
+preprocess none
+length_value 700.0
+const_value 20.0
+upper bound 100.0
+lower bound 0.01
+n_restart_optimizer 2
+0-th learning 
+mbtr_data col 133814
+mbtr_data row 3000
+mbtr_data_size 133814
+mbtr_data_red_size 3000
+=============================
+length of RBF kernel before fitting 700.0
+constant of constant kernel before fitting 20.0
+save_load_split_flag: False 
+mbtr_data_size ==  dataset_size 
+length of test_idxs 10000
+length of remaining_idxs 123814
+length of prediction_idxs 1000
+length of remaining_idxs 122814
+save_load_flag: save 
+initial learning 
+start to make a model 
+time 109.15322637557983[s]
+start prediction
+time 24.083720445632935[s]
+start calculating r2 by hand 
+time 0.0003993511199951172[s]
+start calculating MAE 
+time 0.0006272792816162109[s]
+r2 by hand 0.35488456465262797
+MAE 0.3052017053301426
+time all 147.64352464675903[s]
+============================= 
+1-th learning
+============================= 
+2-th learning
+============================= 
+3-th learning
+============================= 
+4-th learning
+============================= 
+5-th learning
+loading QM9-D-exp_para_kernel_aft_4.txtstarting prediction 
