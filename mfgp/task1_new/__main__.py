@@ -63,6 +63,8 @@ def main():
     const = InData.const
     bound = InData.bound
     n_opt = InData.n_opt
+    alpha = InData.alpha
+    normalize_y = InData.normalize_y
 
     # set the random seed
     np.random.seed(random_seed)
@@ -160,8 +162,8 @@ def main():
         append_write(out_name,"program stopped ! \n")    
         sys.exit()
         
-    normalize_y = False
-    gpr = GaussianProcessRegressor(kernel=kernel, normalize_y=normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)
+    normalize_y = normalize_y
+    gpr = GaussianProcessRegressor(kernel=kernel, normalize_y=normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed, alpha=alpha)
     append_write(out_name,"length of RBF kernel before fitting " + str(length) + "\n")
     append_write(out_name,"constant of constant kernel before fitting " + str(const) + "\n")
 

@@ -71,6 +71,8 @@ class Input:
         self.kernel_type = self.set_para('kernel_type', 'constRBF' , str )
         self.restart_flag = self.set_para('restart_flag', 'False' , bool )
         self.random_seed = self.set_para('random_seed', 1234, int)
+        self.normalize_y = self.set_para('normalize_y', 'False', bool)
+        self.alpha = self.set_para('alpha', 1e-10, float)
         
         self.pre_idxs = np.empty(int(self.num_itr+1),dtype = int)
 
