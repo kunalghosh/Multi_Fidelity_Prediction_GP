@@ -1,37 +1,37 @@
 #!/bin/bash
-#SBATCH --job-name=activeLearning-A-4k
+#SBATCH --job-name=activeLearning-OE_QM9-exp
 #SBATCH --account=project_2000382
-#SBATCH --time=60:00:00
+#SBATCH --time=72:00:00
 #SBATCH --mem-per-cpu=5G
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=20
 #SBATCH --partition=large
-#SBATCH --array=1-20
-#SBATCH --output=activeLearning_%a.out
+#SBATCH --array=0-19
+#SBATCH --output=activeLearning_OE_QM9_%a.out
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
 dirs=(
-"./AA_A_4k/run1"
-"./AA_A_4k/run2"
-"./AA_A_4k/run3"
-"./AA_A_4k/run4"
-"./AA_A_4k/run5"
-"./AA_A_8k/run1"
-"./AA_A_8k/run2"
-"./AA_A_8k/run3"
-"./AA_A_8k/run4"
-"./AA_A_8k/run5"
-"./AA_D_4k/run1"
-"./AA_D_4k/run2"
-"./AA_D_4k/run3"
-"./AA_D_4k/run4"
-"./AA_D_4k/run5"
-"./AA_D_8k/run1"
-"./AA_D_8k/run2"
-"./AA_D_8k/run3"
-"./AA_D_8k/run4"
-"./AA_D_8k/run5"
+"./OE_D_EXP/run1"
+"./OE_D_EXP/run2"
+"./OE_D_EXP/run3"
+"./OE_D_EXP/run4"
+"./OE_D_EXP/run5"
+"./OE_A_EXP/run1"
+"./OE_A_EXP/run2"
+"./OE_A_EXP/run3"
+"./OE_A_EXP/run4"
+"./OE_A_EXP/run5"
+"./QM9_D_EXP/run1"
+"./QM9_D_EXP/run2"
+"./QM9_D_EXP/run3"
+"./QM9_D_EXP/run4"
+"./QM9_D_EXP/run5"
+"./QM9_A_EXP/run1"
+"./QM9_A_EXP/run2"
+"./QM9_A_EXP/run3"
+"./QM9_A_EXP/run4"
+"./QM9_A_EXP/run5"
 )
 
 module load python-data/3.7.6-1
