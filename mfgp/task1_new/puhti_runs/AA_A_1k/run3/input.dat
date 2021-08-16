@@ -17,7 +17,7 @@ kernel_type             constRBF
 length                  700
 const                   20
 bound                   1e2
-n_opt                   0
+n_opt                   2
 
 #flag
 save_load_flag          save
@@ -41,6 +41,7 @@ pre_idxs_12             1000
 pre_idxs_13             1000
 pre_idxs_14             1000
 pre_idxs_15             1000
+pre_idxs_16             1000
 
 #path
 mbtr_path              ../../../../../../../data/AA/mbtr_k2.npz

@@ -18,6 +18,8 @@ length                  700
 const                   20
 bound                   1e2
 n_opt                   2
+alpha                   0.03
+normalize_y             True
 
 #flag
 save_load_flag          save

@@ -331,7 +331,7 @@ def main():
                 append_write(out_name, f"loading {out_name}_para_kernel_aft_{str(i)}.txt")
                 with open(f"{out_name}_para_kernel_aft_{str(i)}.txt") as f:
                     data = eval(f.read())
-                    gpr = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)            
+                    gpr = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed, alpha=alpha)            
                     # gpr.kernel.k1.constant_value = data['k1__constant_value']
                     # gpr.kernel.k2.length_scale = data['k2__length_scale']
 
@@ -443,7 +443,7 @@ def main():
         append_write(out_name,"length of remaining_idxs " + str(len(remaining_idxs)) + "\n")
         append_write(out_name,"length of test_idxs " + str(len(test_idxs)) + "\n")
 
-        gpr = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed)            
+        gpr = GaussianProcessRegressor( kernel = kernel, normalize_y = normalize_y, n_restarts_optimizer = n_opt, random_state = random_seed, alpha=alpha)            
         append_write(out_name,"length of RBF kernel before fitting " + str(length) + "\n")
         append_write(out_name,"constant of constant kernel before fitting " + str(const) + "\n")
         #---------------------------------------------

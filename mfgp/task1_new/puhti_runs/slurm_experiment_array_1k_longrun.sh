@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=activeLearning-A-1k
 #SBATCH --account=project_2000382
-#SBATCH --time=168:00:00
+#SBATCH --time=336:00:00
 #SBATCH --mem-per-cpu=5G
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20

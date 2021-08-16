@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=activeLearning-OE_QM9-exp
 #SBATCH --account=project_2000382
-#SBATCH --time=72:00:00
+#SBATCH --time=120:00:00
 #SBATCH --mem-per-cpu=5G
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
