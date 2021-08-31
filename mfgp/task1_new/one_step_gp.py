@@ -246,10 +246,10 @@ def main():
     try:
       # try to load gpr
       gpr = joblib.load(f"{out_name}_{idx}_model.pkl")
-      print(f"Loaded {out_name}_{idx}_model.pkl")
+      append_write(out_name, f"Loaded {out_name}_{idx}_model.pkl \n")
     except Exception as e:
       # if can't load train again
-      print(f"Can't load {out_name}_{idx}_model.pkl, retraining")
+      append_write(out_name, f"Can't load {out_name}_{idx}_model.pkl, retraining \n")
       gpr.fit(X_train_pp, y_train)
       # save GP model
       joblib.dump(gpr, f"{out_name}_{idx}_model.pkl")
