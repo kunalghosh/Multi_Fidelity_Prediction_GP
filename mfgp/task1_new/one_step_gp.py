@@ -220,7 +220,7 @@ def main():
     # Try to open the full_idxs file, if you can, save the last rem, train, test.
     # If you cannot, use the latest rem train test indices to continue.
     try:
-      print(idx, batch_size)
+      append_write(out_name, f"{idx}, {batch_size}\n")
       data = np.load(f"{out_name}_{idx}_full_idxs.npz")
       append_write(out_name, f"loaded {out_name}_{idx}_full_idxs.npz Continuing iteration.\n")
     except Exception as e:
@@ -230,7 +230,7 @@ def main():
 
   idx = idx - 1
   for idx, batch_size in enumerate(pre_idxs[idx:], idx):
-    append_write(f"Resuming from index {idx} and current batch size is {batch_size}\n")
+    append_write(out_name, f"Resuming from index {idx} and current batch size is {batch_size}\n")
     rem_idxs  = data['remaining_idxs']
     pred_idxs = data['prediction_idxs']
     test_idxs = data['test_idxs']
@@ -243,8 +243,8 @@ def main():
     X_train_pp, X_test_pp = desc_pp(preprocess, X_train, X_test)
 
     const, length = get_gpr_params(gpr) 
-    append_write(out_name,f"length of RBF kernel before fitting {length} \n")
-    append_write(out_name,f"constant of constant kernel before fitting {const} \n")
+    append_write(out_name, f"length of RBF kernel before fitting {length} \n")
+    append_write(out_name, f"constant of constant kernel before fitting {const} \n")
 
     try:
       # try to load gpr
@@ -257,8 +257,8 @@ def main():
       # save GP model
       joblib.dump(gpr, f"{out_name}_{idx}_model.pkl")
 
-    append_write(out_name,f"length of RBF kernel before fitting {length} \n")
-    append_write(out_name,f"constant of constant kernel before fitting {const} \n")
+    append_write(out_name, f"length of RBF kernel before fitting {length} \n")
+    append_write(out_name, f"constant of constant kernel before fitting {const} \n")
 
     append_write(out_name, "Finished training \n")
     process_time = time.time() - start
@@ -267,7 +267,7 @@ def main():
     # Go through acq_fn to get new pred_idxs
     prediction_set_size = batch_size
     start = time.time()
-    print("Starting acq function.")
+    append_write(out_name, f"Starting acq function.\n")
     pred_idxs, rem_idxs, X_train_pp, y_train = acq_fn(fn_name\
                                                       , idx\
                                                       , pred_idxs\
@@ -281,7 +281,7 @@ def main():
                                                       , preprocess\
                                                       , out_name\
                                                       , random_seed)
-    print("Acq fun done.")
+    append_write(out_name, f"Acq fun done.\n")
     process_time = time.time() - start 
     out_time(out_name, process_time)
     np.savez(f"{out_name}_{idx}_full_idxs.npz",remaining_idxs=rem_idxs, prediction_idxs = pred_idxs, test_idxs = test_idxs)
