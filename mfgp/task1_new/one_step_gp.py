@@ -230,6 +230,7 @@ def main():
 
   idx = idx - 1
   for idx, batch_size in enumerate(pre_idxs[idx:], idx):
+    append_write(f"Resuming from index {idx} and current batch size is {batch_size}\n")
     rem_idxs  = data['remaining_idxs']
     pred_idxs = data['prediction_idxs']
     test_idxs = data['test_idxs']
