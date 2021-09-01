@@ -220,17 +220,19 @@ def main():
     # Try to open the full_idxs file, if you can, save the last rem, train, test.
     # If you cannot, use the latest rem train test indices to continue.
     try:
-      print(idx)
+      print(idx, batch_size)
       data = np.load(f"{out_name}_{idx}_full_idxs.npz")
-      rem_idxs  = data['remaining_idxs']
-      pred_idxs = data['prediction_idxs']
-      test_idxs = data['test_idxs']
       append_write(out_name, f"loaded {out_name}_{idx}_full_idxs.npz Continuing iteration.\n")
-      continue
     except Exception as e:
-      append_write(out_name, f"iteration {idx} -- {e}, Continuing with indices from iteration {idx-1}\n")
+      append_write(out_name, f"iteration {idx} -- {e}, Couldn't load _full_idxs for index {idx}\n")
       # So we don't have the full_idxs file corresponding to the latest idx.
       # the previous rem_idxs, pred_idxs, test_idxs are already loaded.
+
+  idx = idx - 1
+  for idx, batch_size in enumerate(pre_idxs[idx:], idx):
+    rem_idxs  = data['remaining_idxs']
+    pred_idxs = data['prediction_idxs']
+    test_idxs = data['test_idxs']
     start = time.time()
     # get the data
     X_train, X_test = mbtr_data_red[pred_idxs, :], mbtr_data_red[test_idxs, :]
