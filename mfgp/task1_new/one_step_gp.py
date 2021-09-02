@@ -225,6 +225,7 @@ def main():
       append_write(out_name, f"loaded {out_name}_{idx}_full_idxs.npz Continuing iteration.\n")
     except Exception as e:
       append_write(out_name, f"iteration {idx} -- {e}, Couldn't load _full_idxs for index {idx}\n")
+      break
       # So we don't have the full_idxs file corresponding to the latest idx.
       # the previous rem_idxs, pred_idxs, test_idxs are already loaded.
 
