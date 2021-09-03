@@ -258,8 +258,9 @@ def main():
       # save GP model
       joblib.dump(gpr, f"{out_name}_{idx}_model.pkl")
 
-    append_write(out_name, f"length of RBF kernel before fitting {length} \n")
-    append_write(out_name, f"constant of constant kernel before fitting {const} \n")
+    const, length = get_gpr_params(gpr) 
+    append_write(out_name, f"length of RBF kernel after fitting {length} \n")
+    append_write(out_name, f"constant of constant kernel after fitting {const} \n")
 
     append_write(out_name, "Finished training \n")
     process_time = time.time() - start
