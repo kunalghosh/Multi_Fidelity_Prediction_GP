@@ -26,7 +26,7 @@ from sklearn.externals import joblib
 
 
 def get_gpr_params(gpr):
-  params = gpr.kernel.get_params() 
+  params = gpr.kernel_.get_params() 
   const  = params['k1__constant_value']
   length = params['k2__length_scale']
   return const, length
@@ -247,6 +247,7 @@ def main():
     append_write(out_name, f"length of RBF kernel before fitting {length} \n")
     append_write(out_name, f"constant of constant kernel before fitting {const} \n")
 
+    pdb.set_trace()
     try:
       # try to load gpr
       gpr = joblib.load(f"{out_name}_{idx}_model.pkl")
