@@ -26,7 +26,10 @@ from sklearn.externals import joblib
 
 
 def get_gpr_params(gpr):
-  params = gpr.kernel_.get_params() 
+  try:
+    params = gpr.kernel_.get_params() 
+  except AttributeError as e:
+    params = gpr.kernel.get_params()
   const  = params['k1__constant_value']
   length = params['k2__length_scale']
   return const, length
