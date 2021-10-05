@@ -225,6 +225,7 @@ def main():
     try:
       append_write(conf.out_name, f"{idx}, {batch_size}\n")
       data = np.load(f"{conf.out_name}_{idx}_full_idxs.npz")
+      # pdb.set_trace()
       print("Loaded data.")
       append_write(conf.out_name, f"loaded {conf.out_name}_{idx}_full_idxs.npz Continuing iteration.\n")
     except Exception as e:
@@ -233,14 +234,17 @@ def main():
       # So we don't have the full_idxs file corresponding to the latest idx.
       # the previous rem_idxs, pred_idxs, test_idxs are already loaded.
 
-  idx = idx - 1
+#  idx = idx - 1
+  rem_idxs  = data['remaining_idxs']
+  pred_idxs = data['prediction_idxs']
+  test_idxs = data['test_idxs']
   for idx, batch_size in enumerate(conf.pre_idxs[idx:], idx):
     append_write(conf.out_name, f"Resuming from index {idx} and current batch size is {batch_size}\n")
-    rem_idxs  = data['remaining_idxs']
-    pred_idxs = data['prediction_idxs']
-    test_idxs = data['test_idxs']
+    print(idx, batch_size)
+    # pdb.set_trace()
     start = time.time()
     # get the data
+    print(f"idx {idx} batch_size {batch_size} pred_idxs - len {len(pred_idxs)}")
     X_train, X_test = mbtr_data_red[pred_idxs, :], mbtr_data_red[test_idxs, :]
     y_train, y_test = homo_lowfid[pred_idxs], homo_lowfid[test_idxs]
 
@@ -251,7 +255,7 @@ def main():
     append_write(conf.out_name, f"length of RBF kernel before fitting {length} \n")
     append_write(conf.out_name, f"constant of constant kernel before fitting {const} \n")
 
-    pdb.set_trace()
+    # pdb.set_trace()
     try:
       # try to load gpr
       gpr = joblib.load(f"{conf.out_name}_{idx}_model.pkl")
@@ -275,12 +279,12 @@ def main():
     prediction_set_size = batch_size
     start = time.time()
     append_write(conf.out_name, f"Starting acq function.\n")
-    pred_idxs, rem_idxs, X_train_pp, y_train = acq_fn(fn_name\
+    pred_idxs, rem_idxs, X_train_pp, y_train = acq_fn(conf.fn_name\
                                                       , idx\
                                                       , pred_idxs\
                                                       , rem_idxs\
                                                       , prediction_set_size\
-                                                      , rnd_size\
+                                                      , conf.rnd_size\
                                                       , mbtr_data_red\
                                                       , homo_lowfid\
                                                       , conf.K_high\
@@ -291,6 +295,7 @@ def main():
     append_write(conf.out_name, f"Acq fun done.\n")
     process_time = time.time() - start 
     out_time(conf.out_name, process_time)
+    print(f"Saving {idx} _full_idxs file.")
     np.savez(f"{conf.out_name}_{idx}_full_idxs.npz",remaining_idxs=rem_idxs, prediction_idxs = pred_idxs, test_idxs = test_idxs)
     compute_stats(conf.out_name, gpr, X_test_pp, y_test)
   #<<<
