@@ -24,6 +24,13 @@ import time
 import multiprocessing as multi
 from sklearn.externals import joblib
 
+def get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
+    # get the data
+    append_write(conf.out_name, f"Getting data corresponding to the latest indices.")
+    X_train, X_test = mbtr_data_red[pred_idxs, :], mbtr_data_red[test_idxs, :]
+    y_train, y_test = homo_lowfid[pred_idxs], homo_lowfid[test_idxs]
+    X_train_pp, X_test_pp = desc_pp(conf.preprocess, X_train, X_test)
+    return X_train_pp, X_test_pp, y_train, y_test
 
 def get_gpr_params(gpr):
   try:
@@ -39,9 +46,10 @@ def exists(file):
   return file.is_file()
 
 # def compute_stats(out_name, preprocess, gpr, X_test_pp, y_test):
-def compute_stats(out_name, gpr, X_test_pp, y_test):
+def compute_stats(conf, gpr, X_test_pp, y_test):
+  out_name = conf.out_name
   start = time.time()
-  append_write(out_name, "starting prediction \n")
+  append_write(conf.out_name, "starting prediction \n")
   mu_s, std_s = gpr.predict(X_test_pp, return_std=True)
   process_time = time.time() - start
   out_time(out_name, process_time)
@@ -225,6 +233,9 @@ def main():
     try:
       append_write(conf.out_name, f"{idx}, {batch_size}\n")
       data = np.load(f"{conf.out_name}_{idx}_full_idxs.npz")
+      rem_idxs  = data['remaining_idxs']
+      pred_idxs = data['prediction_idxs']
+      test_idxs = data['test_idxs']
       # pdb.set_trace()
       print("Loaded data.")
       append_write(conf.out_name, f"loaded {conf.out_name}_{idx}_full_idxs.npz Continuing iteration.\n")
@@ -234,42 +245,57 @@ def main():
       # So we don't have the full_idxs file corresponding to the latest idx.
       # the previous rem_idxs, pred_idxs, test_idxs are already loaded.
 
-#  idx = idx - 1
-  rem_idxs  = data['remaining_idxs']
-  pred_idxs = data['prediction_idxs']
-  test_idxs = data['test_idxs']
+
+  # Now try to load the model file corresponding to idx-1
+  # Since we will need that when we run the acquition function for the next index.
+  idx = idx - 1 
+  try:
+    # try to load gpr
+    gpr = joblib.load(f"{conf.out_name}_{idx}_model.pkl")
+    append_write(conf.out_name, f"Loaded {conf.out_name}_{idx}_model.pkl \n")
+  except Exception as e:
+    # if can't load train again
+    append_write(conf.out_name, f"Can't load {conf.out_name}_{idx}_model.pkl, retraining \n")
+    X_train_pp, X_test_pp, y_train, y_test = get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid)
+    gpr.fit(X_train_pp, y_train)
+    # save GP model
+    joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
+    append_write(conf.out_name, f"Trained {conf.out_name}_{idx}_model.pkl and saved it to disk")
+
+  # Now we can resume from the next index
+  idx = idx + 1
   for idx, batch_size in enumerate(conf.pre_idxs[idx:], idx):
     append_write(conf.out_name, f"Resuming from index {idx} and current batch size is {batch_size}\n")
     print(idx, batch_size)
     # pdb.set_trace()
     start = time.time()
     # get the data
-    print(f"idx {idx} batch_size {batch_size} pred_idxs - len {len(pred_idxs)}")
-    X_train, X_test = mbtr_data_red[pred_idxs, :], mbtr_data_red[test_idxs, :]
-    y_train, y_test = homo_lowfid[pred_idxs], homo_lowfid[test_idxs]
+    # X_train, X_test = mbtr_data_red[pred_idxs, :], mbtr_data_red[test_idxs, :]
+    # y_train, y_test = homo_lowfid[pred_idxs], homo_lowfid[test_idxs]
 
     # train GP with pred_idxs
-    X_train_pp, X_test_pp = desc_pp(conf.preprocess, X_train, X_test)
+    # X_train_pp, X_test_pp = desc_pp(conf.preprocess, X_train, X_test)
+    ## X_train_pp, X_test_pp, y_train, y_test = get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
 
     const, length = get_gpr_params(gpr) 
     append_write(conf.out_name, f"length of RBF kernel before fitting {length} \n")
     append_write(conf.out_name, f"constant of constant kernel before fitting {const} \n")
 
-    # pdb.set_trace()
-    try:
-      # try to load gpr
-      gpr = joblib.load(f"{conf.out_name}_{idx}_model.pkl")
-      append_write(conf.out_name, f"Loaded {conf.out_name}_{idx}_model.pkl \n")
-    except Exception as e:
-      # if can't load train again
-      append_write(conf.out_name, f"Can't load {conf.out_name}_{idx}_model.pkl, retraining \n")
-      gpr.fit(X_train_pp, y_train)
-      # save GP model
-      joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
+    # # pdb.set_trace()
+    # try:
+    #   # try to load gpr
+    #   gpr = joblib.load(f"{conf.out_name}_{idx}_model.pkl")
+    #   append_write(conf.out_name, f"Loaded {conf.out_name}_{idx}_model.pkl \n")
+    # except Exception as e:
+    #   # if can't load train again
+    #   append_write(conf.out_name, f"Can't load {conf.out_name}_{idx}_model.pkl, retraining \n")
+    #   gpr.fit(X_train_pp, y_train)
+    #   # save GP model
+    #   joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
 
-    const, length = get_gpr_params(gpr) 
-    append_write(conf.out_name, f"length of RBF kernel after fitting {length} \n")
-    append_write(conf.out_name, f"constant of constant kernel after fitting {const} \n")
+    # const, length = get_gpr_params(gpr) 
+    # append_write(conf.out_name, f"length of RBF kernel after fitting {length} \n")
+    # append_write(conf.out_name, f"constant of constant kernel after fitting {const} \n")
 
     append_write(conf.out_name, "Finished training \n")
     process_time = time.time() - start
@@ -297,7 +323,13 @@ def main():
     out_time(conf.out_name, process_time)
     print(f"Saving {idx} _full_idxs file.")
     np.savez(f"{conf.out_name}_{idx}_full_idxs.npz",remaining_idxs=rem_idxs, prediction_idxs = pred_idxs, test_idxs = test_idxs)
-    compute_stats(conf.out_name, gpr, X_test_pp, y_test)
+    X_train_pp, X_test_pp, y_train, y_test = get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid)
+    append_write(conf.out_name, f"Training a GP model for index {idx}")
+    gpr.fit(X_train_pp, y_train)
+    # save GP model
+    joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
+    append_write(conf.out_name, f"Trained {conf.out_name}_{idx}_model.pkl and saved it to disk")
+    compute_stats(conf, gpr, X_test_pp, y_test)
   #<<<
 
 if __name__=="__main__":
