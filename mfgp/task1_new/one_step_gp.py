@@ -96,51 +96,8 @@ def main():
   #>>> Load Config
   conf = Input(filepath)
 
-  # #-- Output
-  # out_name = InData.out_name
-  # #-- Condition
-  # fn_name = InData.fn_name
-  # K_high = InData.K_high
-  # rnd_size = InData.rnd_size
-  # random_seed = InData.random_seed
-  # #- Flag
-  # save_load_flag = InData.save_load_flag
-  # save_load_split_flag = InData.save_load_split_flag
-  # restart_flag = InData.restart_flag
-  # #-- Data set
-  # dataset = InData.dataset
-  # dataset_size = InData.dataset_size
-  # test_set_size = InData.test_set_size
-  # num_itr = InData.num_itr    
-  # pre_idxs = np.empty(int(num_itr+1),dtype = int)    
-  # for i in range(int(num_itr+1)):
-  #   pre_idxs[i] = InData.pre_idxs[i]
-  # #-- Preprocess
-  # preprocess = InData.preprocess
-  # mbtr_red = InData.mbtr_red
-  # #-- Path 
-  # mbtr_path = InData.mbtr_path
-  # json_path = InData.json_path
-  # loadidxs_path = InData.loadidxs_path
-  # loadsplitidxs_path = InData.loadsplitidxs_path
-  # #-- Kernel
-  # kernel_type = InData.kernel_type
-  # length = InData.length
-  # const = InData.const
-  # bound = InData.bound
-  # n_opt = InData.n_opt
-  # alpha = InData.alpha
-  # normalize_y = InData.normalize_y
-  # #<<< End Loading config.
-
   # set the random seed
   np.random.seed(conf.random_seed)
-
-  # #-- Initialize
-  # if restart_flag:
-  #   append_write(out_name, "\n\n restart \n\n")
-  # else:
-  #   overwrite(out_name, "")
 
   append_write(conf.out_name, datetime.datetime.today().strftime("%Y-%m-%dT%I-%M-%S"))
   #>>> Load Dataset
@@ -197,18 +154,6 @@ def main():
   n_features = int(mbtr_data_red.shape[1])
   gpr = get_gpr(conf.out_name, conf.const, conf.bound, conf.length, conf.kernel_type, conf.normalize_y, conf.n_opt, conf.random_seed, conf.alpha)
   #<<< Finished setting up GP model
-
-
-  # if the out_name file exists rename to a different file so
-  # contents are not overwritten.
-  # ------------ No need cause we are appending.
-  # if exists(out_name):
-  #     p = Path(out_name)
-  #     datestr = datetime.datetime.today().strftime("%Y-%m-%dT%I-%M-%S")
-  #     new_fname = p.stem + "_" + datestr + p.suffix
-  #     new_path = Path(p.parent ,new_fname)
-  #     p.rename(new_path)
-  #     print(f"Renamed {p} to {new_path}")
 
 
   ####################################################
@@ -269,33 +214,10 @@ def main():
     print(idx, batch_size)
     # pdb.set_trace()
     start = time.time()
-    # get the data
-    # X_train, X_test = mbtr_data_red[pred_idxs, :], mbtr_data_red[test_idxs, :]
-    # y_train, y_test = homo_lowfid[pred_idxs], homo_lowfid[test_idxs]
-
-    # train GP with pred_idxs
-    # X_train_pp, X_test_pp = desc_pp(conf.preprocess, X_train, X_test)
-    ## X_train_pp, X_test_pp, y_train, y_test = get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
 
     const, length = get_gpr_params(gpr) 
     append_write(conf.out_name, f"length of RBF kernel before fitting {length} \n")
     append_write(conf.out_name, f"constant of constant kernel before fitting {const} \n")
-
-    # # pdb.set_trace()
-    # try:
-    #   # try to load gpr
-    #   gpr = joblib.load(f"{conf.out_name}_{idx}_model.pkl")
-    #   append_write(conf.out_name, f"Loaded {conf.out_name}_{idx}_model.pkl \n")
-    # except Exception as e:
-    #   # if can't load train again
-    #   append_write(conf.out_name, f"Can't load {conf.out_name}_{idx}_model.pkl, retraining \n")
-    #   gpr.fit(X_train_pp, y_train)
-    #   # save GP model
-    #   joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
-
-    # const, length = get_gpr_params(gpr) 
-    # append_write(conf.out_name, f"length of RBF kernel after fitting {length} \n")
-    # append_write(conf.out_name, f"constant of constant kernel after fitting {const} \n")
 
     append_write(conf.out_name, "Finished training \n")
     process_time = time.time() - start
