@@ -24,13 +24,40 @@ import time
 import multiprocessing as multi
 from sklearn.externals import joblib
 
+
 def get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
-    # get the data
-    append_write(conf.out_name, f"Getting data corresponding to the latest indices.")
-    X_train, X_test = mbtr_data_red[pred_idxs, :], mbtr_data_red[test_idxs, :]
-    y_train, y_test = homo_lowfid[pred_idxs], homo_lowfid[test_idxs]
-    X_train_pp, X_test_pp = desc_pp(conf.preprocess, X_train, X_test)
-    return X_train_pp, X_test_pp, y_train, y_test
+  # get the data
+  append_write(conf.out_name, f"Getting data corresponding to the latest indices.")
+  X_train, X_test = mbtr_data_red[pred_idxs, :], mbtr_data_red[test_idxs, :]
+  y_train, y_test = homo_lowfid[pred_idxs], homo_lowfid[test_idxs]
+  X_train_pp, X_test_pp = desc_pp(conf.preprocess, X_train, X_test)
+  return X_train_pp, X_test_pp, y_train, y_test
+
+
+def get_gp_model(conf, idx, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
+  """
+  Loads an existing GP model given the index.
+  If the model doesn't exist, gets the data corresponding to the index, 
+  Trains the GP model and returns that.
+  """
+  #>>> Setup the GP model
+  n_features = int(mbtr_data_red.shape[1])
+  gpr = get_gpr(conf.out_name, conf.const, conf.bound, conf.length, conf.kernel_type, conf.normalize_y, conf.n_opt, conf.random_seed, conf.alpha)
+  #<<< Finished setting up GP model
+
+  try:
+    # try to load gpr
+    gpr = joblib.load(f"{conf.out_name}_{idx}_model.pkl")
+    append_write(conf.out_name, f"Loaded {conf.out_name}_{idx}_model.pkl \n")
+  except Exception as e:
+    # if can't load train again
+    append_write(conf.out_name, f"Can't load {conf.out_name}_{idx}_model.pkl, retraining \n")
+    X_train_pp, X_test_pp, y_train, y_test = get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid)
+    gpr.fit(X_train_pp, y_train)
+    # save GP model
+    joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
+    append_write(conf.out_name, f"Trained {conf.out_name}_{idx}_model.pkl and saved it to disk")
+  return gpr
 
 def get_gpr_params(gpr):
   try:
@@ -150,10 +177,6 @@ def main():
       sys.exit()
   #<<< End loading data
 
-  #>>> Setup the GP model
-  n_features = int(mbtr_data_red.shape[1])
-  gpr = get_gpr(conf.out_name, conf.const, conf.bound, conf.length, conf.kernel_type, conf.normalize_y, conf.n_opt, conf.random_seed, conf.alpha)
-  #<<< Finished setting up GP model
 
 
   ####################################################
@@ -181,6 +204,7 @@ def main():
       rem_idxs  = data['remaining_idxs']
       pred_idxs = data['prediction_idxs']
       test_idxs = data['test_idxs']
+      last_loaded_index = idx
       # pdb.set_trace()
       print("Loaded data.")
       append_write(conf.out_name, f"loaded {conf.out_name}_{idx}_full_idxs.npz Continuing iteration.\n")
@@ -193,22 +217,23 @@ def main():
 
   # Now try to load the model file corresponding to idx-1
   # Since we will need that when we run the acquition function for the next index.
-  idx = idx - 1 
-  try:
-    # try to load gpr
-    gpr = joblib.load(f"{conf.out_name}_{idx}_model.pkl")
-    append_write(conf.out_name, f"Loaded {conf.out_name}_{idx}_model.pkl \n")
-  except Exception as e:
-    # if can't load train again
-    append_write(conf.out_name, f"Can't load {conf.out_name}_{idx}_model.pkl, retraining \n")
-    X_train_pp, X_test_pp, y_train, y_test = get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid)
-    gpr.fit(X_train_pp, y_train)
-    # save GP model
-    joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
-    append_write(conf.out_name, f"Trained {conf.out_name}_{idx}_model.pkl and saved it to disk")
+  # idx = idx - 1 
+  gpr = get_gp_model(conf, last_loaded_index, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid)
+  # try:
+  #   # try to load gpr
+  #   gpr = joblib.load(f"{conf.out_name}_{idx}_model.pkl")
+  #   append_write(conf.out_name, f"Loaded {conf.out_name}_{idx}_model.pkl \n")
+  # except Exception as e:
+  #   # if can't load train again
+  #   append_write(conf.out_name, f"Can't load {conf.out_name}_{idx}_model.pkl, retraining \n")
+  #   X_train_pp, X_test_pp, y_train, y_test = get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid)
+  #   gpr.fit(X_train_pp, y_train)
+  #   # save GP model
+  #   joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
+  #   append_write(conf.out_name, f"Trained {conf.out_name}_{idx}_model.pkl and saved it to disk")
 
   # Now we can resume from the next index
-  idx = idx + 1
+  ## idx = idx + 1
   for idx, batch_size in enumerate(conf.pre_idxs[idx:], idx):
     append_write(conf.out_name, f"Resuming from index {idx} and current batch size is {batch_size}\n")
     print(idx, batch_size)
