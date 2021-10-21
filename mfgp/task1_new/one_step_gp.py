@@ -25,6 +25,41 @@ import multiprocessing as multi
 from sklearn.externals import joblib
 
 
+def get_data_from_last_training_run(conf):
+  ####################################################
+  #       How active learning training should        #
+  #                  proceed.                        #
+  ####################################################
+  #
+  # Total number of iterations = len(pre_idxs)
+  # 0. Get rem, test = train_test_plit(rem); iter = 0
+  # 1. split dataset pre, rem = pre_rem_split(number = pre_idxs[0]); idxs_0 = [pre, test, rem]
+  # 2. iter = iter + 1 
+  # 3. train GP on pre
+  # 4. Save the GP model using pickle
+  # 5. Use GP from 3. in acq_func and pick pre_idxs[1] number of molecules. call them pre_new
+  # 6. rem = rem - pre_new; pre = pre_new; save in _{iter}_full_idxs.npz
+  # 7. Goto 2.
+  #>>> Identify indices file from last training iteration.
+  for idx, batch_size in enumerate(conf.pre_idxs[1:], 1):
+    # Try to open the full_idxs file, if you can, save the last rem, train, test.
+    # If you cannot, use the latest rem train test indices to continue.
+    try:
+      append_write(conf.out_name, f"{idx}, {batch_size}\n")
+      data = np.load(f"{conf.out_name}_{idx}_full_idxs.npz")
+      rem_idxs  = data['remaining_idxs']
+      pred_idxs = data['prediction_idxs']
+      test_idxs = data['test_idxs']
+      last_loaded_index = idx
+      print("Loaded data.")
+      append_write(conf.out_name, f"loaded {conf.out_name}_{idx}_full_idxs.npz Continuing iteration.\n")
+    except Exception as e:
+      append_write(conf.out_name, f"iteration {idx} -- {e}, Couldn't load _full_idxs for index {idx}\n")
+      break
+      # So we don't have the full_idxs file corresponding to the latest idx.
+      # the previous rem_idxs, pred_idxs, test_idxs are already loaded.
+  return rem_idxs, pred_idxs, test_idxs, last_loaded_index
+
 def get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
   # get the data
   append_write(conf.out_name, f"Getting data corresponding to the latest indices.")
@@ -117,24 +152,7 @@ def get_gpr(out_name, const, bound, length, kernel_type, normalize_y, n_opt, ran
   append_write(out_name,"constant of constant kernel before fitting " + str(const) + "\n")
   return gpr
 
-def main():
-  start_all = time.time()
-  filepath = sys.argv[1]
-  #>>> Load Config
-  conf = Input(filepath)
-
-  # set the random seed
-  np.random.seed(conf.random_seed)
-
-  append_write(conf.out_name, datetime.datetime.today().strftime("%Y-%m-%dT%I-%M-%S"))
-  #>>> Load Dataset
-  #-- Load for descriptor
-  start = time.time()
-  append_write(conf.out_name, "start load mbtr \n")
-  mbtr_data = load_npz(conf.mbtr_path)
-  process_time = time.time() - start
-  out_time(conf.out_name, process_time)
-
+def load_data(conf):
   #-- Load for HOMO energy
   if conf.dataset in ["OE", "AA", "QM9"]:
     df_62k = 0
@@ -148,25 +166,34 @@ def main():
     append_write(conf.out_name,"program stopped ! \n")    
     sys.exit()
 
+  #-- Load for descriptor
+  start = time.time()
+  append_write(conf.out_name, "start load mbtr \n")
+  mbtr_data = load_npz(conf.mbtr_path)
+  process_time = time.time() - start
+  out_time(conf.out_name, process_time)
+
   #-- Reduce the size of descriptor array
   if conf.mbtr_red :
     mbtr_data_red = mbtr_data[:,mbtr_data.getnnz(0) > 0]
   else:
     mbtr_data_red = mbtr_data
+  #<<< End loading data
 
   #-- Output
   out_condition(conf.out_name, conf)
-  f = open(conf.out_name, 'a')
-  f.write("mbtr_data col " + str(mbtr_data.shape[0]) + "\n" )
-  f.write("mbtr_data row " + str(mbtr_data.shape[1]) + "\n" )
+  append_write(conf.out_name, f"mbtr_data col {str(mbtr_data.shape[0])}")
+  append_write(conf.out_name, f"mbtr_data row {str(mbtr_data.shape[1])}")
+  append_write(conf.out_name, f"mbtr_data row {str(mbtr_data.shape[1])}")
   mbtr_data_size = mbtr_data.shape[0]
-  f.write("mbtr_data_size " + str(mbtr_data_size) + "\n" )
-  f.write("mbtr_data_red_size " + str(mbtr_data_red.shape[1]) + "\n" )
-  f.write("=============================" + "\n")
-  append_write(conf.out_name,str(0) + "-th learning \n")
-  f.flush()
-  f.close()
+  append_write(conf.out_name, f"mbtr_data_size {str(mbtr_data_size)}")
+  append_write(conf.out_name, f"mbtr_data_red_size {str(mbtr_data_red.shape[1])}")
+  append_write(conf.out_name, f"=============================")
+  append_write(conf.out_name, f"{str(0)} -th learning")
 
+  return homo_lowfid, mbtr_data_red
+
+def plot_homo_figure(conf, homo_lowfid):
   #-- Figure of 62k dataset and AA dataset
   if conf.dataset in ["OE", "QM9", "AA"] :
       # fig_atom(df_62k,range(61489),"atoms_all.eps")
@@ -175,69 +202,32 @@ def main():
       append_write(conf.out_name,"Dataset sould be AA, OE or QM9 \n")
       append_write(conf.out_name,"program stopped ! \n")    
       sys.exit()
-  #<<< End loading data
 
+def main(filepath):
+  start_all = time.time()
+  #>>> Load Config
+  conf = Input(filepath)
 
+  # set the random seed
+  np.random.seed(conf.random_seed)
 
-  ####################################################
-  #       How active learning training should        #
-  #                  proceed.                        #
-  ####################################################
-  #
-  # Total number of iterations = len(pre_idxs)
-  # 0. Get rem, test = train_test_plit(rem); iter = 0
-  # 1. split dataset pre, rem = pre_rem_split(number = pre_idxs[0]); idxs_0 = [pre, test, rem]
-  # 2. iter = iter + 1 
-  # 3. train GP on pre
-  # 4. Save the GP model using pickle
-  # 5. Use GP from 3. in acq_func and pick pre_idxs[1] number of molecules. call them pre_new
-  # 6. rem = rem - pre_new; pre = pre_new; save in _{iter}_full_idxs.npz
-  # 7. Goto 2.
+  append_write(conf.out_name, datetime.datetime.today().strftime("%Y-%m-%dT%I-%M-%S"))
+  #>>> Load Dataset
 
-  #>>> Identify indices file from last training iteration.
-  for idx, batch_size in enumerate(conf.pre_idxs[1:], 1):
-    # Try to open the full_idxs file, if you can, save the last rem, train, test.
-    # If you cannot, use the latest rem train test indices to continue.
-    try:
-      append_write(conf.out_name, f"{idx}, {batch_size}\n")
-      data = np.load(f"{conf.out_name}_{idx}_full_idxs.npz")
-      rem_idxs  = data['remaining_idxs']
-      pred_idxs = data['prediction_idxs']
-      test_idxs = data['test_idxs']
-      last_loaded_index = idx
-      # pdb.set_trace()
-      print("Loaded data.")
-      append_write(conf.out_name, f"loaded {conf.out_name}_{idx}_full_idxs.npz Continuing iteration.\n")
-    except Exception as e:
-      append_write(conf.out_name, f"iteration {idx} -- {e}, Couldn't load _full_idxs for index {idx}\n")
-      break
-      # So we don't have the full_idxs file corresponding to the latest idx.
-      # the previous rem_idxs, pred_idxs, test_idxs are already loaded.
+  homo_lowfid, mbtr_data_red = load_data(conf)
+  plot_homo_figure(conf, homo_lowfid)
 
-
+  rem_idxs, pred_idxs, test_idxs, last_loaded_index = get_data_from_last_training_run(conf)
   # Now try to load the model file corresponding to idx-1
   # Since we will need that when we run the acquition function for the next index.
   # idx = idx - 1 
   gpr = get_gp_model(conf, last_loaded_index, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid)
-  # try:
-  #   # try to load gpr
-  #   gpr = joblib.load(f"{conf.out_name}_{idx}_model.pkl")
-  #   append_write(conf.out_name, f"Loaded {conf.out_name}_{idx}_model.pkl \n")
-  # except Exception as e:
-  #   # if can't load train again
-  #   append_write(conf.out_name, f"Can't load {conf.out_name}_{idx}_model.pkl, retraining \n")
-  #   X_train_pp, X_test_pp, y_train, y_test = get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid)
-  #   gpr.fit(X_train_pp, y_train)
-  #   # save GP model
-  #   joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
-  #   append_write(conf.out_name, f"Trained {conf.out_name}_{idx}_model.pkl and saved it to disk")
 
-  # Now we can resume from the next index
-  ## idx = idx + 1
+  # resume from next index
+  idx = last_loaded_index + 1
   for idx, batch_size in enumerate(conf.pre_idxs[idx:], idx):
     append_write(conf.out_name, f"Resuming from index {idx} and current batch size is {batch_size}\n")
     print(idx, batch_size)
-    # pdb.set_trace()
     start = time.time()
 
     const, length = get_gpr_params(gpr) 
@@ -270,14 +260,17 @@ def main():
     out_time(conf.out_name, process_time)
     print(f"Saving {idx} _full_idxs file.")
     np.savez(f"{conf.out_name}_{idx}_full_idxs.npz",remaining_idxs=rem_idxs, prediction_idxs = pred_idxs, test_idxs = test_idxs)
+
     X_train_pp, X_test_pp, y_train, y_test = get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid)
     append_write(conf.out_name, f"Training a GP model for index {idx}")
     gpr.fit(X_train_pp, y_train)
     # save GP model
     joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
+
     append_write(conf.out_name, f"Trained {conf.out_name}_{idx}_model.pkl and saved it to disk")
     compute_stats(conf, gpr, X_test_pp, y_test)
   #<<<
 
 if __name__=="__main__":
-  main()
+  filepath = sys.argv[1]
+  main(filepath)
