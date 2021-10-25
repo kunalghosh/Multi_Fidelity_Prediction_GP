@@ -20,21 +20,43 @@ def get_directories(arg_list):
 
 reference, other_dir = get_directories(sys.argv)
 
-data = np.load(f"{reference}/test-A-1k_1_full_idxs.npz")['prediction_idxs']
-data2 = np.load(f"{reference}/test-A-1k_2_full_idxs.npz")['prediction_idxs']
-print(f"len set diff {len(set(data2).difference(data))} If the previous set has elements then two iterations of the new code produce different indices (this is desirable.)")
 
-old_data = np.load(f"{other_dir}/test-A-1k_1_full_idxs.npz")['prediction_idxs']
-print(f"len set diff {len(set(data).difference(old_data))} If the previous set is empty then index set 1 is same between old and new")
+def get_prediction_idxs(file_path):
+    """
+    Gets path to the file and prints exception if there was a problem.
+    Doesn't terminate execution.
+    """
+    data = None
 
-old_data2 = np.load(f"{other_dir}/test-A-1k_2_full_idxs.npz")['prediction_idxs']
-print(f"len set diff {len(set(data2).difference(old_data2))} If the previous set is empty then index set 2 is same between old and new")
+    try:
+        data = np.load(file_path)['prediction_idxs']
+    except (Exception, OSError) as e:
+        print(f"{e}. Couldn't load file {file_path}")
 
-old_data3 = np.load(f"{other_dir}/test-A-1k_3_full_idxs.npz")['prediction_idxs']
-data3 = np.load(f"{reference}/test-A-1k_3_full_idxs.npz")['prediction_idxs']
-print(f"len set diff {len(set(data3).difference(old_data3))} If the previous set is empty then index set 3 is same between old and new")
+    return data
 
-data4 = np.load(f"{reference}/test-A-1k_4_full_idxs.npz")['prediction_idxs']
-old_data4 = np.load(f"{other_dir}/test-A-1k_4_full_idxs.npz")['prediction_idxs']
-print(f"len set diff {len(set(data4).difference(old_data4))} If the previous set is empty then index set 4 is same between old and new")
-# %history -g -f test_data_old_new.py
+def compare_two_data_lists(data1, data2):
+    """
+    Gets two lists and returns set difference of the two lists.
+    But if one of them is None (file loading error) then the return value is None
+    """
+    set_difference = None
+    if data1 is None or data2 is None:
+        set_difference = None
+    else:
+        set_difference = len(set(data1).difference(data2))
+    return set_difference
+
+
+data1 = get_prediction_idxs(f"{reference}/test-a-1k_1_full_idxs.npz")
+data2 = get_prediction_idxs(f"{reference}/test-A-1k_2_full_idxs.npz")
+set_difference = compare_two_data_lists(data1, data2)
+print(f"len set diff {set_difference} If the previous set has elements then two iterations of the new code produce different indices (this is desirable.). None means there was an error.")
+
+for i in range(1,16):
+    data = get_prediction_idxs(f"{reference}/test-A-1k_{i}_full_idxs.npz")
+    old_data = get_prediction_idxs(f"{other_dir}/test-A-1k_{i}_full_idxs.npz")
+    set_difference = compare_two_data_lists(data, old_data)
+    print(f"len set diff {set_difference} If the previous set is empty then index set {i} is same between old and new. None means there was an error.")
+
+# # %history -g -f test_data_old_new.py
