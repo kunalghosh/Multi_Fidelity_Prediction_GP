@@ -60,6 +60,7 @@ def get_data_from_last_training_run(conf):
       # the previous rem_idxs, pred_idxs, test_idxs are already loaded.
   return rem_idxs, pred_idxs, test_idxs, last_loaded_index
 
+
 def get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
   # get the data
   append_write(conf.out_name, f"Getting data corresponding to the latest indices.")
@@ -72,7 +73,7 @@ def get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfi
 def get_gp_model(conf, idx, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
   """
   Loads an existing GP model given the index.
-  If the model doesn't exist, gets the data corresponding to the index, 
+  If the model doesn't exist, gets the data corresponding to the index,
   Trains the GP model and returns that.
   """
   #>>> Setup the GP model
@@ -94,18 +95,21 @@ def get_gp_model(conf, idx, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
     append_write(conf.out_name, f"Trained {conf.out_name}_{idx}_model.pkl and saved it to disk")
   return gpr
 
+
 def get_gpr_params(gpr):
   try:
-    params = gpr.kernel_.get_params() 
+    params = gpr.kernel_.get_params()
   except AttributeError as e:
     params = gpr.kernel.get_params()
   const  = params['k1__constant_value']
   length = params['k2__length_scale']
   return const, length
 
+
 def exists(file):
   file = Path(file) 
   return file.is_file()
+
 
 # def compute_stats(out_name, preprocess, gpr, X_test_pp, y_test):
 def compute_stats(conf, gpr, X_test_pp, y_test):
@@ -133,37 +137,38 @@ def compute_stats(conf, gpr, X_test_pp, y_test):
   append_write(out_name,"r2 by hand " + str(r2) + "\n")
   append_write(out_name,"MAE " + str(MAE) + "\n")
 
+
 def get_gpr(out_name, const, bound, length, kernel_type, normalize_y, n_opt, random_seed, alpha):
   if kernel_type == "RBF":
       kernel = RBF(length_scale=length, length_scale_bounds=(length*1.0/bound, length*bound))
   elif kernel_type == "constRBF":
       kernel = ConstantKernel(constant_value = const , constant_value_bounds=(const*1.0/bound, const*bound)) \
-               * RBF(length_scale=length, length_scale_bounds=(length*1.0/bound, length*bound)) # best result.    
+               * RBF(length_scale=length, length_scale_bounds=(length*1.0/bound, length*bound)) # best result
   else:
       append_write(out_name,"kernel sould be RBF or constRBF \n")
-      append_write(out_name,"program stopped ! \n")    
+      append_write(out_name,"program stopped ! \n")
       sys.exit()
-      
+
   # normalize_y = normalize_y
-  gpr = GaussianProcessRegressor(kernel=kernel, normalize_y=normalize_y, 
-                                 n_restarts_optimizer = n_opt, 
+  gpr = GaussianProcessRegressor(kernel=kernel, normalize_y=normalize_y,
+                                 n_restarts_optimizer = n_opt,
                                  random_state = random_seed, alpha=alpha)
   append_write(out_name,"length of RBF kernel before fitting " + str(length) + "\n")
   append_write(out_name,"constant of constant kernel before fitting " + str(const) + "\n")
   return gpr
 
+
 def load_data(conf):
   #-- Load for HOMO energy
   if conf.dataset in ["OE", "AA", "QM9"]:
-    df_62k = 0
-    start = time.time()	
+    start = time.time()
     append_write(conf.out_name, "start load OE \n")
     homo_lowfid = np.loadtxt(conf.json_path)
     process_time = time.time() - start
     out_time(conf.out_name, process_time)
   else:
     append_write(conf.out_name,"Dataset sould be AA or OE or QM9\n")
-    append_write(conf.out_name,"program stopped ! \n")    
+    append_write(conf.out_name,"program stopped ! \n")
     sys.exit()
 
   #-- Load for descriptor
@@ -182,26 +187,85 @@ def load_data(conf):
 
   #-- Output
   out_condition(conf.out_name, conf)
-  append_write(conf.out_name, f"mbtr_data col {str(mbtr_data.shape[0])}")
-  append_write(conf.out_name, f"mbtr_data row {str(mbtr_data.shape[1])}")
-  append_write(conf.out_name, f"mbtr_data row {str(mbtr_data.shape[1])}")
+  append_write(conf.out_name, f"mbtr_data row {str(mbtr_data.shape[0])}")
+  append_write(conf.out_name, f"mbtr_data col {str(mbtr_data.shape[1])}")
   mbtr_data_size = mbtr_data.shape[0]
   append_write(conf.out_name, f"mbtr_data_size {str(mbtr_data_size)}")
   append_write(conf.out_name, f"mbtr_data_red_size {str(mbtr_data_red.shape[1])}")
   append_write(conf.out_name, f"=============================")
   append_write(conf.out_name, f"{str(0)} -th learning")
 
+  # check that the dataset size specified in config is correct
+  assert conf.dataset_size == len(homo_lowfid), "The dataset size specified in config {conf.dataset_size} doesn't match the number of homo values {len(homo_low_fid)}"
+  assert mbtr_data_red.shape[0] == len(homo_lowfid), "The number of mbtrs {mbtr_data_red.shape[0]} doesn't match the number of homo values {len(homo_low_fid)}"
   return homo_lowfid, mbtr_data_red
+
 
 def plot_homo_figure(conf, homo_lowfid):
   #-- Figure of 62k dataset and AA dataset
   if conf.dataset in ["OE", "QM9", "AA"] :
-      # fig_atom(df_62k,range(61489),"atoms_all.eps")
-      fig_HOMO(homo_lowfid,range(conf.dataset_size), "HOMO_all.eps")
+    # fig_atom(df_62k,range(61489),"atoms_all.eps")
+    fig_HOMO(homo_lowfid,range(conf.dataset_size), "HOMO_all.eps")
   else:
-      append_write(conf.out_name,"Dataset sould be AA, OE or QM9 \n")
-      append_write(conf.out_name,"program stopped ! \n")    
-      sys.exit()
+    append_write(conf.out_name,"Dataset sould be AA, OE or QM9 \n")
+    append_write(conf.out_name,"program stopped ! \n")
+    sys.exit()
+
+
+def execute_first_training_run(conf, homo_lowfid, mbtr_data_red):
+  """
+  Checks if 1_full_idxs exists:
+  If it does, then it prints out that the file exists and does nothing else.
+  If 1_full_idxs doesn't exist, then it does the following:
+  1. train_test_split based on the random seed
+  2. Train a GP on the loaded data
+  3. Run acquisition and get prediction, remaining and held_out set
+  4. Save the data in 1_full_idxs
+  5. Print, data successfully generated.
+  """
+  if exists(f"{conf.out_name}_1_full_idxs.npz"):
+    print("{conf.out_name}_1_full_idxs.npz Exists continuing from that file.")
+  else:
+    print(f"{conf.out_name}_1_full_idxs.npz Doesn't exist. \nPerforming train test split.")
+    # working with indices. Also checked that the dataset size is the
+    # same as the nubmer of elements in homolow_fid and number of mbtrs
+    all_indices = range(len(homo_lowfid))
+    test_idxs, remaining_idxs = train_test_split(all_indices, train_size = conf.test_set_size ,random_state = conf.random_seed)
+    prediction_idxs, remaining_idxs = train_test_split(remaining_idxs, train_size = conf.pre_idxs[0], random_state = conf.random_seed)
+
+    # save the indices
+    idx = 0
+    np.savez(f"{conf.out_name}_{idx}_full_idxs.npz", remaining_idxs=remaining_idxs, test_idxs=test_idxs, prediction_idxs=prediction_idxs)
+
+    # train GP on loaded data
+    X_train_pp, X_test_pp, y_train, y_test = get_data_given_indices(conf, prediction_idxs, test_idxs, mbtr_data_red, homo_lowfid)
+    gpr = get_gp_model(conf, idx, prediction_idxs, test_idxs, mbtr_data_red, homo_lowfid)
+
+    # run acquisition
+    idx = 1
+    prediction_set_size = conf.pre_idxs[idx]
+    start = time.time()
+    append_write(conf.out_name, f"Starting acq function.\n")
+    pred_idxs, rem_idxs, X_train_pp, y_train = acq_fn(conf.fn_name\
+                                                      , idx\
+                                                      , prediction_idxs\
+                                                      , remaining_idxs\
+                                                      , prediction_set_size\
+                                                      , conf.rnd_size\
+                                                      , mbtr_data_red\
+                                                      , homo_lowfid\
+                                                      , conf.K_high\
+                                                      , gpr\
+                                                      , conf.preprocess\
+                                                      , conf.out_name\
+                                                      , conf.random_seed)
+    append_write(conf.out_name, f"Acq fun done.\n")
+    process_time = time.time() - start
+    out_time(conf.out_name, process_time)
+    # these indices are to be used in the next iteration therefore idx = idx + 1 (or idx = 1)
+    print(f"Saving {idx} _full_idxs file.")
+    np.savez(f"{conf.out_name}_{idx}_full_idxs.npz",remaining_idxs=rem_idxs, prediction_idxs = pred_idxs, test_idxs = test_idxs)
+
 
 def main(filepath):
   start_all = time.time()
@@ -216,6 +280,9 @@ def main(filepath):
 
   homo_lowfid, mbtr_data_red = load_data(conf)
   plot_homo_figure(conf, homo_lowfid)
+
+  # execute the first training run
+  execute_first_training_run(conf, homo_lowfid, mbtr_data_red)
 
   rem_idxs, pred_idxs, test_idxs, last_loaded_index = get_data_from_last_training_run(conf)
   # Now try to load the model file corresponding to idx-1
