@@ -1,37 +1,28 @@
-import sys
+from datetime import datetime
 from pathlib import Path
-import numpy as np
-import matplotlib
-
-matplotlib.use("Agg")
-from scipy.sparse import load_npz, save_npz, lil_matrix
+from sklearn.externals import joblib
+from scipy.sparse import load_npz
 from sklearn.model_selection import train_test_split
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF
-from sklearn.gaussian_process.kernels import ConstantKernel, WhiteKernel
-from sklearn.model_selection import train_test_split
+from sklearn.gaussian_process.kernels import ConstantKernel
 from sklearn.metrics import mean_absolute_error
-from sklearn import preprocessing
-from mfgp.utils import get_level
 from acq import acq_fn
 from utils import desc_pp, desc_pp_notest, has_duplicates, pre_rem_split, r2_byhand
 from io_utils import (
-    overwrite,
     append_write,
     out_condition,
     out_time,
-    out_time_all,
-    out_time_all_temp,
-    fig_atom,
     fig_HOMO,
-    fig_scatter_r2,
-    fig_MDS_scatter_std,
-    fig_MDS_scatter_label,
     Input,
 )
-import datetime
+
+import sys
+import numpy as np
 import time
-from sklearn.externals import joblib
+import matplotlib
+
+matplotlib.use("Agg")
 
 
 def get_data_from_last_training_run(conf):
@@ -78,10 +69,10 @@ def get_data_from_last_training_run(conf):
 
 def get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
     # get the data
-    append_write(conf.out_name, f"Getting data corresponding to the latest indices.")
-    X_train, X_test = mbtr_data_red[pred_idxs, :], mbtr_data_red[test_idxs, :]
+    append_write(conf.out_name, f"Getting data corresponding to the latest indices")
+    x_train, x_test = mbtr_data_red[pred_idxs, :], mbtr_data_red[test_idxs, :]
     y_train, y_test = homo_lowfid[pred_idxs], homo_lowfid[test_idxs]
-    x_train_pp, x_test_pp = desc_pp(conf.preprocess, X_train, X_test)
+    x_train_pp, x_test_pp = desc_pp(conf.preprocess, x_train, x_test)
     return x_train_pp, x_test_pp, y_train, y_test
 
 
@@ -108,11 +99,11 @@ def get_gp_model(conf, idx, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
     try:
         # try to load gpr
         gpr = joblib.load(f"{conf.out_name}_{idx}_model.pkl")
-        append_write(conf.out_name, f"Loaded {conf.out_name}_{idx}_model.pkl \n")
-    except Exception as e:
+        append_write(conf.out_name, f"Loaded {conf.out_name}_{idx}_model.pkl\n")
+    except Exception:
         # if can't load train again
         append_write(
-            conf.out_name, f"Can't load {conf.out_name}_{idx}_model.pkl, retraining \n"
+            conf.out_name, f"Can't load {conf.out_name}_{idx}_model.pkl, retraining\n"
         )
         x_train_pp, _, y_train, _ = get_data_given_indices(
             conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid
@@ -130,7 +121,7 @@ def get_gp_model(conf, idx, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
 def get_gpr_params(gpr):
     try:
         params = gpr.kernel_.get_params()
-    except AttributeError as e:
+    except AttributeError:
         params = gpr.kernel.get_params()
     const = params["k1__constant_value"]
     length = params["k2__length_scale"]
@@ -147,7 +138,7 @@ def compute_stats(conf, gpr, x_test_pp, y_test):
     out_name = conf.out_name
     start = time.time()
     append_write(conf.out_name, "starting prediction \n")
-    mu_s, std_s = gpr.predict(x_test_pp, return_std=True)
+    mu_s, _ = gpr.predict(x_test_pp, return_std=True)
     process_time = time.time() - start
     out_time(out_name, process_time)
 
@@ -161,12 +152,12 @@ def compute_stats(conf, gpr, x_test_pp, y_test):
     # -- Score(MAE)
     start = time.time()
     append_write(out_name, "start calculating MAE \n")
-    MAE = np.array(mean_absolute_error(y_test, mu_s))
+    mae = np.array(mean_absolute_error(y_test, mu_s))
     process_time = time.time() - start
     out_time(out_name, process_time)
 
-    append_write(out_name, "r2 by hand " + str(r2) + "\n")
-    append_write(out_name, "MAE " + str(MAE) + "\n")
+    append_write(out_name, f"r2 by hand {r2}\n")
+    append_write(out_name, f"MAE {mae} \n")
 
 
 def get_gpr(
@@ -198,10 +189,8 @@ def get_gpr(
         random_state=random_seed,
         alpha=alpha,
     )
-    append_write(out_name, "length of RBF kernel before fitting " + str(length) + "\n")
-    append_write(
-        out_name, "constant of constant kernel before fitting " + str(const) + "\n"
-    )
+    append_write(out_name, f"length of RBF kernel before fitting {length}\n")
+    append_write(out_name, f"constant before fitting {const}\n")
     return gpr
 
 
@@ -234,21 +223,25 @@ def load_data(conf):
 
     # -- Output
     out_condition(conf.out_name, conf)
-    append_write(conf.out_name, f"mbtr_data row {str(mbtr_data.shape[0])}")
-    append_write(conf.out_name, f"mbtr_data col {str(mbtr_data.shape[1])}")
+    append_write(conf.out_name, f"mbtr_data row {mbtr_data.shape[0]}")
+    append_write(conf.out_name, f"mbtr_data col {mbtr_data.shape[1]}")
     mbtr_data_size = mbtr_data.shape[0]
-    append_write(conf.out_name, f"mbtr_data_size {str(mbtr_data_size)}")
-    append_write(conf.out_name, f"mbtr_data_red_size {str(mbtr_data_red.shape[1])}")
-    append_write(conf.out_name, f"=============================")
+    append_write(conf.out_name, f"mbtr_data_size {mbtr_data_size}")
+    append_write(conf.out_name, f"mbtr_data_red_size {mbtr_data_red.shape[1]}")
+    append_write(conf.out_name, "=============================")
     append_write(conf.out_name, f"{str(0)} -th learning")
 
     # check that the dataset size specified in config is correct
-    assert conf.dataset_size == len(
-        homo_lowfid
-    ), "The dataset size specified in config {conf.dataset_size} doesn't match the number of homo values {len(homo_low_fid)}"
-    assert mbtr_data_red.shape[0] == len(
-        homo_lowfid
-    ), "The number of mbtrs {mbtr_data_red.shape[0]} doesn't match the number of homo values {len(homo_low_fid)}"
+    assert conf.dataset_size == len(homo_lowfid), (
+        f"The dataset size specified in config {conf.dataset_size}"
+        " doesn't match the number of homo values"
+        f"{len(homo_lowfid)}"
+    )
+
+    assert mbtr_data_red.shape[0] == len(homo_lowfid), (
+        f"The number of mbtrs {mbtr_data_red.shape[0]}"
+        f" doesn't match the number of homo values {len(homo_lowfid)}"
+    )
     return homo_lowfid, mbtr_data_red
 
 
@@ -274,20 +267,23 @@ def execute_first_training_run(conf, homo_lowfid, mbtr_data_red):
     4. Save the data in 1_full_idxs
     5. Print, data successfully generated.
     """
+    rnd = conf.random_seed
+
     if exists(f"{conf.out_name}_1_full_idxs.npz"):
-        print("{conf.out_name}_1_full_idxs.npz Exists continuing from that file.")
+        print("{conf.out_name}_1_full_idxs.npz exists continuing from that file")
     else:
         print(
-            f"{conf.out_name}_1_full_idxs.npz Doesn't exist. \nPerforming train test split."
+            f"{conf.out_name}_1_full_idxs.npz Doesn't exist.\n"
+            "Performing train test split."
         )
         # working with indices. Also checked that the dataset size is the
         # same as the nubmer of elements in homolow_fid and number of mbtrs
         all_indices = range(len(homo_lowfid))
         test_idxs, remaining_idxs = train_test_split(
-            all_indices, train_size=conf.test_set_size, random_state=conf.random_seed
+            all_indices, train_size=conf.test_set_size, random_state=rnd
         )
         prediction_idxs, remaining_idxs = train_test_split(
-            remaining_idxs, train_size=conf.pre_idxs[0], random_state=conf.random_seed
+            remaining_idxs, train_size=conf.pre_idxs[0], random_state=rnd
         )
 
         # save the indices
@@ -311,7 +307,7 @@ def execute_first_training_run(conf, homo_lowfid, mbtr_data_red):
         idx = 1
         prediction_set_size = conf.pre_idxs[idx]
         start = time.time()
-        append_write(conf.out_name, f"Starting acq function.\n")
+        append_write(conf.out_name, "Starting acq function.\n")
         pred_idxs, rem_idxs, x_train_pp, y_train = acq_fn(
             conf.fn_name,
             idx,
@@ -327,10 +323,12 @@ def execute_first_training_run(conf, homo_lowfid, mbtr_data_red):
             conf.out_name,
             conf.random_seed,
         )
-        append_write(conf.out_name, f"Acq fun done.\n")
+        append_write(conf.out_name, "Acq fun done.\n")
         process_time = time.time() - start
         out_time(conf.out_name, process_time)
-        # these indices are to be used in the next iteration therefore idx = idx + 1 (or idx = 1)
+
+        # these indices are to be used in the next iteration
+        # therefore idx = idx + 1 (or idx = 1)
         print(f"Saving {idx} _full_idxs file.")
         np.savez(
             f"{conf.out_name}_{idx}_full_idxs.npz",
@@ -347,23 +345,24 @@ def main(filepath):
     # set the random seed
     np.random.seed(conf.random_seed)
 
-    append_write(conf.out_name, datetime.datetime.today().strftime("%Y-%m-%dT%I-%M-%S"))
+    append_write(conf.out_name, datetime.today().strftime("%Y-%m-%dT%I-%M-%S"))
     # >>> Load Dataset
 
-    homo_lowfid, mbtr_data_red = load_data(conf)
-    plot_homo_figure(conf, homo_lowfid)
+    homo_low_fid, mbtr_data_red = load_data(conf)
+    plot_homo_figure(conf, homo_low_fid)
 
     # execute the first training run
-    execute_first_training_run(conf, homo_lowfid, mbtr_data_red)
+    execute_first_training_run(conf, homo_low_fid, mbtr_data_red)
 
     rem_idxs, pred_idxs, test_idxs, last_loaded_index = get_data_from_last_training_run(
         conf
     )
     # Now try to load the model file corresponding to idx-1
-    # Since we will need that when we run the acquition function for the next index.
+    # Since we will need that when we run the
+    # acquition function for the next index.
     # idx = idx - 1
     gpr = get_gp_model(
-        conf, last_loaded_index, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid
+        conf, last_loaded_index, pred_idxs, test_idxs, mbtr_data_red, homo_low_fid
     )
 
     # resume from next index
@@ -371,16 +370,14 @@ def main(filepath):
     for idx, batch_size in enumerate(conf.pre_idxs[idx:], idx):
         append_write(
             conf.out_name,
-            f"Resuming from index {idx} and current batch size is {batch_size}\n",
+            f"Resuming from index {idx} current batch size is {batch_size}\n",
         )
         print(idx, batch_size)
         start = time.time()
 
         const, length = get_gpr_params(gpr)
-        append_write(conf.out_name, f"length of RBF kernel before fitting {length} \n")
-        append_write(
-            conf.out_name, f"constant of constant kernel before fitting {const} \n"
-        )
+        append_write(conf.out_name, f"length RBF kernel before fit {length}\n")
+        append_write(conf.out_name, f"constant of before fit {const} \n")
 
         append_write(conf.out_name, "Finished training \n")
         process_time = time.time() - start
@@ -389,7 +386,7 @@ def main(filepath):
         # Go through acq_fn to get new pred_idxs
         prediction_set_size = batch_size
         start = time.time()
-        append_write(conf.out_name, f"Starting acq function.\n")
+        append_write(conf.out_name, "Starting acq function.\n")
         pred_idxs, rem_idxs, x_train_pp, y_train = acq_fn(
             conf.fn_name,
             idx,
@@ -398,14 +395,14 @@ def main(filepath):
             prediction_set_size,
             conf.rnd_size,
             mbtr_data_red,
-            homo_lowfid,
+            homo_low_fid,
             conf.K_high,
             gpr,
             conf.preprocess,
             conf.out_name,
             conf.random_seed,
         )
-        append_write(conf.out_name, f"Acq fun done.\n")
+        append_write(conf.out_name, "Acq fun done.\n")
         process_time = time.time() - start
         out_time(conf.out_name, process_time)
         print(f"Saving {idx} _full_idxs file.")
@@ -417,7 +414,7 @@ def main(filepath):
         )
 
         x_train_pp, x_test_pp, y_train, y_test = get_data_given_indices(
-            conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid
+            conf, pred_idxs, test_idxs, mbtr_data_red, homo_low_fid
         )
         append_write(conf.out_name, f"Training a GP model for index {idx}")
         gpr.fit(x_train_pp, y_train)
