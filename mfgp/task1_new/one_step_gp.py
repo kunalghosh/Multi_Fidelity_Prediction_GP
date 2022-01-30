@@ -1,13 +1,9 @@
-import pdb
 import sys
-import pickle as pkl
 from pathlib import Path
 import numpy as np
-import pandas as pd
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 from scipy.sparse import load_npz, save_npz, lil_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.gaussian_process import GaussianProcessRegressor
@@ -35,7 +31,6 @@ from io_utils import (
 )
 import datetime
 import time
-import multiprocessing as multi
 from sklearn.externals import joblib
 
 
@@ -86,8 +81,8 @@ def get_data_given_indices(conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfi
     append_write(conf.out_name, f"Getting data corresponding to the latest indices.")
     X_train, X_test = mbtr_data_red[pred_idxs, :], mbtr_data_red[test_idxs, :]
     y_train, y_test = homo_lowfid[pred_idxs], homo_lowfid[test_idxs]
-    X_train_pp, X_test_pp = desc_pp(conf.preprocess, X_train, X_test)
-    return X_train_pp, X_test_pp, y_train, y_test
+    x_train_pp, x_test_pp = desc_pp(conf.preprocess, X_train, X_test)
+    return x_train_pp, x_test_pp, y_train, y_test
 
 
 def get_gp_model(conf, idx, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
@@ -97,7 +92,6 @@ def get_gp_model(conf, idx, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
     Trains the GP model and returns that.
     """
     # >>> Setup the GP model
-    n_features = int(mbtr_data_red.shape[1])
     gpr = get_gpr(
         conf.out_name,
         conf.const,
@@ -120,10 +114,10 @@ def get_gp_model(conf, idx, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
         append_write(
             conf.out_name, f"Can't load {conf.out_name}_{idx}_model.pkl, retraining \n"
         )
-        X_train_pp, X_test_pp, y_train, y_test = get_data_given_indices(
+        x_train_pp, _, y_train, _ = get_data_given_indices(
             conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid
         )
-        gpr.fit(X_train_pp, y_train)
+        gpr.fit(x_train_pp, y_train)
         # save GP model
         joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
         append_write(
@@ -148,12 +142,12 @@ def exists(file):
     return file.is_file()
 
 
-# def compute_stats(out_name, preprocess, gpr, X_test_pp, y_test):
-def compute_stats(conf, gpr, X_test_pp, y_test):
+# def compute_stats(out_name, preprocess, gpr, x_test_pp, y_test):
+def compute_stats(conf, gpr, x_test_pp, y_test):
     out_name = conf.out_name
     start = time.time()
     append_write(conf.out_name, "starting prediction \n")
-    mu_s, std_s = gpr.predict(X_test_pp, return_std=True)
+    mu_s, std_s = gpr.predict(x_test_pp, return_std=True)
     process_time = time.time() - start
     out_time(out_name, process_time)
 
@@ -306,7 +300,7 @@ def execute_first_training_run(conf, homo_lowfid, mbtr_data_red):
         )
 
         # train GP on loaded data
-        X_train_pp, X_test_pp, y_train, y_test = get_data_given_indices(
+        x_train_pp, x_test_pp, y_train, y_test = get_data_given_indices(
             conf, prediction_idxs, test_idxs, mbtr_data_red, homo_lowfid
         )
         gpr = get_gp_model(
@@ -318,7 +312,7 @@ def execute_first_training_run(conf, homo_lowfid, mbtr_data_red):
         prediction_set_size = conf.pre_idxs[idx]
         start = time.time()
         append_write(conf.out_name, f"Starting acq function.\n")
-        pred_idxs, rem_idxs, X_train_pp, y_train = acq_fn(
+        pred_idxs, rem_idxs, x_train_pp, y_train = acq_fn(
             conf.fn_name,
             idx,
             prediction_idxs,
@@ -347,7 +341,6 @@ def execute_first_training_run(conf, homo_lowfid, mbtr_data_red):
 
 
 def main(filepath):
-    start_all = time.time()
     # >>> Load Config
     conf = Input(filepath)
 
@@ -397,7 +390,7 @@ def main(filepath):
         prediction_set_size = batch_size
         start = time.time()
         append_write(conf.out_name, f"Starting acq function.\n")
-        pred_idxs, rem_idxs, X_train_pp, y_train = acq_fn(
+        pred_idxs, rem_idxs, x_train_pp, y_train = acq_fn(
             conf.fn_name,
             idx,
             pred_idxs,
@@ -423,11 +416,11 @@ def main(filepath):
             test_idxs=test_idxs,
         )
 
-        X_train_pp, X_test_pp, y_train, y_test = get_data_given_indices(
+        x_train_pp, x_test_pp, y_train, y_test = get_data_given_indices(
             conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid
         )
         append_write(conf.out_name, f"Training a GP model for index {idx}")
-        gpr.fit(X_train_pp, y_train)
+        gpr.fit(x_train_pp, y_train)
         # save GP model
         joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
 
@@ -435,7 +428,7 @@ def main(filepath):
             conf.out_name,
             f"Trained {conf.out_name}_{idx}_model.pkl and saved it to disk",
         )
-        compute_stats(conf, gpr, X_test_pp, y_test)
+        compute_stats(conf, gpr, x_test_pp, y_test)
     # <<<
 
 
