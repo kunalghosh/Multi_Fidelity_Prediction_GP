@@ -296,9 +296,6 @@ def execute_first_training_run(conf, homo_lowfid, mbtr_data_red):
         )
 
         # train GP on loaded data
-        x_train_pp, x_test_pp, y_train, y_test = get_data_given_indices(
-            conf, prediction_idxs, test_idxs, mbtr_data_red, homo_lowfid
-        )
         gpr = get_gp_model(
             conf, idx, prediction_idxs, test_idxs, mbtr_data_red, homo_lowfid
         )
@@ -308,7 +305,7 @@ def execute_first_training_run(conf, homo_lowfid, mbtr_data_red):
         prediction_set_size = conf.pre_idxs[idx]
         start = time.time()
         append_write(conf.out_name, "Starting acq function.\n")
-        pred_idxs, rem_idxs, x_train_pp, y_train = acq_fn(
+        pred_idxs, rem_idxs, _, _ = acq_fn(
             conf.fn_name,
             idx,
             prediction_idxs,
