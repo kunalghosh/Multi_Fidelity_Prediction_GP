@@ -22,8 +22,7 @@ from io_utils import overwrite, append_write, out_condition, out_time, out_time_
 import datetime
 import time
 import multiprocessing as multi
-from sklearn.externals import joblib
-
+import joblib
 
 def get_data_from_last_training_run(conf):
   ####################################################
