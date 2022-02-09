@@ -1,6 +1,5 @@
 from datetime import datetime
 from pathlib import Path
-from sklearn.externals import joblib
 from scipy.sparse import load_npz
 from sklearn.model_selection import train_test_split
 from sklearn.gaussian_process import GaussianProcessRegressor
