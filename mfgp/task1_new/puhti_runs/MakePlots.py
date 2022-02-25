@@ -16,15 +16,9 @@
 # This notebook is used to make plots. The notebook is converted to a plain python text file using [jupytext](https://jupytext.readthedocs.io/en/latest/)
 
 # %%
+import os
 import numpy as np
 import pandas as pd
-# !pip install xarray
-
-# %%
-aa_a_1k = pd.read_csv("csv_files/Active learning results - new - AA_A_1k.csv")
-
-# %%
-aa_a_1k.mean_vals
 
 # %%
 os.chdir("/projappl/project_2000382/ghoshkun/code/Multi_Fidelity_Prediction_GP/mfgp/task1_new/puhti_runs")
@@ -48,6 +42,7 @@ os.getcwd()
 os.chdir("/projappl/project_2000382/ghoshkun/code/Multi_Fidelity_Prediction_GP/mfgp/task1_new/puhti_runs")
 assert os.getcwd() == "/projappl/project_2000382/ghoshkun/code/Multi_Fidelity_Prediction_GP/mfgp/task1_new/puhti_runs"
 
+
 # %% [markdown]
 # TODO : For the plot with the new data, save the means and standard deviation.
 
@@ -55,75 +50,6 @@ assert os.getcwd() == "/projappl/project_2000382/ghoshkun/code/Multi_Fidelity_Pr
 # # Data savings plot
 #
 # The code is based on the original implementation in 
-
-# %%
-os.chdir("/projappl/project_2000382/ghoshkun/code/Multi_Fidelity_Prediction_GP/mfgp/task1_new/puhti_runs")
-print(os.getcwd())
-aa_a_1k = pd.read_csv("csv_files/Active_learning_results - AA_A_1k.csv")
-aa_d_1k = pd.read_csv("csv_files/Active_learning_results - AA_D_1k.csv")
-
-aa_a_2k = pd.read_csv("csv_files/Active_learning_results - AA_A_2k.csv")
-aa_d_2k = pd.read_csv("csv_files/Active_learning_results - AA_D_2k.csv")
-
-aa_a_4k = pd.read_csv("csv_files/Active_learning_results - AA_A_4k.csv")
-aa_d_4k = pd.read_csv("csv_files/Active_learning_results - AA_D_4k.csv")
-
-aa_a_8k = pd.read_csv("csv_files/Active_learning_results - AA_A_8k.csv")
-aa_d_8k = pd.read_csv("csv_files/Active_learning_results - AA_D_8k.csv")
-
-
-# %%
-from collections import namedtuple
-Dataset = namedtuple("Dataset", "strategy mean_val std_val coeff")
-
-# get_named_tuple
-# QM9 = Dataset(["A","D"], 
-#               [aa_a_1k.mean_vals.to_numpy(), aa_d_1k.mean_vals.to_numpy()],
-#               [aa_a_1k.std_vals.to_numpy(), aa_d_1k.std_vals.to_numpy()],
-#               []
-#              )
-# create a list of lists with means and standard deviations
-# def get_means_stds(list_of_dfs):
-#     for df in list_of_dfs:
-
-# %%
-# formatting plots
-font = {'family' : 'normal',
-        # 'weight' : 'bold',
-        'size'   : 15}
-lines = {"linewidth": 4}
-
-matplotlib.rc('font', **font)
-matplotlib.rc('lines', **lines)
-
-batch_size = 8 # 1 for 1k, 2 for 2k etc
-batch_sizes = np.arange(0,17,batch_size) + 1
-labels = "A B C D E F G".split(" ")
-labs = [[_] for _ in labels]
-
-aa_a_means = aa_a_8k.mean_vals.to_numpy()
-aa_d_means = aa_d_8k.mean_vals.to_numpy()
-
-aa_a_stds = aa_a_8k.std_vals.to_numpy()
-aa_d_stds = aa_d_8k.std_vals.to_numpy()
-
-
-stds = [aa_a_stds,
-     [],
-     [],
-     aa_d_stds,
-     [],
-     [],
-     []]
-
-means = [aa_a_means,
-     [],
-     [],
-     aa_d_means,
-     [],
-     [],
-     []]
-
 
 # %%
 def plot_strategy_a_vs_d(dataset_name, means, stds):
@@ -140,8 +66,9 @@ def plot_strategy_a_vs_d(dataset_name, means, stds):
     plt.xlim((0, 18))
     plt.xticks(range(0, 17, 2))
     plt.title(f"{dataset_name} - Strategy A vs D")
+    
+# plot_strategy_a_vs_d(dataset_name = "AA", means=means, stds=stds)    
 
-plot_strategy_a_vs_d(dataset_name = "AA", means=means, stds=stds)    
 
 # %%
 from scipy.optimize import curve_fit
@@ -257,22 +184,6 @@ os.chdir("/projappl/project_2000382/ghoshkun/code/Multi_Fidelity_Prediction_GP/m
 plot_data_savings(strategy_a_file = "csv_files/Active_learning_results - AA_A_1k.csv",
                   strategy_d_file = "csv_files/Active_learning_results - AA_D_1k.csv",
                   batch_size=1) # 1 for 1k, 2 for 2k etc
-
-# %%
-data_saving = np.array(data_saving)
-batch_sizes = np.array(batch_sizes)
-print(f"Batch sizes {batch_sizes}")
-savings_in_percent = 100 * data_saving / batch_sizes
-print(f"datasavings {data_saving}")
-plt.plot(batch_sizes, savings_in_percent, color="k")
-print(f"datasavings {savings_in_percent}")
-plt.scatter(batch_sizes, savings_in_percent, color="k", label="Datasaving (D vs A) in percent")
-plt.xscale("linear")
-plt.legend()
-plt.xticks(batch_sizes)
-plt.xlabel("Data size (x10^3)")
-plt.ylabel("Datasaving in percent")
-plt.grid()
 
 # %% [markdown]
 # # Distribution of molecule count per energy range
