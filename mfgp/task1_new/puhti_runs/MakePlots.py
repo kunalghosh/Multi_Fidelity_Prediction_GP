@@ -154,26 +154,21 @@ def fit_curve_to_data(means, stds, labels, batch_sizes):
             """
             Only plot strategy A and D.
             """
-            print(f"Data for strategy {labels[idx]}")
-
             results = curve_fit(lambda x,a,b,c,d: d + (a-d)/(1 + (x/c)**b), batch_sizes, mean, p0=[0.5, 0.5, 0.5, 0.5], bounds=(-1, [3., 1., 2, 2]))
             a, b, c, d= results[0]
             coeffs[labels[idx]] = results[0]
             mean_dict[labels[idx]] = mean
-            print(a, b, c, d)
+
             x = batch_sizes # np.arange(0, 17, batch_size)
             y = d + (a-d)/(1 + (x/c)**b)
 
-            plt.plot(x, y)
-            plt.scatter(batch_sizes, mean, label=labels[idx])
-    plt.legend()
     return coeffs, mean_dict
 
 
 # fit_curve_to_data(means, stds, labels, batch_sizes)
 
 # %%
-def get_and_plot_data_savings(mean_dict, coeffs, batch_size, batch_sizes):
+def get_data_savings(mean_dict, coeffs, batch_size, batch_sizes):
     xticks = [_ for _ in range(0,17,batch_size)]
     data_saving = []
     a,b,c,d = coeffs['D']
@@ -181,15 +176,8 @@ def get_and_plot_data_savings(mean_dict, coeffs, batch_size, batch_sizes):
         x = c * (-1 + (a-d)/(y-d))**(1./b)
         xticks.append(x)
         data_saving.append(batch_size - x)
-        print(batch_size, x)
-        # vertical line at x
-        # plt.axvline(x=x, color='k', linestyle="--")
-        plt.plot((x, x), (0, y), color='k', linestyle="--")
-        plt.hlines(y, x, batch_size, color='k', linestyle="--")
 
     xticks.sort()
-    print(xticks)
-    plt.legend()
     xticks_str = []
     for idx, x in enumerate(xticks):
         if x in batch_sizes:
@@ -197,10 +185,9 @@ def get_and_plot_data_savings(mean_dict, coeffs, batch_size, batch_sizes):
         else:
             xticks_str.append("%.2f" % x)
     
-    print(xticks_str)
     return data_saving
 
-# get_and_plot_data_savings(mean_dict, coeffs, batch_size, batch_sizes)
+# get_data_savings(mean_dict, coeffs, batch_size, batch_sizes)
 
 
 # %%
@@ -256,11 +243,9 @@ def plot_data_savings(strategy_a_file, strategy_d_file, batch_size):
     
     data_saving = np.array(data_saving)
     batch_sizes = np.array(batch_sizes)
-    print(f"Batch sizes {batch_sizes}")
+
     savings_in_percent = 100 * data_saving / batch_sizes
-    print(f"datasavings {data_saving}")
     plt.plot(batch_sizes, savings_in_percent, color="k")
-    print(f"datasavings {savings_in_percent}")
     plt.scatter(batch_sizes, savings_in_percent, color="k", label="Datasaving (D vs A) in percent")
     plt.xscale("linear")
     plt.legend()
