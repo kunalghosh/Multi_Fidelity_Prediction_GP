@@ -28,9 +28,9 @@ aa_a_1k.mean_vals
 
 # %%
 os.chdir("/projappl/project_2000382/ghoshkun/code/Multi_Fidelity_Prediction_GP/mfgp/task1_new/puhti_runs")
-print(os.getcwd())
-# !module load python-data/3.7.6-1
-# !python -m pip install jupytext
+# print(os.getcwd())
+# # !module load python-data/3.7.6-1
+# # !python -m pip install jupytext
 # !python -m jupytext --sync MakePlots.ipynb
 
 # %% [markdown]
@@ -209,7 +209,6 @@ def plot_data_savings(strategy_a_file, strategy_d_file, batch_size):
     matplotlib.rc('font', **font)
     matplotlib.rc('lines', **lines)
 
-    batch_size = batch_size # 1 for 1k, 2 for 2k etc
     batch_sizes = np.arange(0,17,batch_size) + 1
     
     labels = "A B C D E F G".split(" ")
@@ -254,11 +253,10 @@ def plot_data_savings(strategy_a_file, strategy_d_file, batch_size):
     plt.ylabel("Datasaving in percent")
     plt.grid()
     
-
 os.chdir("/projappl/project_2000382/ghoshkun/code/Multi_Fidelity_Prediction_GP/mfgp/task1_new/puhti_runs")    
 plot_data_savings(strategy_a_file = "csv_files/Active_learning_results - AA_A_1k.csv",
                   strategy_d_file = "csv_files/Active_learning_results - AA_D_1k.csv",
-                  batch_size=1)
+                  batch_size=1) # 1 for 1k, 2 for 2k etc
 
 # %%
 data_saving = np.array(data_saving)
