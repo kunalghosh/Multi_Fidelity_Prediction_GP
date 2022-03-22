@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=activeLearning-A-1k
+#SBATCH --job-name=activeLearning-D-1k
 #SBATCH --account=project_2000382
 #SBATCH --time=120:00:00
 #SBATCH --mem-per-cpu=5G
@@ -7,16 +7,16 @@
 #SBATCH --cpus-per-task=18
 #SBATCH --partition=longrun
 #SBATCH --array=0-4
-#SBATCH --output=activeLearning_1k_longrun_test_%a.out
+#SBATCH --output=activeLearning_1k_longrun_D_test_%a.out
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
 dirs=(
-"./AA_A_1k/run1"
-"./AA_A_1k/run2"
-"./AA_A_1k/run3"
-"./AA_A_1k/run4"
-"./AA_A_1k/run5"
+"./AA_D_1k/run1"
+"./AA_D_1k/run2"
+"./AA_D_1k/run3"
+"./AA_D_1k/run4"
+"./AA_D_1k/run5"
 )
 
 module load python-data/3.7.6-1

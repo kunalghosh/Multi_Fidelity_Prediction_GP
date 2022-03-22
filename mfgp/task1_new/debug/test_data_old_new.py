@@ -48,14 +48,14 @@ def compare_two_data_lists(data1, data2):
     return set_difference
 
 
-data1 = get_prediction_idxs(f"{reference}/test-a-1k_1_full_idxs.npz")
-data2 = get_prediction_idxs(f"{reference}/test-A-1k_2_full_idxs.npz")
+data1 = get_prediction_idxs(f"{reference}/test-D-1k_1_full_idxs.npz")
+data2 = get_prediction_idxs(f"{reference}/test-D-1k_2_full_idxs.npz")
 set_difference = compare_two_data_lists(data1, data2)
 print(f"len set diff {set_difference} If the previous set has elements then two iterations of the new code produce different indices (this is desirable.). None means there was an error.")
 
 for i in range(1,16):
-    data = get_prediction_idxs(f"{reference}/test-A-1k_{i}_full_idxs.npz")
-    old_data = get_prediction_idxs(f"{other_dir}/test-A-1k_{i}_full_idxs.npz")
+    data = get_prediction_idxs(f"{reference}/test-D-1k_{i}_full_idxs.npz")
+    old_data = get_prediction_idxs(f"{other_dir}/test-D-1k_{i}_full_idxs.npz")
     set_difference = compare_two_data_lists(data, old_data)
     print(f"len set diff {set_difference} If the previous set is empty then index set {i} is same between old and new. None means there was an error.")
 

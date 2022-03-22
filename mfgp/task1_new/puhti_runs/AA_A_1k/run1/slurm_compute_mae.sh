@@ -6,16 +6,14 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=18
 #SBATCH --partition=small
-#SBATCH --array=3
+#SBATCH --array=0
 #SBATCH --output=activeLearning_1k_longrun_test_mae_run1_%a.out
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
 dirs=(
+"12"
 "13"
-"14"
-"15"
-"16"
 )
 
 module load python-data/3.7.6-1

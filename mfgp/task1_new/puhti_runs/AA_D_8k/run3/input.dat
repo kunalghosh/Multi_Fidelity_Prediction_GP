@@ -31,7 +31,7 @@ pre_idxs_1              8000
 pre_idxs_2              8000
 
 #path
-mbtr_path              ../../../../../../../data/AA/mbtr_k2.npz
-json_path              ../../../../../../../data/AA/HOMO.txt
-loadidxs_path          ../../../../../../../data/AA_derived/10K_dataset_load_high/10Kloadhigh2_0_idxs.npz
-loadsplitidxs_path     ../../../../../../../data/AA_derived/10K_dataset_load_high/10Kdataset_dataset_split_idxs.npz
+mbtr_path              /projappl/project_2000382/ghoshkun//data/AA/mbtr_k2.npz
+json_path              /projappl/project_2000382/ghoshkun//data/AA/HOMO.txt
+loadidxs_path          /projappl/project_2000382/ghoshkun//data/AA_derived/10K_dataset_load_high/10Kloadhigh2_0_idxs.npz
+loadsplitidxs_path     /projappl/project_2000382/ghoshkun//data/AA_derived/10K_dataset_load_high/10Kdataset_dataset_split_idxs.npz

@@ -1,9 +1,9 @@
 start load mbtr 
-time 12.641899585723877[s]
+time 12.95734691619873[s]
 start load QM9 
-time 0.41687893867492676[s]
+time 0.39678525924682617[s]
 =============================
-2020-10-10 00:25:22.191239
+2021-01-18 13:58:47.510046
 condition 
 fn_name(acquistion function) high_and_cluster
 num_itr 5
@@ -49,16 +49,16 @@ length of remaining_idxs 122814
 save_load_flag: save 
 initial learning 
 start to make a model 
-time 135.08858394622803[s]
+time 78.52628707885742[s]
 start prediction
-time 28.248783826828003[s]
+time 28.178290367126465[s]
 start calculating r2 by hand 
-time 0.0004987716674804688[s]
+time 0.0004360675811767578[s]
 start calculating MAE 
-time 0.0007066726684570312[s]
-r2 by hand 0.38590922468590994
-MAE 0.30075902225596246
-time all 178.96292877197266[s]
+time 0.0006718635559082031[s]
+r2 by hand 0.6934232334825137
+MAE 0.2117712113147045
+time all 121.7543580532074[s]
 ============================= 
 1-th learning
 ============================= 

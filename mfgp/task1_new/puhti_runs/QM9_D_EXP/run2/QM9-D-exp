@@ -1,9 +1,9 @@
 start load mbtr 
-time 12.397564888000488[s]
+time 12.938553810119629[s]
 start load QM9 
-time 0.39421963691711426[s]
+time 0.4637024402618408[s]
 =============================
-2021-01-13 15:00:48.463690
+2021-01-18 13:58:47.562340
 condition 
 fn_name(acquistion function) high_and_cluster
 num_itr 5
@@ -49,24 +49,20 @@ length of remaining_idxs 122814
 save_load_flag: save 
 initial learning 
 start to make a model 
-time 94.87102007865906[s]
+time 137.85374546051025[s]
 start prediction
-time 23.87299084663391[s]
+time 24.37901020050049[s]
 start calculating r2 by hand 
-time 0.0003705024719238281[s]
+time 0.0004069805145263672[s]
 start calculating MAE 
-time 0.0006053447723388672[s]
-r2 by hand 0.47663488577744484
-MAE 0.28455341902465436
-time all 133.16448426246643[s]
+time 0.0006158351898193359[s]
+r2 by hand 0.7448579709787695
+MAE 0.20002995916803623
+time all 177.4614498615265[s]
 ============================= 
 1-th learning
 ============================= 
 2-th learning
 ============================= 
 3-th learning
-============================= 
-4-th learning
-============================= 
-5-th learning
-loading QM9-D-exp_para_kernel_aft_4.txt
+loading QM9-D-exp_para_kernel_aft_2.txt

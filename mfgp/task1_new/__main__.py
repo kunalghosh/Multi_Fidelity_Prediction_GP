@@ -417,6 +417,7 @@ def main():
         prediction_set_size = pre_idxs[i+1]
 
         # print(f"Prediciton idxs {i}-before : {prediction_idxs}")
+        pdb.set_trace()
         prediction_idxs, remaining_idxs, X_train_pp, y_train = acq_fn(fn_name\
                                                                       , i\
                                                                       , prediction_idxs\
