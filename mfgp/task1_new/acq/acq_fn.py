@@ -703,9 +703,9 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
             pick_idxs_tmp = np.argpartition(-std_s, K)[:K]
             
             #-- check 
-            append_write(out_name,"Max value of std within pick_idxs " + str(np.max(std_s[pick_idxs])) + "\n" )
-            append_write(out_name,"Min value of std within pick_idxs " + str(np.min(std_s[pick_idxs])) + "\n" )
-            append_write(out_name,"Max value of std within all remaining_idxs " + str(np.max(std_s[np.setdiff1d(range(len(prediction_idxs)), pick_idxs)])) + "\n" )
+            append_write(out_name,"Max value of std within pick_idxs " + str(np.max(std_s[pick_idxs_tmp])) + "\n" )
+            append_write(out_name,"Min value of std within pick_idxs " + str(np.min(std_s[pick_idxs_tmp])) + "\n" )
+            append_write(out_name,"Max value of std within all remaining_idxs " + str(np.max(std_s[np.setdiff1d(range(len(prediction_idxs)), pick_idxs_tmp)])) + "\n" )
             append_write(out_name,"Min value of std within all remaining_idxs " + str(np.min(std_s[:])) + "\n" )
             append_write(out_name, "The # of zero values " + str(np.count_nonzero(std_s < 1e-10)) + "\n" )
             append_write(out_name, "The # of not zero values " + str(np.count_nonzero(std_s > 1e-10)) + "\n" )
@@ -954,14 +954,14 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
             prediction_idxs = np.r_[prediction_idxs_bef, pick_idxs]
             remaining_idxs = np.setdiff1d(remaining_idxs, pick_idxs)
 
-            #-- Histgram of high std
-            plt.figure()
-            plt.title('', fontsize = 20)
-            plt.xlabel('std.', fontsize = 16)
-            plt.ylabel('Number of molecules', fontsize = 16)
-            plt.tick_params(labelsize = 14)
-            (a_hist2, a_bins2, _) = plt.hist(std_s[pick_idxs_tmp[closest]], bins=170)
-            plt.savefig(out_name + "_" + str(i+1) + "_picked_std.eps")
+            # #-- Histgram of high std
+            # plt.figure()
+            # plt.title('', fontsize = 20)
+            # plt.xlabel('std.', fontsize = 16)
+            # plt.ylabel('Number of molecules', fontsize = 16)
+            # plt.tick_params(labelsize = 14)
+            # (a_hist2, a_bins2, _) = plt.hist(std_s[pick_idxs_tmp[closest]], bins=170)
+            # plt.savefig(out_name + "_" + str(i+1) + "_picked_std.eps")
             
         #--
         X_train = mbtr_data[prediction_idxs, :]
