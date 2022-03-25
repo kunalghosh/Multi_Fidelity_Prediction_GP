@@ -92,11 +92,12 @@ def fit_data_and_check(path_to_csv):
 
 
 # %%
+import os
 os.chdir("/projappl/project_2000382/ghoshkun/code/Multi_Fidelity_Prediction_GP/mfgp/task1_new/puhti_runs")
 # print(os.getcwd())
 # # !module load python-data/3.7.6-1
 # # !python -m pip install jupytext
-# !python -m jupytext --sync Datasavings.ipynb
+# !python -m jupytext --sync Datasavings_plots.ipynb
 
 # %%
 # computations for AA
