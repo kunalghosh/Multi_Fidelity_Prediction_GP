@@ -120,65 +120,6 @@ y_predict_oe, fit_params_oe, x, y_true_oe = fit_data_and_check("csv_files/old_cs
 oe_d = pd.read_csv("csv_files/old_csvs/Active_learning_results - OE_D_EXP.csv")
 oe_vals = (y_true_oe, oe_d.mean_vals, y_predict_oe, x)
 
-# %%
-# AA data
-aa_d_1k = pd.read_csv("csv_files/old_csvs/Active_learning_results - AA_D_1k.csv")
-aa_a_1k = pd.read_csv("csv_files/old_csvs/Active_learning_results - AA_A_1k.csv")
-
-fn_aa = lambda x,a,b,c: -a + c/x**b
-
-fit_aa = scipy_fit(fn_aa, aa_a_1k.train_size//1000, aa_a_1k.mean_vals)
-fit_params_aa = fit_aa.x
-
-y_predict_aa = get_y(fn_aa, fit_params_aa, aa_a_1k.train_size//1000)
-error = np.mean(np.abs(y_predict_aa - aa_a_1k.mean_vals))
-r2 = np.corrcoef(y_predict_aa, aa_a_1k.mean_vals)
-print(f"error : {error}, r2 : {r2}")
-
-plot_fit_and_true(y_predict_aa, aa_a_1k.mean_vals, aa_a_1k.train_size//1000)
-
-aa_vals = (aa_a_1k.mean_vals, aa_d_1k.mean_vals, y_predict_aa, aa_a_1k.train_size//1000)
-
-# %%
-# QM9 data
-qm9_d_1k = pd.read_csv("csv_files/old_csvs/Active_learning_results - QM9_D_EXP.csv")
-qm9_a_1k = pd.read_csv("csv_files/old_csvs/Active_learning_results - QM9_A_EXP.csv")
-
-fn_qm9 = lambda x,a,b,c: -a + c/x**b
-
-fit_qm9 = scipy_fit(fn_qm9, qm9_a_1k.train_size//1000, qm9_a_1k.mean_vals)
-fit_params_qm9 = fit_qm9.x
-
-
-
-y_predict_qm9 = get_y(fn_qm9, fit_params_qm9, qm9_a_1k.train_size//1000)
-error = np.mean(np.abs(y_predict_qm9 - qm9_a_1k.mean_vals))
-r2 = np.corrcoef(y_predict_qm9,qm9_a_1k.mean_vals)
-print(f"error : {error}, r2 : {r2}")
-
-plot_fit_and_true(y_predict_qm9, qm9_a_1k.mean_vals, qm9_a_1k.train_size//1000)
-qm9_vals = (qm9_a_1k.mean_vals, qm9_d_1k.mean_vals, y_predict_qm9, qm9_a_1k.train_size//1000)
-
-# %%
-# OE data
-oe_d_1k = pd.read_csv("csv_files/old_csvs/Active_learning_results - OE_D_EXP.csv")
-oe_a_1k = pd.read_csv("csv_files/old_csvs/Active_learning_results - OE_A_EXP.csv")
-
-fn_oe = lambda x,a,b,c: -a + c/x**b
-
-fit_oe = scipy_fit(fn_oe, oe_a_1k.train_size//1000, oe_a_1k.mean_vals)
-fit_params_oe = fit_oe.x
-
-
-
-y_predict_oe = get_y(fn_oe, fit_params_oe, oe_a_1k.train_size//1000)
-error = np.mean(np.abs(y_predict_oe - oe_a_1k.mean_vals))
-r2 = np.corrcoef(y_predict_oe,oe_a_1k.mean_vals)
-print(f"error : {error}, r2 : {r2}")
-
-plot_fit_and_true(y_predict_oe, oe_a_1k.mean_vals, oe_a_1k.train_size//1000)
-oe_vals = (oe_a_1k.mean_vals, oe_d_1k.mean_vals, y_predict_oe, oe_a_1k.train_size//1000)
-
 
 # %% [markdown]
 # # Plot predicted_a and true_a and true_d in same plot
