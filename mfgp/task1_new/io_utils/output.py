@@ -1,5 +1,19 @@
+import time
 import datetime
 import multiprocessing as multi
+import contextlib
+
+
+@contextlib.contextmanager
+def log_timing(conf, description):
+    start = time.time()
+    append_write(conf.out_name, f"START: {description}\n")
+    ### actual piece of code to time
+    yield
+    ### 
+    append_write(conf.out_name, f"FINISH: {description}\n")
+    process_time = time.time() - start
+    out_time(conf.out_name, process_time)
 
 def out_condition(filepath, InData):
     """                                                                                                                                                                       
@@ -59,6 +73,7 @@ def out_time(filepath, time):
     f = open(filepath, 'a')
     f.write("time "),f.write(str(time) + "[s]" + "\n")
     f.close()
+
 def out_time_all(filepath, time):
     """                                                                                                
     Writes calculation time into the given file appending.                                                                                                           
