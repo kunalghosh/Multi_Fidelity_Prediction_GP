@@ -14,6 +14,7 @@ from io_utils import (
     out_time,
     fig_HOMO,
     Input,
+    log_timing
 )
 
 import sys
@@ -414,8 +415,10 @@ def main(filepath):
         x_train_pp, x_test_pp, y_train, y_test = get_data_given_indices(
             conf, pred_idxs, test_idxs, mbtr_data_red, homo_low_fid
         )
+
         append_write(conf.out_name, f"Training a GP model for index {idx}")
-        gpr.fit(x_train_pp, y_train)
+        with log_timing(conf, f"Training a GP model for index {idx}"):
+            gpr.fit(x_train_pp, y_train)
         # save GP model
         joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
 

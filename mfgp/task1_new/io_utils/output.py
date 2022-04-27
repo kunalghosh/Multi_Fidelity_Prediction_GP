@@ -9,11 +9,12 @@ def log_timing(conf, description):
     start = time.time()
     append_write(conf.out_name, f"START: {description}\n")
     ### actual piece of code to time
-    yield
-    ### 
-    append_write(conf.out_name, f"FINISH: {description}\n")
-    process_time = time.time() - start
-    out_time(conf.out_name, process_time)
+    try: 
+        yield
+    finally:
+        append_write(conf.out_name, f"FINISH: {description}\n")
+        process_time = time.time() - start
+        out_time(conf.out_name, process_time)
 
 def out_condition(filepath, InData):
     """                                                                                                                                                                       
