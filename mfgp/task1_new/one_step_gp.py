@@ -110,7 +110,10 @@ def get_gp_model(conf, idx, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
         x_train_pp, _, y_train, _ = get_data_given_indices(
             conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid
         )
-        gpr.fit(x_train_pp, y_train)
+        
+        with log_timing(conf, f"\nTraining a GP model for index {idx}"):
+            gpr.fit(x_train_pp, y_train)
+
         # save GP model
         joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
         append_write(
@@ -298,9 +301,10 @@ def execute_first_training_run(conf, homo_lowfid, mbtr_data_red):
         )
 
         # train GP on loaded data
-        gpr = get_gp_model(
-            conf, idx, prediction_idxs, test_idxs, mbtr_data_red, homo_lowfid
-        )
+        with log_timing(conf, f"\nTraining a GP model for index {idx}"):
+            gpr = get_gp_model(
+                conf, idx, prediction_idxs, test_idxs, mbtr_data_red, homo_lowfid
+            )
 
         # run acquisition
         idx = 1
@@ -417,7 +421,7 @@ def main(filepath):
         )
 
         append_write(conf.out_name, f"Training a GP model for index {idx}")
-        with log_timing(conf, f"Training a GP model for index {idx}"):
+        with log_timing(conf, f"\nTraining a GP model for index {idx}"):
             gpr.fit(x_train_pp, y_train)
         # save GP model
         joblib.dump(gpr, f"{conf.out_name}_{idx}_model.pkl")
