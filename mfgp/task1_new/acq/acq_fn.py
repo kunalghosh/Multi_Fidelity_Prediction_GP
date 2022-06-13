@@ -502,16 +502,16 @@ def acq_fn(fn_name, i, prediction_idxs, remaining_idxs, prediction_set_size, rnd
             start = time.time()
             append_write(out_name,"starting clustering \n")
             try:
-            	km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24, random_state=random_seed)
-            	z_km = km.fit(X_train_pp)
-	    except ValueError as e:
-            	print(f"Couldn't cluster the datapoints. {e}")
-		print(f"Continuing without clustering..")
-		append_write(out_name,"Continuing without clustering...\n")
+                km = cluster.KMeans(n_clusters = num_clusters, n_jobs = 24, random_state=random_seed)
+                z_km = km.fit(X_train_pp)
+            except ValueError as e:
+                print(f"Couldn't cluster the datapoints. {e}")
+                print(f"Continuing without clustering..")
+                append_write(out_name,"Continuing without clustering...\n")
                 append_write(out_name,f"Pick idxs length = {len(pick_idxs)}")
                 np.savez(out_name + "_" + str(i+1) + "pickidxs_valuerror.npz", pick_idxs = pick_idxs)
-	    else:
-		# No exception raised
+            else:
+                # No exception raised
                 process_time = time.time() - start
                 out_time(out_name, process_time)
                 
