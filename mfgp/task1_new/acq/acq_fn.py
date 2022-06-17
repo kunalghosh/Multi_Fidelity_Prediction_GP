@@ -48,6 +48,10 @@ def acq_fn(
         if conf.range_high is not None:
             take predictions < conf.range_high
         """
+        assert (
+            conf.range_low is not None and conf.range_high is not None
+        ), "conf.range_low and conf.range_high are both None, acquisition strategy cannot work"
+
         print(
             f"prediction_set_size={prediction_set_size}, rnd_size={rnd_size}, K_high={K_high}"
         )
