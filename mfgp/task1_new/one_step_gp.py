@@ -305,6 +305,7 @@ def execute_first_training_run(conf, homo_lowfid, mbtr_data_red):
         start = time.time()
         append_write(conf.out_name, "Starting acq function.\n")
         pred_idxs, rem_idxs, _, _ = acq_fn(
+            conf,
             conf.fn_name,
             idx,
             prediction_idxs,
@@ -384,6 +385,7 @@ def main(filepath):
         start = time.time()
         append_write(conf.out_name, "Starting acq function.\n")
         pred_idxs, rem_idxs, x_train_pp, y_train = acq_fn(
+            conf,
             conf.fn_name,
             idx,
             pred_idxs,
