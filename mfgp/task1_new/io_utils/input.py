@@ -1,3 +1,4 @@
+import math
 import numpy as np
 
 
@@ -73,7 +74,13 @@ class Input:
         self.random_seed = self.set_para("random_seed", 1234, int)
         self.normalize_y = self.set_para("normalize_y", "False", bool)
         self.alpha = self.set_para("alpha", 1e-10, float)
+        self.target_low = self.set_para("target_low", None, float)
+        self.target_high = self.set_para("target_high", None, float)
 
+        if self.target_low is not None and self.target_high is not None:
+            assert math.isclose(
+                self.target_low, self.target_high
+            ), f"the lower bound {self.target_low} must be less than {self.target_high}"
 
         self.pre_idxs = np.empty(int(self.num_itr + 1), dtype=int)
 
