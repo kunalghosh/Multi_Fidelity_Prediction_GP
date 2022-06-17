@@ -8,14 +8,7 @@ from sklearn.gaussian_process.kernels import ConstantKernel
 from sklearn.metrics import mean_absolute_error
 from acq import acq_fn
 from utils import desc_pp, desc_pp_notest, has_duplicates, pre_rem_split, r2_byhand
-from io_utils import (
-    append_write,
-    out_condition,
-    out_time,
-    fig_HOMO,
-    Input,
-    log_timing
-)
+from io_utils import append_write, out_condition, out_time, fig_HOMO, Input, log_timing
 
 import sys
 import numpy as np
@@ -110,7 +103,7 @@ def get_gp_model(conf, idx, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid):
         x_train_pp, _, y_train, _ = get_data_given_indices(
             conf, pred_idxs, test_idxs, mbtr_data_red, homo_lowfid
         )
-        
+
         with log_timing(conf, f"\nTraining a GP model for index {idx}"):
             gpr.fit(x_train_pp, y_train)
 
