@@ -49,7 +49,7 @@ def acq_fn(
             take predictions < conf.range_high
         """
         assert (
-            conf.range_low is not None and conf.range_high is not None
+            conf.range_low is not None or conf.range_high is not None # atleast one of them has to be not None
         ), "conf.range_low and conf.range_high are both None, acquisition strategy cannot work"
 
         print(
@@ -64,7 +64,7 @@ def acq_fn(
 
         # -- check mean and std in next dataset
         with log_timing(conf, "\nGPR Prediction"):
-            mu_s, _ = gpr.predict(X_train_pp, return_std=False)
+            mu_s = gpr.predict(X_train_pp, return_std=False)
 
         save_data(conf, "debug_mean_pred", data=mu_s, iter=i)
         # -- unsorted top K idxs
