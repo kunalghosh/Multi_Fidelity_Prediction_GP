@@ -70,7 +70,7 @@ def acq_fn(
         save_data(conf, "debug_mean_pred", data=mu_s, iter=i)
         # -- unsorted top K idxs
         K = K_high
-        idxs_above_lowlimit = np.where(mu_s > conf.range_low)
+        idxs_above_lowlimit = np.where(mu_s > conf.range_low)[0]
         save_data(conf, "debug_idxs_above_lowlimit", data=idxs_above_lowlimit, iter=i)
 
         # randomly pick number we need
