@@ -49,7 +49,8 @@ def acq_fn(
             take predictions < conf.range_high
         """
         assert (
-            conf.range_low is not None or conf.range_high is not None # atleast one of them has to be not None
+            conf.range_low is not None
+            or conf.range_high is not None  # atleast one of them has to be not None
         ), "conf.range_low and conf.range_high are both None, acquisition strategy cannot work"
 
         print(
