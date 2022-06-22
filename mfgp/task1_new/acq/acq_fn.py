@@ -59,7 +59,7 @@ def acq_fn(
         # prediction_idxs_bef = prediction_idxs
         # prediction_idxs = remaining_idxs
         X_train = mbtr_data[remaining_idxs, :]
-        y_train = homo_lowfid[remaining_idxs, :]
+        y_train = homo_lowfid[remaining_idxs]
 
         # -- Preprocessing
         X_train_pp = desc_pp_notest(preprocess, X_train)
