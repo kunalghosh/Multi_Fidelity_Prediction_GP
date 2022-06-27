@@ -92,6 +92,10 @@ def acq_fn(
             pick_idxs=K_idxs_within_limit,
         )
 
+        # re-writing these variables as these are the ones that are returned by this function
+        prediction_idxs = updated_prediction_idxs
+        remaining_idxs = updated_remaining_idxs
+
     elif fn_name == "none":
         """
         A. random sampling
