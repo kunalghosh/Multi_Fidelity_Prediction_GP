@@ -70,7 +70,7 @@ def acq_fn(
 
         save_data(conf, "debug_mean_pred", data=mu_s, iter=i)
         # -- unsorted top K idxs
-        K = K_high
+        K = prediction_set_size
         idxs_above_lowlimit = np.where(mu_s > conf.range_low)[0]
         save_data(conf, "debug_idxs_above_lowlimit", data=idxs_above_lowlimit, iter=i)
 
