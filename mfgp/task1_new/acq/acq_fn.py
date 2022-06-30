@@ -75,7 +75,9 @@ def acq_fn(
         save_data(conf, "debug_idxs_above_lowlimit", data=idxs_above_lowlimit, iter=i)
 
         # randomly pick number we need
-        K_idxs_within_limit = np.random.choice(idxs_above_lowlimit, size=int(K))
+        K_idxs_within_limit = np.random.choice(
+            idxs_above_lowlimit, size=int(K), replace=False
+        )
         save_data(conf, "debug_K_idxs_within_limit", data=K_idxs_within_limit, iter=i)
 
         # TODO : How many picked were actually in the range (we have the true labels)
