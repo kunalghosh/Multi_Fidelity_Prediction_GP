@@ -1,0 +1,39 @@
+#condtidion
+fn_name                 high_and_cluster
+out_name                test-D-4k
+dataset                 AA
+dataset_size            44004
+test_set_size           10000
+rnd_size                2.0
+K_high                  100
+random_seed             5678
+
+#preprocess
+mbtr_red                False
+preprocess               none
+
+#kernel
+kernel_type             constRBF
+length                  700
+const                   20
+bound                   1e2
+n_opt                   0
+
+#flag
+save_load_flag          save
+save_load_split_flag    False
+restart_flag            False
+
+#trainsize
+num_itr                 4
+pre_idxs_0              1000
+pre_idxs_1              4000
+pre_idxs_2              4000
+pre_idxs_2              4000
+pre_idxs_2              4000
+
+#path
+mbtr_path              ../../../../../../multifidelity_data/AA/mbtr_k2.npz
+json_path              ../../../../../../multifidelity_data/AA/HOMO.txt
+loadidxs_path          ../../../../../../multifidelity_data/AA_derived/10K_dataset_load_high/10Kloadhigh2_0_idxs.npz
+loadsplitidxs_path     ../../../../../../multifidelity_data/AA_derived/10K_dataset_load_high/10Kdataset_dataset_split_idxs.npz
