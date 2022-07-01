@@ -3,8 +3,8 @@ import time
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
-from utils import desc_pp, desc_pp_notest, pre_rem_split
-from io_utils import (
+from mfgp_refactor.utils import desc_pp, desc_pp_notest, pre_rem_split
+from mfgp_refactor.io_utils import (
     append_write,
     out_time,
     fig_MDS_scatter_std,
