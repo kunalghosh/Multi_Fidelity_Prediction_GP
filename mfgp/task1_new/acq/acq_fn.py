@@ -39,7 +39,66 @@ def acq_fn(
     out_name,
     random_seed,
 ):
-    if fn_name == "mean_pred":
+    if fn_name == "mean_pred_with_uncertainty":
+        """
+        I.
+        We take GP predictions and (Predictions + std) which lie in the range we are interested in.
+        And randomly pick from there. In practice, we do predictions + std > range_low
+        """
+        assert (
+            conf.range_low is not None
+            or conf.range_high is not None  # atleast one of them has to be not None
+        ), "conf.range_low and conf.range_high are both None, acquisition strategy cannot work"
+
+        print(
+            f"prediction_set_size={prediction_set_size}, rnd_size={rnd_size}, K_high={K_high}"
+        )
+        # prediction_idxs_bef = prediction_idxs
+        # prediction_idxs = remaining_idxs
+        X_train = mbtr_data[remaining_idxs, :]
+        y_train = homo_lowfid[remaining_idxs]
+
+        # -- Preprocessing
+        X_train_pp = desc_pp_notest(preprocess, X_train)
+
+        # -- check mean and std in next dataset
+        with log_timing(conf, "\nGPR Prediction"):
+            mu_s, std_s = gpr.predict(X_train_pp, return_std=True)
+
+        save_data(conf, "debug_mean_pred", data=mu_s, iter=i)
+        save_data(conf, "debug_std_pred", data=std_s, iter=i)
+        # -- unsorted top K idxs
+        K = prediction_set_size
+        idxs_above_lowlimit = np.where(mu_s + std_s > conf.range_low)[
+            0
+        ]  # NOTE : This is the only difference from H:
+        save_data(conf, "debug_idxs_above_lowlimit", data=idxs_above_lowlimit, iter=i)
+
+        # randomly pick number we need
+        K_idxs_within_limit = np.random.choice(
+            idxs_above_lowlimit, size=int(K), replace=False
+        )
+        save_data(conf, "debug_K_idxs_within_limit", data=K_idxs_within_limit, iter=i)
+
+        # TODO : How many picked were actually in the range (we have the true labels)
+        # The better the model gets the fewer false positives we have
+
+        heldout_idxs_add_to_train = np.array(remaining_idxs)[K_idxs_within_limit]
+        updated_prediction_idxs = np.r_[prediction_idxs, heldout_idxs_add_to_train]
+        updated_remaining_idxs = np.setdiff1d(remaining_idxs, heldout_idxs_add_to_train)
+
+        np.savez(
+            out_name + "_" + str(i + 1) + "_idxs.npz",
+            remaining_idxs=updated_remaining_idxs,
+            prediction_idxs=updated_prediction_idxs,
+            pick_idxs=K_idxs_within_limit,
+        )
+
+        # re-writing these variables as these are the ones that are returned by this function
+        prediction_idxs = updated_prediction_idxs
+        remaining_idxs = updated_remaining_idxs
+
+    elif fn_name == "mean_pred":
         """
         We take GP predictions and only pick the ones in the range [conf.range_low, conf.range_high] we are interested in.
         also assert conf.range_low < conf.range_high (in the Input)
