@@ -23,9 +23,9 @@ def main(idxs_within_energy, working_dir):
             idxs_ = np.load(file)["prediction_idxs"]
             num_above_range = sum(homo_vals[idxs_] > range_low)
             assert (
-                num_above_range < max_num_above_range,
-                f"The number above {config.range_low} cannot be above the {max_num_above_range} calculated from all the homo values",
-            )
+                num_above_range < max_num_above_range
+            ), f"The number above {config.range_low} cannot be above the {max_num_above_range} calculated from all the homo values"
+
             print(
                 f" For file {file} above {config.range_low} eV = {num_above_range}, % of total = {num_above_range * 100 / max_num_above_range}"
             )
