@@ -74,10 +74,22 @@ def acq_fn(
         ]  # NOTE : This is the only difference from H:
         save_data(conf, "debug_idxs_above_lowlimit", data=idxs_above_lowlimit, iter=i)
 
-        # randomly pick number we need
-        K_idxs_within_limit = np.random.choice(
-            idxs_above_lowlimit, size=int(K), replace=False
-        )
+        try:
+            # randomly pick number we need
+            K_idxs_within_limit = np.random.choice(
+                idxs_above_lowlimit, size=int(K), replace=False
+            )
+        except ValueError as e:
+            # Usually happens when count of idxs_above_lowlimit is less than K
+            # Check that assumption
+            assert len(idxs_above_lowlimit) < int(
+                K
+            ), f"Assumption of the following code violated, Something is very wrong, check why was the error generated {e}"
+            print(
+                f"WARNING : Number of indices above low limit {len(idxs_above_lowlimit)} < {K}"
+            )
+            K_idxs_within_limit = int(K)
+
         save_data(conf, "debug_K_idxs_within_limit", data=K_idxs_within_limit, iter=i)
 
         # TODO : How many picked were actually in the range (we have the true labels)
@@ -133,10 +145,21 @@ def acq_fn(
         idxs_above_lowlimit = np.where(mu_s > conf.range_low)[0]
         save_data(conf, "debug_idxs_above_lowlimit", data=idxs_above_lowlimit, iter=i)
 
-        # randomly pick number we need
-        K_idxs_within_limit = np.random.choice(
-            idxs_above_lowlimit, size=int(K), replace=False
-        )
+        try:
+            # randomly pick number we need
+            K_idxs_within_limit = np.random.choice(
+                idxs_above_lowlimit, size=int(K), replace=False
+            )
+        except ValueError as e:
+            # Usually happens when count of idxs_above_lowlimit is less than K
+            # Check that assumption
+            assert len(idxs_above_lowlimit) < int(
+                K
+            ), f"Assumption of the following code violated, Something is very wrong, check why was the error generated {e}"
+            print(
+                f"WARNING : Number of indices above low limit {len(idxs_above_lowlimit)} < {K}"
+            )
+            K_idxs_within_limit = int(K)
         save_data(conf, "debug_K_idxs_within_limit", data=K_idxs_within_limit, iter=i)
 
         # TODO : How many picked were actually in the range (we have the true labels)
