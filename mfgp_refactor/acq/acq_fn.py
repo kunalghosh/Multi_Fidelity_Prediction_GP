@@ -95,7 +95,7 @@ def acq_fn(
         # re-writing these variables as these are the ones that are returned by this function
         prediction_idxs = updated_prediction_idxs
         remaining_idxs = updated_remaining_idxs
-    else if fn_name == "mean_pred":
+    elif fn_name == "mean_pred":
         """
         H.
         We take GP predictions and only pick the ones in the range [conf.range_low, conf.range_high] we are interested in.
