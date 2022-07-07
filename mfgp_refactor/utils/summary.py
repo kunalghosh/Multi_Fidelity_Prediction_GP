@@ -17,6 +17,9 @@ def main(idxs_within_energy, working_dir):
         homo_vals = np.loadtxt(config.json_path)
 
         range_low = config.range_low
+        print(
+            "WARNING : Can't find range_low value in config. Using default range_low values."
+        )
         if range_low is None:
             range_low = default_range_low[config.dataset]
         range_low = float(range_low)
