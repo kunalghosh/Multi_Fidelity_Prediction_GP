@@ -75,7 +75,7 @@ def main(idxs_within_energy, working_dir):
             test_idxs_ = np.load(file)["test_idxs"]
 
             predicted_homos = get_predicted_homos(idx)
-            if predicte_homos is not None:
+            if predicted_homos is not None:
                 mae, mae_in_range = get_mae(
                     homo_vals[test_idxs_], predicted_homos, range_low=range_low
                 )
