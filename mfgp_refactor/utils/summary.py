@@ -27,8 +27,8 @@ def get_full_idxs_filenames(working_dir):
     return sorted_idxs_files
 
 
-def get_predicted_homos(idx):
-    files = glob.glob(f"*{idx}_testset_predictions.npz.npy")
+def get_predicted_homos(working_dir, idx):
+    files = glob.glob(f"{working_dir}/*{idx}_testset_predictions.npz.npy")
     try:
         predicted_vals = np.load(files[0])
     except Exception as e:
@@ -74,7 +74,7 @@ def main(idxs_within_energy, working_dir):
             idxs_ = np.load(file)["prediction_idxs"]
             test_idxs_ = np.load(file)["test_idxs"]
 
-            predicted_homos = get_predicted_homos(idx)
+            predicted_homos = get_predicted_homos(working_dir, idx)
             if predicted_homos is None:
                 mae, mae_in_range = None, None
             else:
