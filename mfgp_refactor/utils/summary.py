@@ -5,6 +5,12 @@ import glob
 
 default_range_low = {"AA": -8.5, "OE": -5.2, "QM9": -5.55}
 
+def fmt(val):
+    try:
+        a = f"{val}"
+    except Exception as e:
+        a = val
+    return a
 
 def get_true_positive(idx, num_in_range, predicted_in_range, percent=True):
     """
@@ -14,10 +20,8 @@ def get_true_positive(idx, num_in_range, predicted_in_range, percent=True):
     if idx > 0:
         # because iteration 0 is randomly picked
         true_positive = num_in_range / predicted_in_range
-
         if percent:
             true_positive = true_positive * 100
-
     return true_positive
 
 
@@ -37,20 +41,26 @@ def get_predicted_homos(working_dir, idx):
 
 
 def get_mae(test_homos, predicted_homos, range_low):
-    error_overall = np.abs(test_homos - predicted_homos)
-    mask_test_homos_in_range = test_homos > range_low  # mask of test_homos in range
-    print(test_homos[mask_test_homos_in_range])
-    print(error_overall)
-    print(mask_test_homos_in_range)
-    error_in_range = error_overall[mask_test_homos_in_range]
-    print(error_in_range)
-    return np.mean(error_overall), np.mean(error_in_range)
+    if predicted_homos is None:
+        mae, mae_in_range = None, None
+    else:
+        error_overall = np.abs(test_homos - predicted_homos)
+        mask_test_homos_in_range = test_homos > range_low  # mask of test_homos in range
+        # print(test_homos[mask_test_homos_in_range])
+        # print(error_overall)
+        # print(mask_test_homos_in_range)
+        error_in_range = error_overall[mask_test_homos_in_range]
+        # print(error_in_range)
+        mae, mae_in_range = np.mean(error_overall), np.mean(error_in_range)
+    return mae, mae_in_range
 
 
 @click.command()
 @click.argument("working_dir", default=".")
 @click.option(
-    "--idxs_within_energy", is_flag=True, help="Check how many indices are within energy"
+    "--idxs_within_energy",
+    is_flag=True,
+    help="Check how many indices are within energy",
 )
 def main(idxs_within_energy, working_dir):
     if idxs_within_energy:
@@ -66,7 +76,9 @@ def main(idxs_within_energy, working_dir):
         range_low = float(range_low)
 
         max_num_above_range = sum(homo_vals > range_low)
-        print(f"{config.json_path} has {max_num_above_range} values above {range_low} eV")
+        print(
+            f"{config.json_path} has {max_num_above_range} values above {range_low} eV"
+        )
 
         sorted_idxs_files = get_full_idxs_filenames(working_dir)
 
@@ -75,12 +87,8 @@ def main(idxs_within_energy, working_dir):
             test_idxs_ = np.load(file)["test_idxs"]
 
             predicted_homos = get_predicted_homos(working_dir, idx)
-            if predicted_homos is None:
-                mae, mae_in_range = None, None
-            else:
-                mae, mae_in_range = get_mae(
-                    homo_vals[test_idxs_], predicted_homos, range_low=range_low
-                )
+            homo_test = homo_vals[test_idxs_]
+            mae, mae_in_range = get_mae(homo_test, predicted_homos, range_low)
 
             num_above_range = sum(homo_vals[idxs_] > range_low)
             true_positive = get_true_positive(idx, num_above_range, len(idxs_))
