@@ -83,7 +83,7 @@ def main(idxs_within_energy, working_dir):
                 mae, mae_in_range = None, None
 
             num_above_range = sum(homo_vals[idxs_] > range_low)
-            true_positive = get_true_positive(idx, num_above_range, batch_size)
+            true_positive = get_true_positive(idx, num_above_range, len(idxs_))
             assert (
                 num_above_range < max_num_above_range
             ), f"The number above {config.range_low} cannot be above the {max_num_above_range} calculated from all the homo values"
