@@ -75,12 +75,12 @@ def main(idxs_within_energy, working_dir):
             test_idxs_ = np.load(file)["test_idxs"]
 
             predicted_homos = get_predicted_homos(idx)
-            if predicted_homos is not None:
+            if predicted_homos is None:
+                mae, mae_in_range = None, None
+            else:
                 mae, mae_in_range = get_mae(
                     homo_vals[test_idxs_], predicted_homos, range_low=range_low
                 )
-            else:
-                mae, mae_in_range = None, None
 
             num_above_range = sum(homo_vals[idxs_] > range_low)
             true_positive = get_true_positive(idx, num_above_range, len(idxs_))
