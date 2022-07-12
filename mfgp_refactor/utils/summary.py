@@ -89,7 +89,7 @@ def main(idxs_within_energy, working_dir):
             ), f"The number above {config.range_low} cannot be above the {max_num_above_range} calculated from all the homo values"
 
             print(
-                f" For file {file} above {config.range_low} eV = {num_above_range}, % of total = {num_above_range * 100 / max_num_above_range}, test_MAE = {mae}, inRange_MAE = {mae_in_range}"
+                f" For file {file} above {config.range_low} eV = {num_above_range}, % of total = {num_above_range * 100 / max_num_above_range}, test_MAE = {mae}, inRange_MAE = {mae_in_range}, true_positive = {true_positive}"
             )
 
 
