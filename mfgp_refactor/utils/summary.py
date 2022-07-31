@@ -6,6 +6,14 @@ import glob
 default_range_low = {"AA": -8.5, "OE": -5.2, "QM9": -5.55}
 
 
+def fmt(val):
+    try:
+        a = f"{val}"
+    except Exception as e:
+        a = val
+    return a
+
+
 def get_true_positive(idx, num_in_range, predicted_in_range, percent=True):
     """
     How many were `in range` out of the total `predicted to be in range`
@@ -14,10 +22,8 @@ def get_true_positive(idx, num_in_range, predicted_in_range, percent=True):
     if idx > 0:
         # because iteration 0 is randomly picked
         true_positive = num_in_range / predicted_in_range
-
         if percent:
             true_positive = true_positive * 100
-
     return true_positive
 
 
@@ -37,20 +43,26 @@ def get_predicted_homos(working_dir, idx):
 
 
 def get_mae(test_homos, predicted_homos, range_low):
-    error_overall = np.abs(test_homos - predicted_homos)
-    mask_test_homos_in_range = test_homos > range_low  # mask of test_homos in range
-    print(test_homos[mask_test_homos_in_range])
-    print(error_overall)
-    print(mask_test_homos_in_range)
-    error_in_range = error_overall[mask_test_homos_in_range]
-    print(error_in_range)
-    return np.mean(error_overall), np.mean(error_in_range)
+    if predicted_homos is None:
+        mae, mae_in_range = None, None
+    else:
+        error_overall = np.abs(test_homos - predicted_homos)
+        mask_test_homos_in_range = test_homos > range_low  # mask of test_homos in range
+        # print(test_homos[mask_test_homos_in_range])
+        # print(error_overall)
+        # print(mask_test_homos_in_range)
+        error_in_range = error_overall[mask_test_homos_in_range]
+        # print(error_in_range)
+        mae, mae_in_range = np.mean(error_overall), np.mean(error_in_range)
+    return mae, mae_in_range
 
 
 @click.command()
 @click.argument("working_dir", default=".")
 @click.option(
-    "--idxs_within_energy", is_flag=True, help="Check how many indices are within energy"
+    "--idxs_within_energy",
+    is_flag=True,
+    help="Check how many indices are within energy",
 )
 def main(idxs_within_energy, working_dir):
     if idxs_within_energy:
@@ -88,7 +100,7 @@ def main(idxs_within_energy, working_dir):
             ), f"The number above {config.range_low} cannot be above the {max_num_above_range} calculated from all the homo values"
 
             print(
-                f" For file {file} above {config.range_low} eV = {num_above_range}, % of total = {num_above_range * 100 / max_num_above_range}, test_MAE = {mae}, inRange_MAE = {mae_in_range}"
+                f" For file {file} above {config.range_low} eV = {num_above_range}, % of total = {num_above_range * 100 / max_num_above_range}, test_MAE = {mae}, inRange_MAE = {mae_in_range}, true_positive = {true_positive}"
             )
 
 
