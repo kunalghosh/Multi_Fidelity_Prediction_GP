@@ -71,7 +71,7 @@ def acq_fn(
 
         # if the mean is in the range, then return std, else return std as -Inf
         std_given_idx = lambda x: std_s[x] if idxs_above_lowlimit[x] is True else -np.Inf
-        masked_stds = [std_given_idx(_) for idx, val in enumerate(idxs_above_lowlimit)]
+        masked_stds = [std_given_idx(idx) for idx, _ in enumerate(idxs_above_lowlimit)]
         save_data(conf, "debug_masked_stds", data=masked_stds, iter=i)
 
         # argsort the masked stds, sorts stds where mu_s > range_low
