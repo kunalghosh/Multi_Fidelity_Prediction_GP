@@ -78,9 +78,8 @@ def main(idxs_within_energy, working_dir):
             if predicted_homos is None:
                 mae, mae_in_range = None, None
             else:
-                mae, mae_in_range = get_mae(
-                    homo_vals[test_idxs_], predicted_homos, range_low=range_low
-                )
+                homo_test = homo_vals[test_idxs_]
+                mae, mae_in_range = get_mae(homo_test, predicted_homos, range_low)
 
             num_above_range = sum(homo_vals[idxs_] > range_low)
             true_positive = get_true_positive(idx, num_above_range, len(idxs_))
