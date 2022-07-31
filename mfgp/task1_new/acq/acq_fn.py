@@ -70,13 +70,14 @@ def acq_fn(
         save_data(conf, "debug_idxs_above_lowlimit", data=idxs_above_lowlimit, iter=i)
 
         # if the mean is in the range, then return std, else return std as -Inf
-        std_given_idx = lambda x: std_s[x] if idxs_above_lowlimit[x] is True else -np.Inf
-        masked_stds = [std_given_idx(idx) for idx, _ in enumerate(idxs_above_lowlimit)]
-        save_data(conf, "debug_masked_stds", data=masked_stds, iter=i)
+        # std_given_idx = lambda x: std_s[x] if x in idxs_above_lowlimit else -np.Inf
+        stds_for_idxs_above_lowlimit = std_s[idxs_above_lowlimit]
+        save_data(conf, "debug_chosen_stds", data=stds_for_idxs_above_lowlimit, iter=i)
 
         # argsort the masked stds, sorts stds where mu_s > range_low
         # Take top K
-        K_idxs_within_limit = np.argsort(masked_stds)[-K:]
+        idxs_thatsort_based_on_stds = np.argsort(stds_for_idxs_above_lowlimit)
+        K_idxs_within_limit = idxs_above_lowlimit[idxs_thatsort_based_on_stds][-K:]
 
         save_data(conf, "debug_K_idxs_within_limit", data=K_idxs_within_limit, iter=i)
         # Check that all the picked idxs are in the range
