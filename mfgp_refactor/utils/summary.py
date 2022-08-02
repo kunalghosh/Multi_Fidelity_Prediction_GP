@@ -38,6 +38,9 @@ def get_predicted_homos(working_dir, idx):
     try:
         predicted_vals = np.load(files[0])
     except Exception as e:
+        print(
+            f"WARNING: Couldn't find {files[0]}, did you run the get_mae script ? predicted_values set to None"
+        )
         predicted_vals = None
     return predicted_vals
 
