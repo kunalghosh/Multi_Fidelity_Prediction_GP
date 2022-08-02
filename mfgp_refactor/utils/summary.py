@@ -8,7 +8,7 @@ default_range_low = {"AA": -8.5, "OE": -5.2, "QM9": -5.55}
 
 def fmt(val):
     try:
-        a = f"{val}"
+        a = f"{val:>9.3f}"
     except Exception as e:
         a = val
     return a
@@ -81,7 +81,9 @@ def main(idxs_within_energy, working_dir):
         range_low = float(range_low)
 
         max_num_above_range = sum(homo_vals > range_low)
-        print(f"{config.json_path} has {max_num_above_range} values above {range_low} eV")
+        print(
+            f"{config.json_path} has {max_num_above_range} values above {fmt(range_low)} eV"
+        )
 
         sorted_idxs_files = get_full_idxs_filenames(working_dir)
 
@@ -103,7 +105,7 @@ def main(idxs_within_energy, working_dir):
             ), f"The number above {config.range_low} cannot be above the {max_num_above_range} calculated from all the homo values"
 
             print(
-                f" For file {file} above {config.range_low} eV = {num_above_range}, % of total = {num_above_range * 100 / max_num_above_range}, test_MAE = {mae}, inRange_MAE = {mae_in_range}, true_positive = {true_positive}"
+                f" For file {file} above {fmt(config.range_low)} eV = {fmt(num_above_range)}, % of total = {fmt(num_above_range * 100 / max_num_above_range)}, test_MAE = {fmt(mae)}, inRange_MAE = {fmt(mae_in_range)}, true_positive = {fmt(true_positive)}"
             )
 
 
