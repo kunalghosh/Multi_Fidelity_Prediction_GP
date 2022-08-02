@@ -1,4 +1,5 @@
 from mfgp_refactor.io_utils import Input
+
 import click
 import numpy as np
 import glob
