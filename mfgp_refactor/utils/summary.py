@@ -15,6 +15,49 @@ def fmt(val):
     return a
 
 
+def get_in_range(vector_of_values, range_low):
+    """
+    Arguments:
+        vector_of_values: numpy array of floats
+        range_low: float value representing lower limit of the range.
+
+    Returns a boolean vector:
+        with True for entries above range_low, and False otherwise.
+    """
+    return vector_of_values > range_low
+
+
+def get_true_positive_false_negative(homo_vals, predicted_vals, range_low):
+    """
+    Given an array of true and predicted values, and range_low (anything above range_low is correct classification). Returns entries of the confusion matrix.
+
+    Parameters
+    ----------
+    homo_vals: ndarray
+        1D array of `float`
+    predicted_vals: ndarray
+        1D array of `float`
+    range_low: float
+        lower limit of the range, anything above this is classified to be true
+
+    Returns
+    -------
+    tuple with four `floats`. Values corresponding to entries of a confusion matrix
+    """
+    true = get_in_range(predicted_vals, range_low)
+    positive = get_in_range(homo_vals, range_low)
+
+    negative = not positive
+    false = not true
+
+    true_positive = np.dot(true, positive)
+    true_negative = np.dot(true, negative)
+    false_positive = np.dot(false, positive)
+    false_negative = np.dot(false, negative)
+
+    return true_positive, true_negative, false_positive, false_negative
+
+
 def get_true_positive(idx, num_in_range, predicted_in_range, percent=True):
     """
     How many were `in range` out of the total `predicted to be in range`
@@ -100,13 +143,23 @@ def main(idxs_within_energy, working_dir):
                 mae, mae_in_range = get_mae(homo_test, predicted_homos, range_low)
 
             num_above_range = sum(homo_vals[idxs_] > range_low)
-            true_positive = get_true_positive(idx, num_above_range, len(idxs_))
             assert (
                 num_above_range < max_num_above_range
             ), f"The number above {config.range_low} cannot be above the {max_num_above_range} calculated from all the homo values"
+            # true_positive = get_true_positive(idx, num_above_range, len(idxs_))
+
+            try:
+                tp, fp, tn, fn = get_true_positive_false_negative(
+                    homo_vals, predicted_homos, range_low
+                )
+                tpr = tp / (tp + fn)  # Precision
+                fpr = fp / (fp + tn)  # Recall
+            except Exception as e:
+                print(f"Couldn't compute entries of confusion matrix: {e}")
+                tp, fp, tn, fn, tpr, fpr = None, None, None, None, None, None
 
             print(
-                f" For file {file} above {fmt(config.range_low)} eV = {fmt(num_above_range)}, % of total = {fmt(num_above_range * 100 / max_num_above_range)}, test_MAE = {fmt(mae)}, inRange_MAE = {fmt(mae_in_range)}, true_positive = {fmt(true_positive)}"
+                f" For file {file} above {fmt(config.range_low)} eV = {fmt(num_above_range)}, % of total = {fmt(num_above_range * 100 / max_num_above_range)}, test_MAE = {fmt(mae)}, inRange_MAE = {fmt(mae_in_range)}, tp = {fmt(tp)}, fp = {fmt(fp)}, tn = {fmt(tn)}, fn = {fmt(fn)}, tpr = {fmt(tpr)}, fpr = {fmt(fpr)}"
             )
 
 
