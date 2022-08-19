@@ -47,13 +47,13 @@ def get_true_positive_false_negative(homo_vals, predicted_vals, range_low):
     true = get_in_range(predicted_vals, range_low)
     positive = get_in_range(homo_vals, range_low)
 
+    false = np.invert(true)
     negative = np.invert(positive)
-    false = np.invert(positive)
 
-    true_positive = np.dot(true, positive)
-    true_negative = np.dot(true, negative)
-    false_positive = np.dot(false, positive)
-    false_negative = np.dot(false, negative)
+    true_positive = np.sum(np.logical_and(true, positive))
+    true_negative = np.sum(np.logical_and(true, negative))
+    false_positive = np.sum(np.logical_and(false, positive))
+    false_negative = np.sum(np.logical_and(false, negative))
 
     return true_positive, true_negative, false_positive, false_negative
 
@@ -150,7 +150,7 @@ def main(idxs_within_energy, working_dir):
 
             try:
                 tp, fp, tn, fn = get_true_positive_false_negative(
-                    homo_vals[_idxs], predicted_homos, range_low
+                    homo_vals[test_idxs_], predicted_homos, range_low
                 )
                 tpr = tp / (tp + fn)  # Precision
                 fpr = fp / (fp + tn)  # Recall
