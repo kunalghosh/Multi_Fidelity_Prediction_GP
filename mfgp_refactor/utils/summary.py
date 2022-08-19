@@ -47,8 +47,8 @@ def get_true_positive_false_negative(homo_vals, predicted_vals, range_low):
     true = get_in_range(predicted_vals, range_low)
     positive = get_in_range(homo_vals, range_low)
 
-    negative = not positive
-    false = not true
+    negative = np.invert(positive)
+    false = np.invert(positive)
 
     true_positive = np.dot(true, positive)
     true_negative = np.dot(true, negative)
