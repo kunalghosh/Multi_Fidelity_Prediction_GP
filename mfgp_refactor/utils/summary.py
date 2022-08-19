@@ -150,7 +150,7 @@ def main(idxs_within_energy, working_dir):
 
             try:
                 tp, fp, tn, fn = get_true_positive_false_negative(
-                    homo_vals, predicted_homos, range_low
+                    homo_vals[_idxs], predicted_homos, range_low
                 )
                 tpr = tp / (tp + fn)  # Precision
                 fpr = fp / (fp + tn)  # Recall
