@@ -1,9 +1,11 @@
 from mfgp_refactor.io_utils import Input
+from collections import namedtuple
 
 import click
 import numpy as np
 import glob
 
+ClassificationScore = namedtuple("ClassificationScore" "tp fp tn fn tpr fpr".split())
 default_range_low = {"AA": -8.5, "OE": -5.2, "QM9": -5.55}
 
 
@@ -77,7 +79,7 @@ def get_full_idxs_filenames(working_dir):
     return sorted_idxs_files
 
 
-def get_predicted_homos(working_dir, idx):
+def get_testset_predicted_homos(working_dir, idx):
     files = glob.glob(f"{working_dir}/*{idx}_testset_predictions.npz.npy")
     try:
         predicted_vals = np.load(files[0])
@@ -87,6 +89,19 @@ def get_predicted_homos(working_dir, idx):
         )
         predicted_vals = None
     return predicted_vals
+
+
+def get_heldoutset_predicted_homos(working_dir, idx):
+    # idx of heldout set is in debug_mean_pred_{idx+1} if the testset_predictions is for idx
+    files = glob.glob(f"{working_dir/*_debug_mean_pred_{idx+1}_idxs.npz.npy}")
+    try:
+        heldout_vals = np.load(files[0])
+    except Exception as e:
+        print(
+            f"WARNING: Couldn't find any _debug_mean_pred_ file, did you run the get_mae script ? predicted_values set to None"
+        )
+        heldout_vals = None
+    return heldout_vals
 
 
 def get_mae(test_homos, predicted_homos, range_low):
@@ -134,13 +149,15 @@ def main(idxs_within_energy, working_dir):
         for idx, file in enumerate(sorted_idxs_files):
             idxs_ = np.load(file)["prediction_idxs"]
             test_idxs_ = np.load(file)["test_idxs"]
+            held_idxs_ = np.load(file)["remaining_idxs"]
 
-            predicted_homos = get_predicted_homos(working_dir, idx)
-            if predicted_homos is None:
+            # Testset classification score
+            testset_predicted_homos = get_testset_predicted_homos(working_dir, idx)
+            if testset_predicted_homos is None:
                 mae, mae_in_range = None, None
             else:
                 homo_test = homo_vals[test_idxs_]
-                mae, mae_in_range = get_mae(homo_test, predicted_homos, range_low)
+                mae, mae_in_range = get_mae(homo_test, testset_predicted_homos, range_low)
 
             num_above_range = sum(homo_vals[idxs_] > range_low)
             assert (
@@ -150,16 +167,43 @@ def main(idxs_within_energy, working_dir):
 
             try:
                 tp, fp, tn, fn = get_true_positive_false_negative(
-                    homo_vals[test_idxs_], predicted_homos, range_low
+                    homo_vals[test_idxs_], testset_predicted_homos, range_low
                 )
                 tpr = tp / (tp + fn)  # Precision
                 fpr = fp / (fp + tn)  # Recall
             except Exception as e:
                 print(f"Couldn't compute entries of confusion matrix: {e}")
                 tp, fp, tn, fn, tpr, fpr = None, None, None, None, None, None
+            testset_score = ClassificationScore(tp, fp, tn, fn, tpr, fpr)
+
+            # ----------------------------------------------------------------------
+            # heldoutset classification score
+            # -----------------------------------------------------------------------
+            heldout_predicted_homos = get_heldoutset_predicted_homos(working_dir, idx)
+            if testet_predicted_homos is None:
+                mae, mae_in_range = None, None
+            else:
+                homo_heldout = homo_vals[held_idxs_]
+                mae, mae_in_range = get_mae(
+                    homo_heldout, heldout_predicted_homos, range_low
+                )
+            try:
+                tp, fp, tn, fn = get_true_positive_false_negative(
+                    homo_vals[held_idxs_], heldout_predicted_homos, range_low
+                )
+                tpr = tp / (tp + fn)  # Precision
+                fpr = fp / (fp + tn)  # Recall
+            except Exception as e:
+                print(f"Couldn't compute entries of confusion matrix: {e}")
+                tp, fp, tn, fn, tpr, fpr = None, None, None, None, None, None
+            heldout_score = ClassificationScore(tp, fp, tn, fn, tpr, fpr)
 
             print(
-                f" For file {file} above {fmt(config.range_low)} eV = {fmt(num_above_range)}, % of total = {fmt(num_above_range * 100 / max_num_above_range)}, test_MAE = {fmt(mae)}, inRange_MAE = {fmt(mae_in_range)}, tp = {fmt(tp)}, fp = {fmt(fp)}, tn = {fmt(tn)}, fn = {fmt(fn)}, tpr = {fmt(tpr)}, fpr = {fmt(fpr)}"
+                f" For file {file} above {fmt(config.range_low)} eV = {fmt(num_above_range)}, % of total = {fmt(num_above_range * 100 / max_num_above_range)}, test_MAE = {fmt(mae)}, inRange_MAE = {fmt(mae_in_range)}, "
+                + "Testset"
+                + f"tp = {fmt(testset_score.tp)}, fp = {fmt(testset_score.fp)}, tn = {fmt(testset_score.tn)}, fn = {fmt(fn)}, tpr = {fmt(testset_score.tpr)}, fpr = {fmt(testset_score.fpr)}"
+                + "Heldoutset"
+                + f"tp = {fmt(heldout_score.tp)}, fp = {fmt(heldout_score.fp)}, tn = {fmt(heldout_score.tn)}, fn = {fmt(fn)}, tpr = {fmt(heldout_score.tpr)}, fpr = {fmt(heldout_score.fpr)}"
             )
 
 
