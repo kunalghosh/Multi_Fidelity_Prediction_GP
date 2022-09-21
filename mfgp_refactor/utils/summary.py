@@ -11,7 +11,10 @@ default_range_low = {"AA": -8.5, "OE": -5.2, "QM9": -5.55}
 
 def fmt(val):
     try:
-        a = f"{val:>9.3f}"
+        if isinstance(val, int):
+            a = f"{val:>9d}"
+        else:
+            a = f"{val:>9.3f}"
     except Exception as e:
         a = val
     return a
