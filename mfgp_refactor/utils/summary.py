@@ -194,7 +194,7 @@ def main(idxs_within_energy, working_dir):
             )
 
             try:
-                tp, tn, fp, fn = get_true_positive_false_negative(
+                tp, tn, fp, fn, p, n = get_true_positive_false_negative(
                     homo_vals[test_idxs_], testset_predicted_homos, range_low
                 )
                 tpr = tp / (tp + fn)  # Precision
