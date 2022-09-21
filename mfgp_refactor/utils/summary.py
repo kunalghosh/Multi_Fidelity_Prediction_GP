@@ -5,7 +5,7 @@ import click
 import numpy as np
 import glob
 
-ClassificationScore = namedtuple("ClassificationScore", "tp fp tn fn tpr fpr".split())
+ClassificationScore = namedtuple("ClassificationScore", "tp fp tn fn tpr fpr p n".split())
 default_range_low = {"AA": -8.5, "OE": -5.2, "QM9": -5.55}
 
 
@@ -60,7 +60,14 @@ def get_true_positive_false_negative(homo_vals, predicted_vals, range_low):
     false_positive = np.sum(np.logical_and(false, positive))
     false_negative = np.sum(np.logical_and(false, negative))
 
-    return true_positive, true_negative, false_positive, false_negative
+    return (
+        true_positive,
+        true_negative,
+        false_positive,
+        false_negative,
+        positive,
+        negative,
+    )
 
 
 def get_true_positive(idx, num_in_range, predicted_in_range, percent=True):
@@ -124,15 +131,15 @@ def get_mae(test_homos, predicted_homos, range_low):
 
 def get_classification_metrics(true_homos, predicted_homos, range_low):
     try:
-        tp, tn, fp, fn = get_true_positive_false_negative(
+        tp, tn, fp, fn, p, n = get_true_positive_false_negative(
             true_homos, predicted_homos, range_low
         )
         tpr = tp / (tp + fn)  # Precision
         fpr = fp / (fp + tn)  # Recall
     except Exception as e:
         print(f"Couldn't compute entries of confusion matrix: {e}")
-        tp, fp, tn, fn, tpr, fpr = None, None, None, None, None, None
-    score = ClassificationScore(tp, fp, tn, fn, tpr, fpr)
+        tp, fp, tn, fn, tpr, fpr, p, n = None, None, None, None, None, None, None, None
+    score = ClassificationScore(tp, fp, tn, fn, tpr, fpr, p, n)
     return score
 
 
@@ -194,8 +201,17 @@ def main(idxs_within_energy, working_dir):
                 fpr = fp / (fp + tn)  # Recall
             except Exception as e:
                 print(f"Couldn't compute entries of confusion matrix: {e}")
-                tp, fp, tn, fn, tpr, fpr = None, None, None, None, None, None
-            testset_score = ClassificationScore(tp, fp, tn, fn, tpr, fpr)
+                tp, fp, tn, fn, tpr, fpr, p, n = (
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                )
+            testset_score = ClassificationScore(tp, fp, tn, fn, tpr, fpr, p, n)
             assert testset_score_ == testset_score, "Testset scores must match"
 
             # ----------------------------------------------------------------------
@@ -213,15 +229,24 @@ def main(idxs_within_energy, working_dir):
                 homo_vals[held_idxs_], heldout_predicted_homos, range_low
             )
             try:
-                tp, tn, fp, fn = get_true_positive_false_negative(
+                tp, tn, fp, fn, p, n = get_true_positive_false_negative(
                     homo_vals[held_idxs_], heldout_predicted_homos, range_low
                 )
                 tpr = tp / (tp + fn)  # Precision
                 fpr = fp / (fp + tn)  # Recall
             except Exception as e:
                 print(f"Couldn't compute entries of confusion matrix: {e}")
-                tp, fp, tn, fn, tpr, fpr = None, None, None, None, None, None
-            heldout_score = ClassificationScore(tp, fp, tn, fn, tpr, fpr)
+                tp, fp, tn, fn, tpr, fpr, p, n = (
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                )
+            heldout_score = ClassificationScore(tp, fp, tn, fn, tpr, fpr, p, n)
             assert heldout_score_ == heldout_score, "Heldout scores must match"
 
             print(
