@@ -65,8 +65,8 @@ def get_true_positive_false_negative(homo_vals, predicted_vals, range_low):
         true_negative,
         false_positive,
         false_negative,
-        positive,
-        negative,
+        np.sum(positive),
+        np.sum(negative),
     )
 
 
