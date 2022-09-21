@@ -11,7 +11,7 @@ default_range_low = {"AA": -8.5, "OE": -5.2, "QM9": -5.55}
 
 def fmt(val):
     try:
-        if isinstance(val, int):
+        if isinstance(val, np.int64):
             a = f"{val:>9d}"
         else:
             a = f"{val:>9.3f}"
