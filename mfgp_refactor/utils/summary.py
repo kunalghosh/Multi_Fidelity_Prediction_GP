@@ -93,7 +93,7 @@ def get_testset_predicted_homos(working_dir, idx):
 
 def get_heldoutset_predicted_homos(working_dir, idx):
     # idx of heldout set is in debug_mean_pred_{idx+1} if the testset_predictions is for idx
-    files = glob.glob(f"{working_dir/*_debug_mean_pred_{idx+1}_idxs.npz.npy}")
+    files = glob.glob(f"{working_dir}/*_debug_mean_pred_{idx+1}_idxs.npz.npy")
     try:
         heldout_vals = np.load(files[0])
     except Exception as e:
