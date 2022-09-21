@@ -252,9 +252,9 @@ def main(idxs_within_energy, working_dir):
             print(
                 f"For file {file} above {fmt(config.range_low)} eV = {fmt(num_above_range)}, % of total = {fmt(num_above_range * 100 / max_num_above_range)}, test_MAE = {fmt(mae)}, inRange_MAE = {fmt(mae_in_range)}, \n"
                 + "Testset\n"
-                + f"tp = {fmt(testset_score.tp)}, fp = {fmt(testset_score.fp)}, tn = {fmt(testset_score.tn)}, fn = {fmt(testset_score.fn)}, tpr = {fmt(testset_score.tpr)}, fpr = {fmt(testset_score.fpr)}\n"
+                + f"positive = {testset_score.tp}, negative = {fmt(testset_score.tp)}, tp = {fmt(testset_score.tp)}, fp = {fmt(testset_score.fp)}, tn = {fmt(testset_score.tn)}, fn = {fmt(testset_score.fn)}, tpr = {fmt(testset_score.tpr)}, fpr = {fmt(testset_score.fpr)}\n"
                 + "Heldoutset\n"
-                + f"tp = {fmt(heldout_score.tp)}, fp = {fmt(heldout_score.fp)}, tn = {fmt(heldout_score.tn)}, fn = {fmt(heldout_score.fn)}, tpr = {fmt(heldout_score.tpr)}, fpr = {fmt(heldout_score.fpr)}\n"
+                + f"positive = {heldout_score.tp}, negative = {heldout_score.tp}, tp = {fmt(heldout_score.tp)}, fp = {fmt(heldout_score.fp)}, tn = {fmt(heldout_score.tn)}, fn = {fmt(heldout_score.fn)}, tpr = {fmt(heldout_score.tpr)}, fpr = {fmt(heldout_score.fpr)}\n"
             )
 
 
