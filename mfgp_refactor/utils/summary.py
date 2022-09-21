@@ -119,6 +119,20 @@ def get_mae(test_homos, predicted_homos, range_low):
     return mae, mae_in_range
 
 
+def get_classification_metrics(true_homos, predicted_homos, range_low):
+    try:
+        tp, tn, fp, fn = get_true_positive_false_negative(
+            true_homos, predicted_homos, range_low
+        )
+        tpr = tp / (tp + fn)  # Precision
+        fpr = fp / (fp + tn)  # Recall
+    except Exception as e:
+        print(f"Couldn't compute entries of confusion matrix: {e}")
+        tp, fp, tn, fn, tpr, fpr = None, None, None, None, None, None
+    score = ClassificationScore(tp, fp, tn, fn, tpr, fpr)
+    return score
+
+
 @click.command()
 @click.argument("working_dir", default=".")
 @click.option(
@@ -165,6 +179,10 @@ def main(idxs_within_energy, working_dir):
             ), f"The number above {config.range_low} cannot be above the {max_num_above_range} calculated from all the homo values"
             # true_positive = get_true_positive(idx, num_above_range, len(idxs_))
 
+            testset_score_ = get_classification_metrics(
+                homo_vals[test_idxs_], testset_predicted_homos, range_low
+            )
+
             try:
                 tp, tn, fp, fn = get_true_positive_false_negative(
                     homo_vals[test_idxs_], testset_predicted_homos, range_low
@@ -175,6 +193,7 @@ def main(idxs_within_energy, working_dir):
                 print(f"Couldn't compute entries of confusion matrix: {e}")
                 tp, fp, tn, fn, tpr, fpr = None, None, None, None, None, None
             testset_score = ClassificationScore(tp, fp, tn, fn, tpr, fpr)
+            assert testset_score_ == testset_score, "Testset scores must match"
 
             # ----------------------------------------------------------------------
             # heldoutset classification score
@@ -187,8 +206,11 @@ def main(idxs_within_energy, working_dir):
             #     # mae, mae_in_range = get_mae(
             #     #     homo_heldout, heldout_predicted_homos, range_low
             #     # )
+            heldout_score_ = get_classification_metrics(
+                homo_vals[held_idxs_], heldout_predicted_homos, range_low
+            )
             try:
-                tp, fp, tn, fn = get_true_positive_false_negative(
+                tp, tn, fp, fn = get_true_positive_false_negative(
                     homo_vals[held_idxs_], heldout_predicted_homos, range_low
                 )
                 tpr = tp / (tp + fn)  # Precision
@@ -197,6 +219,7 @@ def main(idxs_within_energy, working_dir):
                 print(f"Couldn't compute entries of confusion matrix: {e}")
                 tp, fp, tn, fn, tpr, fpr = None, None, None, None, None, None
             heldout_score = ClassificationScore(tp, fp, tn, fn, tpr, fpr)
+            assert heldout_score_ == heldout_score, "Heldout scores must match"
 
             print(
                 f"For file {file} above {fmt(config.range_low)} eV = {fmt(num_above_range)}, % of total = {fmt(num_above_range * 100 / max_num_above_range)}, test_MAE = {fmt(mae)}, inRange_MAE = {fmt(mae_in_range)}, \n"
