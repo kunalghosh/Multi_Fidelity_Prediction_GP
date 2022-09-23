@@ -5,7 +5,9 @@ import click
 import numpy as np
 import glob
 
-ClassificationScore = namedtuple("ClassificationScore", "tp fp tn fn tpr fpr p n".split())
+ClassificationScore = namedtuple(
+    "ClassificationScore", "tp tn fp fn t f p n tpr fpr".split()
+)
 default_range_low = {"AA": -8.5, "OE": -5.2, "QM9": -5.55}
 
 
@@ -65,6 +67,8 @@ def get_true_positive_false_negative(homo_vals, predicted_vals, range_low):
         true_negative,
         false_positive,
         false_negative,
+        np.sum(true),
+        np.sum(false),
         np.sum(positive),
         np.sum(negative),
     )
@@ -131,15 +135,26 @@ def get_mae(test_homos, predicted_homos, range_low):
 
 def get_classification_metrics(true_homos, predicted_homos, range_low):
     try:
-        tp, tn, fp, fn, p, n = get_true_positive_false_negative(
+        tp, tn, fp, fn, t, f, p, n = get_true_positive_false_negative(
             true_homos, predicted_homos, range_low
         )
         tpr = tp / (tp + fn)  # Precision
         fpr = fp / (fp + tn)  # Recall
     except Exception as e:
         print(f"Couldn't compute entries of confusion matrix: {e}")
-        tp, fp, tn, fn, tpr, fpr, p, n = None, None, None, None, None, None, None, None
-    score = ClassificationScore(tp, fp, tn, fn, tpr, fpr, p, n)
+        tp, tn, fp, fn, t, f, p, n, tpr, fpr = (
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
+    score = ClassificationScore(tp, tn, fp, fn, t, f, p, n, tpr, fpr)
     return score
 
 
@@ -194,14 +209,16 @@ def main(idxs_within_energy, working_dir):
             )
 
             try:
-                tp, tn, fp, fn, p, n = get_true_positive_false_negative(
+                tp, tn, fp, fn, t, f, p, n = get_true_positive_false_negative(
                     homo_vals[test_idxs_], testset_predicted_homos, range_low
                 )
                 tpr = tp / (tp + fn)  # Precision
                 fpr = fp / (fp + tn)  # Recall
             except Exception as e:
                 print(f"Couldn't compute entries of confusion matrix: {e}")
-                tp, fp, tn, fn, tpr, fpr, p, n = (
+                tp, tn, fp, fn, t, f, p, n, tpr, fpr = (
+                    None,
+                    None,
                     None,
                     None,
                     None,
@@ -229,14 +246,16 @@ def main(idxs_within_energy, working_dir):
                 homo_vals[held_idxs_], heldout_predicted_homos, range_low
             )
             try:
-                tp, tn, fp, fn, p, n = get_true_positive_false_negative(
+                tp, tn, fp, fn, t, f, p, n = get_true_positive_false_negative(
                     homo_vals[held_idxs_], heldout_predicted_homos, range_low
                 )
                 tpr = tp / (tp + fn)  # Precision
                 fpr = fp / (fp + tn)  # Recall
             except Exception as e:
                 print(f"Couldn't compute entries of confusion matrix: {e}")
-                tp, fp, tn, fn, tpr, fpr, p, n = (
+                tp, tn, fp, fn, t, f, p, n, tpr, fpr = (
+                    None,
+                    None,
                     None,
                     None,
                     None,
@@ -246,15 +265,15 @@ def main(idxs_within_energy, working_dir):
                     None,
                     None,
                 )
-            heldout_score = ClassificationScore(tp, fp, tn, fn, tpr, fpr, p, n)
+            heldout_score = ClassificationScore(tp, tn, fp, fn, t, f, p, n, tpr, fpr)
             assert heldout_score_ == heldout_score, "Heldout scores must match"
 
             print(
                 f"For file {file} above {fmt(config.range_low)} eV = {fmt(num_above_range)}, % of total = {fmt(num_above_range * 100 / max_num_above_range)}, test_MAE = {fmt(mae)}, inRange_MAE = {fmt(mae_in_range)}, \n"
                 + "Testset\n"
-                + f"Test total = {fmt(len(test_idxs_))}, positive = {fmt( testset_score.p )}, negative = {fmt( testset_score.n )}, tp = {fmt(testset_score.tp)}, fp = {fmt(testset_score.fp)}, tn = {fmt(testset_score.tn)}, fn = {fmt(testset_score.fn)}, tpr = {fmt(testset_score.tpr)}, fpr = {fmt(testset_score.fpr)}\n"
+                + f"Test total = {fmt(len(test_idxs_))}, positive = {fmt( testset_score.p )}, negative = {fmt( testset_score.n )}, true = {fmt(testset_score.t)}, false = {fmt(testset_score.f)}, tp = {fmt(testset_score.tp)}, fp = {fmt(testset_score.fp)}, tn = {fmt(testset_score.tn)}, fn = {fmt(testset_score.fn)}, tpr = {fmt(testset_score.tpr)}, fpr = {fmt(testset_score.fpr)}\n"
                 + "Heldoutset\n"
-                + f"Heldout total = {fmt(len(held_idxs_))}, positive = {fmt( heldout_score.p )}, negative = {fmt( heldout_score.n )}, tp = {fmt(heldout_score.tp)}, fp = {fmt(heldout_score.fp)}, tn = {fmt(heldout_score.tn)}, fn = {fmt(heldout_score.fn)}, tpr = {fmt(heldout_score.tpr)}, fpr = {fmt(heldout_score.fpr)}\n"
+                + f"Heldout total = {fmt(len(held_idxs_))}, positive = {fmt( heldout_score.p )}, negative = {fmt( heldout_score.n )}, true = {fmt(heldout_score.t)}, false = {fmt(heldout_score.f)},tp = {fmt(heldout_score.tp)}, fp = {fmt(heldout_score.fp)}, tn = {fmt(heldout_score.tn)}, fn = {fmt(heldout_score.fn)}, tpr = {fmt(heldout_score.tpr)}, fpr = {fmt(heldout_score.fpr)}\n"
             )
 
 
