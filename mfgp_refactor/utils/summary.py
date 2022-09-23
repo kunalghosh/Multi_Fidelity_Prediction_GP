@@ -228,7 +228,7 @@ def main(idxs_within_energy, working_dir):
                     None,
                     None,
                 )
-            testset_score = ClassificationScore(tp, fp, tn, fn, tpr, fpr, p, n)
+            testset_score = ClassificationScore(tp, tn, fp, fn, t, f, p, n, tpr, fpr)
             assert testset_score_ == testset_score, "Testset scores must match"
 
             # ----------------------------------------------------------------------
