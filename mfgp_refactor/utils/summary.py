@@ -5,7 +5,6 @@ import click
 import numpy as np
 import glob
 
-
 class bcolors:
     HEADER = "\033[95m"
     OKBLUE = "\033[94m"
@@ -16,7 +15,6 @@ class bcolors:
     ENDC = "\033[0m"
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
-
 
 ClassificationScore = namedtuple(
     "ClassificationScore", "tp tn fp fn t f p n tpr fpr".split()
@@ -153,6 +151,7 @@ def get_classification_metrics(true_homos, predicted_homos, range_low):
         tp, tn, fp, fn, t, f, p, n = get_true_positive_false_negative(
             true_homos, predicted_homos, range_low
         )
+        print(f"{bcolors.WARNING} tp {tp} fn {fn} tp + fn {tp + fn} tp / (tp + fn) {tp/ (tp + fn)}{bcolors.ENDC}")
         tpr = tp / (tp + fn)  # Precision
         fpr = fp / (fp + tn)  # Recall
     except Exception as e:
@@ -220,6 +219,7 @@ def main(idxs_within_energy, working_dir):
                 num_above_range < max_num_above_range
             ), f"The number above {config.range_low} cannot be above the {max_num_above_range} calculated from all the homo values"
 
+            assert len(homo_vals[test_idxs_]) == len(testset_predicted_homos), "Number of tests homos and predicted homos must match" # They are the same, assert not triggered
             testset_score = get_classification_metrics(
                 homo_vals[test_idxs_], testset_predicted_homos, range_low
             )
@@ -228,6 +228,7 @@ def main(idxs_within_energy, working_dir):
             # heldoutset classification score
             # -----------------------------------------------------------------------
             heldout_predicted_homos = get_heldoutset_predicted_homos(working_dir, idx)
+            assert len(homo_vals[held_idxs_]) == len(heldout_predicted_homos), "Number of tests homos and predicted homos must match" # They are the same assert not triggered
             heldout_score = get_classification_metrics(
                 homo_vals[held_idxs_], heldout_predicted_homos, range_low
             )
