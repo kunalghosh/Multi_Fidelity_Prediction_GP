@@ -5,6 +5,19 @@ import click
 import numpy as np
 import glob
 
+
+class bcolors:
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKCYAN = "\033[96m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
+
+
 ClassificationScore = namedtuple(
     "ClassificationScore", "tp tn fp fn t f p n tpr fpr".split()
 )
@@ -58,9 +71,15 @@ def get_true_positive_false_negative(homo_vals, predicted_vals, range_low):
     negative = np.invert(positive)
 
     true_positive = np.sum(np.logical_and(true, positive))
-    true_negative = np.sum(np.logical_and(true, negative))
-    false_positive = np.sum(np.logical_and(false, positive))
-    false_negative = np.sum(np.logical_and(false, negative))
+    true_negative = np.sum(
+        np.logical_and(false, negative)
+    )  # predicted to be negative AND actually is negative
+    false_positive = np.sum(
+        np.logical_and(true, negative)
+    )  # predicted to be positive AND actually negative
+    false_negative = np.sum(
+        np.logical_and(false, positive)
+    )  # predicted to be negative AND actually positive
 
     return (
         true_positive,
