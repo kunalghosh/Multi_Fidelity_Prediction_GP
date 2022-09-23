@@ -124,11 +124,7 @@ def get_mae(test_homos, predicted_homos, range_low):
     else:
         error_overall = np.abs(test_homos - predicted_homos)
         mask_test_homos_in_range = test_homos > range_low  # mask of test_homos in range
-        # print(test_homos[mask_test_homos_in_range])
-        # print(error_overall)
-        # print(mask_test_homos_in_range)
         error_in_range = error_overall[mask_test_homos_in_range]
-        # print(error_in_range)
         mae, mae_in_range = np.mean(error_overall), np.mean(error_in_range)
     return mae, mae_in_range
 
@@ -190,7 +186,9 @@ def main(idxs_within_energy, working_dir):
             test_idxs_ = np.load(file)["test_idxs"]
             held_idxs_ = np.load(file)["remaining_idxs"]
 
+            # ---------------------------------------------------------------------
             # Testset classification score
+            # ---------------------------------------------------------------------
             testset_predicted_homos = get_testset_predicted_homos(working_dir, idx)
             if testset_predicted_homos is None:
                 mae, mae_in_range = None, None
