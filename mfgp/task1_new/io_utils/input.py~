@@ -1,0 +1,85 @@
+import numpy as np
+
+class Input:
+
+    def str_to_bool(self,s):
+        if s == 'True':
+            return True
+        elif s == 'False':
+            return False
+        else:
+            raise ValueError        
+
+    def set_para(self, keyword, default, type):
+        if keyword in self.set_keywds.keys():
+            if type == str:
+                print(self.set_keywds[keyword])
+                val = str(self.set_keywds[keyword])
+            elif type == int:
+                print(self.set_keywds[keyword])
+                val = int(self.set_keywds[keyword])
+            elif type == float:
+                print(self.set_keywds[keyword])
+                val = float(self.set_keywds[keyword])
+            elif type == bool:
+                print(self.set_keywds[keyword])
+                val = self.str_to_bool(self.set_keywds[keyword])  
+            del self.set_keywds[keyword]
+            return val
+        else:
+            return default
+
+    def readfile(self):
+        self.set_keywds = {} 
+        with open(self.inputfile) as ipf:
+            for line in ipf:
+                line = line.split('#', maxsplit=1)[0]
+                line = line.replace('\n', '').split(maxsplit=1)
+                if len(line) > 0:
+                    self.set_keywds[line[0]] = line[1]
+                    
+    def __init__(self, inputfile):
+
+        self.inputfile = inputfile
+        filepath = self.inputfile
+
+        self.readfile()
+        print(self.set_keywds)
+        print(self.set_keywds['fn_name'])  
+        #-- input_data
+        f = open(filepath)
+        input_data = f.read()
+        f.close()
+        input_data_split = input_data.split('\n')
+
+        self.fn_name = self.set_para('fn_name', 'none', str )
+        self.out_name = self.set_para('out_name', 'test', str )
+        self.num_itr = self.set_para('num_itr', 0, int )
+        self.K_high = self.set_para('K_high', 0, float )
+        self.dataset = self.set_para('dataset', 'AA', str )
+        self.dataset_size = self.set_para('dataset_size', 10000, int )
+        self.test_set_size = self.set_para('test_set_size', 10000, int )
+        self.rnd_size = self.set_para('rnd_size', 1.0, float )
+        self.mbtr_red = self.set_para('mbtr_red', 'False', bool )
+        self.preprocess = self.set_para('preprocess', 'none', str )
+        self.save_load_flag = self.set_para('save_load_flag', 'save', str)
+        self.save_load_split_flag = self.set_para('save_load_split_flag', 'True' , bool )
+        self.length = self.set_para('length', 700 , float )
+        self.const = self.set_para('const', 13 , float )
+        self.bound = self.set_para('bound', 1e2 , float )
+        self.n_opt = self.set_para('n_opt', 0 , int )
+        self.kernel_type = self.set_para('kernel_type', 'constRBF' , str )
+        self.restart_flag = self.set_para('restart_flag', 'False' , bool )
+        
+        self.pre_idxs = np.empty(int(self.num_itr+1),dtype = int)
+
+        for i in range(int(self.num_itr+1)):
+            self.pre_idxs[i] = self.set_para('pre_idxs_' + str(i), '1000' , int )
+            
+        #-- path
+        self.mbtr_path = self.set_para('mbtr_path', '' , str )
+        self.json_path = self.set_para('json_path', '' , str )
+        self.loadidxs_path = self.set_para('loadidxs_path', '' , str )
+        self.loadsplitidxs_path = self.set_para('loadsplitidxs_path', '' , str )        
+
+    
