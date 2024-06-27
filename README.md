@@ -17,6 +17,7 @@ The datasets used in the publication can be found in the links below:
 
 ### Instructions 
 To run the code, you need to specify the configuration in a config file (c.f. [example](https://github.com/kunalghosh/Multi_Fidelity_Prediction_GP/blob/testing_runs/mfgp/task1_new/puhti_runs/AA_A_1k/run1/input.dat)). Remember to modify the `mbtr_path` and `json_path` to the appropriate paths with the MBTR vectors and HOMO energy values of the training dataset.
+
 Invoking `__main__.py` ([link](https://github.com/kunalghosh/Multi_Fidelity_Prediction_GP/blob/testing_runs/mfgp/task1_new/__main__.py)) with the config file will execute the specified active learning setup.
 All the output data and log files are saved in the working directory.
 
