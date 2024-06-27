@@ -1,5 +1,1 @@
-Author : Shingo Teranishi (shingoteranishi@gmail.com)
-Python package dependencies
-Usage instructions
-
-Test commit
+Author : Kunal Ghosh (kunal.t2@gmail.com) and Shingo Teranishi (shingoteranishi@gmail.com)
