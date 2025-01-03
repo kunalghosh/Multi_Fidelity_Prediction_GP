@@ -1,0 +1,31 @@
+#aa
+fn_name                 none
+out_name                none2
+num_itr                 4
+K_high                  100
+dataset                 AA
+dataset_size            44004
+test_set_size           10000
+rnd_size                2.0
+mbtr_red                True
+preprcess               none
+save_load_flag          save
+save_load_split_flag    False
+length                  700
+const                   20
+bound                   1e2
+n_opt                   0
+kernel_type             constRBF
+restart_flag            False
+pre_idxs_0              1000
+pre_idxs_1              1000
+pre_idxs_2              2000
+pre_idxs_3              4000
+pre_idxs_4              8000
+
+#path
+mbtr_path               ../AA_data/mbtr_k2.npz
+json_path               ../AA_data/HOMO.txt
+loadidxs_path           ../10K_dataset_load_high/10Kloadhigh2_0_idxs.npz
+loadsplitidxs_path      ../10K_dataset_load_high/10Kdataset_dataset_split_idxs.npz
+#a

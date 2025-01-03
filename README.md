@@ -1,0 +1,46 @@
+## Active Learning of Molecular Data for Task-Specific Objectives
+
+### Python Requirements
+latest versions of the following packages:
+* NumPy
+* Pandas
+* Matplotlib
+* SciPy
+* SKLearn
+
+### Downloading the data
+Before running the script, ensure you download the relevant dataset and save it in a directory titled `data` with one subdirectory for each `dataset`.
+The datasets used in the publication can be found in the links below:
+* AA : https://doi.org/10.5281/zenodo.3967308.
+* OE62 : https://doi.org/10.5281/zenodo.4035923.
+* QM9 : https://doi.org/10.5281/zenodo.4035918.
+
+### Instructions 
+To run the code, you need to specify the configuration in a config file (c.f. [example](https://github.com/kunalghosh/Multi_Fidelity_Prediction_GP/blob/testing_runs/mfgp/task1_new/puhti_runs/AA_A_1k/run1/input.dat)). Remember to modify the `mbtr_path` and `json_path` to the appropriate paths with the MBTR vectors and HOMO energy values of the training dataset.
+
+Invoking `__main__.py` ([link](https://github.com/kunalghosh/Multi_Fidelity_Prediction_GP/blob/testing_runs/mfgp/task1_new/__main__.py)) with the config file will execute the specified active learning setup.
+All the output data and log files are saved in the working directory.
+
+To run multiple runs of an active learning loop, please use the cookie-cutter template defined [here](https://github.com/kunalghosh/ActiveLearning_run_dir_cookiecutter/tree/master). The template will generate the folder structure and relevant config files.
+
+### Cite Us
+
+https://doi.org/10.1063/5.0229834
+```
+@article{ghosh_etal_2025,
+    author = {Ghosh, Kunal and Todorović, Milica and Vehtari, Aki and Rinke, Patrick},
+    title = {Active learning of molecular data for task-specific objectives},
+    journal = {The Journal of Chemical Physics},
+    volume = {162},
+    number = {1},
+    pages = {014103},
+    year = {2025},
+    month = {01},
+    issn = {0021-9606},
+    doi = {10.1063/5.0229834},
+    url = {https://doi.org/10.1063/5.0229834},
+    eprint = {https://pubs.aip.org/aip/jcp/article-pdf/doi/10.1063/5.0229834/20327578/014103\_1\_5.0229834.pdf},
+}
+```
+
+
