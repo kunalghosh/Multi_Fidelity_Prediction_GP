@@ -22,3 +22,25 @@ Invoking `__main__.py` ([link](https://github.com/kunalghosh/Multi_Fidelity_Pred
 All the output data and log files are saved in the working directory.
 
 To run multiple runs of an active learning loop, please use the cookie-cutter template defined [here](https://github.com/kunalghosh/ActiveLearning_run_dir_cookiecutter/tree/master). The template will generate the folder structure and relevant config files.
+
+### Cite Us
+
+https://doi.org/10.1063/5.0229834
+
+@article{ghosh_etal_2025,
+    author = {Ghosh, Kunal and Todorović, Milica and Vehtari, Aki and Rinke, Patrick},
+    title = {Active learning of molecular data for task-specific objectives},
+    journal = {The Journal of Chemical Physics},
+    volume = {162},
+    number = {1},
+    pages = {014103},
+    year = {2025},
+    month = {01},
+    issn = {0021-9606},
+    doi = {10.1063/5.0229834},
+    url = {https://doi.org/10.1063/5.0229834},
+    eprint = {https://pubs.aip.org/aip/jcp/article-pdf/doi/10.1063/5.0229834/20327578/014103\_1\_5.0229834.pdf},
+}
+
+
+
