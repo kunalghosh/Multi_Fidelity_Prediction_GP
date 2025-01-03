@@ -26,7 +26,7 @@ To run multiple runs of an active learning loop, please use the cookie-cutter te
 ### Cite Us
 
 https://doi.org/10.1063/5.0229834
-
+```
 @article{ghosh_etal_2025,
     author = {Ghosh, Kunal and Todorović, Milica and Vehtari, Aki and Rinke, Patrick},
     title = {Active learning of molecular data for task-specific objectives},
@@ -41,6 +41,6 @@ https://doi.org/10.1063/5.0229834
     url = {https://doi.org/10.1063/5.0229834},
     eprint = {https://pubs.aip.org/aip/jcp/article-pdf/doi/10.1063/5.0229834/20327578/014103\_1\_5.0229834.pdf},
 }
-
+```
 
 
